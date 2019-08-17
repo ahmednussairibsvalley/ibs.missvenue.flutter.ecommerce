@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "441942475368",
+    "firebase_url": "https://miss-venue.firebaseio.com",
+    "project_id": "miss-venue",
+    "storage_bucket": "miss-venue.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441942475368:android:0adbbee5ff1de8cb",
+        "android_client_info": {
+          "package_name": "com.ibsvalley.missvenue"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441942475368-fhbflcqvl0ph1mjkcv85kp4d015qdd3i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOrDSi1aFEDYuneyAsQ7y8ymXa0L4xaHY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441942475368-fhbflcqvl0ph1mjkcv85kp4d015qdd3i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
