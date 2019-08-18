@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../globals.dart';
+import '../../utils.dart';
 
 class OffersScreen extends StatelessWidget {
   @override
@@ -30,10 +31,8 @@ class OffersScreen extends StatelessWidget {
           final String _title = Globals.controller.offers[index].title;
           final double _price = Globals.controller.offers[index].price;
           final String _imageUrl = Globals.controller.offers[index].imageUrl;
-          final int _color = Globals.controller.offers[index].color;
-          final String _size = Globals.controller.offers[index].size;
-          final double _discountPecentage = Globals.controller.offers[index].discountPecentage;
-          return OfferItem(_id, _title, _price, _imageUrl, _color, _size, _discountPecentage);
+          final double _sellingPrice = Globals.controller.offers[index].sellingPrice;
+          return OfferItem(_id, _title, _price, _imageUrl, _sellingPrice);
         }),
       ),
     );
@@ -46,13 +45,11 @@ class OfferItem extends StatefulWidget {
   final String _title;
   final double _price;
   final String _imageUrl;
-  final int _color;
-  final String _size;
-  final double _discountPecentage;
+  final double _sellingPrice;
 
-  OfferItem(this._id, this._title, this._price, this._imageUrl, this._color, this._size, this._discountPecentage);
+  OfferItem(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
   @override
-  _OfferItemState createState() => _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._color, this._size, this._discountPecentage);
+  _OfferItemState createState() => _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
 }
 
 class _OfferItemState extends State<OfferItem> {
@@ -61,16 +58,17 @@ class _OfferItemState extends State<OfferItem> {
   final String _title;
   final double _price;
   final String _imageUrl;
-  final int _color;
-  final String _size;
-  final double _discountPecentage;
+  final double _sellingPrice;
+
+  double _discountPercentage;
   bool _addedToWishlist = false;
 
-  _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._color, this._size, this._discountPecentage);
+  _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
 
   @override
   void initState() {
     super.initState();
+    _discountPercentage = 100 - ((_sellingPrice / _price) * 100);
     for(int i = 0; i < Globals.controller.customer.wishList.length ; i++){
       if(Globals.controller.customer.wishList.contains(Globals.controller.getProductById(_id))){
         _addedToWishlist = true;
@@ -93,9 +91,23 @@ class _OfferItemState extends State<OfferItem> {
                   onTap: (){
 
                   },
-                  child: Image.network(_imageUrl,
-                    width: 150,
-                    height: 100,
+                  child: FutureBuilder(
+                    future: isImageAvailable(_imageUrl),
+                      builder: (context, snapshot){
+                        if(snapshot.hasData){
+                          if(snapshot.data){
+                            return Image.network(_imageUrl,
+                              width: 90,
+                              height: 80,
+                            );
+                          } else {
+                            return Center(
+                              child: Text('No Image Available', textAlign: TextAlign.center,),
+                            );
+                          }
+                        }
+                        return CircularProgressIndicator();
+                      }
                   ),
                 ),
               ),
@@ -146,13 +158,13 @@ class _OfferItemState extends State<OfferItem> {
                 alignment: Alignment.topLeft,
                 child: Stack(
                   children: <Widget>[
-                    Image.asset('assets/offerbg.png', width: 55, height: 55, fit: BoxFit.cover,),
+                    Image.asset('assets/offerbg.png', width: 50, height: 50, fit: BoxFit.cover,),
                     Transform.rotate(
                       angle: 5.49779,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
-                          child: Text('$_discountPecentage%',
+                          child: Text('${_discountPercentage.toStringAsFixed(0)}%',
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -173,19 +185,13 @@ class _OfferItemState extends State<OfferItem> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: Text('${_price - (_price * (_discountPecentage / 100))} SR'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: Text('$_price SR',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          decoration: TextDecoration.lineThrough
-                      ),
+                  Text('$_sellingPrice SR'),
+                  Text('$_price SR',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough
                     ),
-                  )
+                  ),
                 ],
               ),
               GestureDetector(

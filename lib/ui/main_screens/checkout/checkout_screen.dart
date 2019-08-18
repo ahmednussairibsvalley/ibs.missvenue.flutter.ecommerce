@@ -687,13 +687,13 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                         final double _price = Globals.controller.customer.cart[index].product.price;
                         final int _quantity = Globals.controller.customer.cart[index].quantity;
                         final String _imageUrl = Globals.controller.customer.cart[index].product.imageUrl;
-                        final int _color = Globals.controller.customer.cart[index].product.color;
-                        final String _size = Globals.controller.customer.cart[index].product.size;
-                        final double _discountPercentage = Globals.controller.customer.cart[index].product.discountPecentage;
+//                        final int _color = Globals.controller.customer.cart[index].product.color;
+//                        final String _size = Globals.controller.customer.cart[index].product.size;
+                        final double _sellingPrice = Globals.controller.customer.cart[index].product.sellingPrice;
 
                         return CartItem(
                           id: _id, title: _title, price: _price, quantity: _quantity, imageUrl: _imageUrl,
-                          color: _color, size: _size, discountPercentage: _discountPercentage,
+                          sellingPrice: _sellingPrice,
                         );
                       }),
                     ),
@@ -864,18 +864,17 @@ class CartItem extends StatelessWidget {
   final double price;
   final String imageUrl;
   final int quantity;
-  final int color;
-  final double discountPercentage;
-  final String size;
+//  final int color;
+//  final String size;
+  final double sellingPrice;
+
 
   CartItem({this.id,
     this.title,
     this.price,
     this.imageUrl,
     this.quantity,
-    this.color,
-    this.size,
-    this.discountPercentage,
+    this.sellingPrice,
 
   }
       );
@@ -907,6 +906,7 @@ class CartItem extends StatelessWidget {
 
                                 Container(
                                   alignment: Alignment.centerLeft,
+                                  width: 150,
                                   child: Text('$title',
                                     style: TextStyle(
                                       fontSize: 15,
@@ -916,24 +916,24 @@ class CartItem extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text('Size: $size',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text('Color: ${Globals.controller.getColorName(color)}',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
+//                                    Padding(
+//                                      padding: const EdgeInsets.only(right: 8.0),
+//                                      child: Text('Size: $size',
+//                                        style: TextStyle(
+//                                          fontSize: 15,
+//                                          color: Colors.grey,
+//                                        ),
+//                                      ),
+//                                    ),
+//                                    Padding(
+//                                      padding: const EdgeInsets.all(8.0),
+//                                      child: Text('Color: ${Globals.controller.getColorName(color)}',
+//                                        style: TextStyle(
+//                                          fontSize: 15,
+//                                          color: Colors.grey,
+//                                        ),
+//                                      ),
+//                                    ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text('Qty: $quantity',
@@ -954,13 +954,13 @@ class CartItem extends StatelessWidget {
                     ),
                     Container(
                       alignment: Alignment.bottomCenter,
-                      child: discountPercentage < 100?
+                      child: sellingPrice < price?
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.all(4),
-                            child: Text('${(price - (price * (discountPercentage / 100))) * quantity} SR'),
+                            child: Text('${sellingPrice * quantity} SR'),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(4),

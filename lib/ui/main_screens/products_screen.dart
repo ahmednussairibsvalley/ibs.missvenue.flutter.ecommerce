@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../globals.dart';
+import '../../utils.dart';
 
 class ProductsScreen extends StatelessWidget {
+
+  final int sectorIndex;
+  final int categoryIndex;
+
+  ProductsScreen ({@required this.sectorIndex, @required this.categoryIndex,});
   @override
   Widget build(BuildContext context) {
 
@@ -18,15 +24,13 @@ class ProductsScreen extends StatelessWidget {
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
 
-        children: List.generate(Globals.controller.products.length, (index){
-          final int _id = Globals.controller.products[index].id;
-          final String _title = Globals.controller.products[index].title;
-          final double _price = Globals.controller.products[index].price;
-          final String _imageUrl = Globals.controller.products[index].imageUrl;
-          final int _color = Globals.controller.products[index].color;
-          final String _size = Globals.controller.products[index].size;
-          final double _discountPecentage = Globals.controller.products[index].discountPecentage;
-          return ProductItem(_id, _title, _price, _imageUrl, _color, _size, _discountPecentage);
+        children: List.generate(Globals.controller.sectors[sectorIndex].categories[categoryIndex].products.length, (index){
+          final int _id = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].id;
+          final String _title = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].title;
+          final double _price = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].price;
+          final String _imageUrl = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].imageUrl;
+          final double _sellingPrice = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].sellingPrice;
+          return ProductItem(_id, _title, _price, _imageUrl, _sellingPrice);
         }),
       ),
     );
@@ -41,13 +45,11 @@ class ProductItem extends StatefulWidget {
   final String _title;
   final double _price;
   final String _imageUrl;
-  final int _color;
-  final String _size;
-  final double _discountPecentage;
+  final double _sellingPrice;
 
-  ProductItem(this._id, this._title, this._price, this._imageUrl, this._color, this._size, this._discountPecentage);
+  ProductItem(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
   @override
-  _ProductItemState createState() => _ProductItemState(this._id, this._title, this._price, this._imageUrl, this._color, this._size, this._discountPecentage);
+  _ProductItemState createState() => _ProductItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
 }
 
 class _ProductItemState extends State<ProductItem> {
@@ -56,14 +58,12 @@ class _ProductItemState extends State<ProductItem> {
   final String _title;
   final double _price;
   final String _imageUrl;
-  final int _color;
-  final String _size;
-  final double _discountPecentage;
+  final double _sellingPrice;
 
   bool _addedToWishlist = false;
   bool _addedToCart = false;
 
-  _ProductItemState(this._id, this._title, this._price, this._imageUrl, this._color, this._size, this._discountPecentage);
+  _ProductItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
 
   @override
   void initState() {
@@ -97,9 +97,23 @@ class _ProductItemState extends State<ProductItem> {
                   onTap: (){
 
                   },
-                  child: Image.network(_imageUrl,
-                    width: 100,
-                    height: 80,
+                  child: FutureBuilder(
+                      builder: (context, snapshot){
+                        if(snapshot.hasData){
+                          if(snapshot.data){
+                            return Image.network(_imageUrl,
+                              width: 90,
+                              height: 80,
+                            );
+                          } else {
+                            return Center(
+                              child: Text('Product Image is not available', textAlign: TextAlign.center,),
+                            );
+                          }
+                        }
+                        return CircularProgressIndicator();
+                      },
+                    future: isImageAvailable(_imageUrl),
                   ),
                 ),
               ),
@@ -150,29 +164,23 @@ class _ProductItemState extends State<ProductItem> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(_title),
+            padding: const EdgeInsets.all(4.0),
+            child: Text(_title, maxLines: 1, overflow: TextOverflow.ellipsis,),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              _discountPecentage < 100?
+              _sellingPrice < _price?
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Text('${_price - (_price * (_discountPecentage / 100))} SR'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Text('$_price SR',
-                          style: TextStyle(
+                      Text('$_sellingPrice SR'),
+                      Text('$_price SR',
+                        style: TextStyle(
                             color: Colors.grey,
                             decoration: TextDecoration.lineThrough
-                          ),
                         ),
-                      )
+                      ),
                     ],
                   )
                   : Text('$_price SR'),

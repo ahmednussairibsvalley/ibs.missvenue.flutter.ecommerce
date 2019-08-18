@@ -5,15 +5,23 @@ class Product{
   String _imageUrl;
   int _color;
   String _size;
-  double _discountPecentage;
+  double _sellingPrice;
 
-  Product(this._id, this._title, this._imageUrl, this._price, this._color, this._size, this._discountPecentage);
+  Product(this._id, this._title, this._imageUrl, this._price, this._sellingPrice){
+    _color = 0;
+    _size = '';
+  }
 
   Product.fromJson(Map json){
     _id = json['id'];
     _title = json['Name'];
     _price = json['Price'];
-    _imageUrl = json['Images'][0];
+    List images = json['Images'];
+
+    images.length > 0 ? _imageUrl = json['Images'][0]: _imageUrl = null;
+    _sellingPrice = json['SellingPrice'];
+    _color = 0;
+    _size = '';
 
   }
 
@@ -54,10 +62,10 @@ class Product{
     _color = value;
   }
 
-  double get discountPecentage => _discountPecentage;
+  double get sellingPrice => _sellingPrice;
 
-  set discountPecentage(double value) {
-    _discountPecentage = value;
+  set sellingPrice(double value) {
+    _sellingPrice = value;
   }
 
 

@@ -198,6 +198,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   for(int i = 0; i < Globals.controller.sectors.length ; i ++){
                     var list = await getCategoriesList(Globals.controller.sectors[i].id);
                     Globals.controller.populateCategories(i, list);
+                    for(int j = 0; j < list.length ; j ++){
+                      var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
+                      Globals.controller.populateProducts(i, j, productsList);
+                    }
                   }
                   Globals.customerId = accepted['Customer']['Customer_Id'];
 //                  String fullName = accepted['Customer']['FullName'];
@@ -317,6 +321,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       for(int i = 0; i < Globals.controller.sectors.length ; i ++){
                         var list = await getCategoriesList(Globals.controller.sectors[i].id);
                         Globals.controller.populateCategories(i, list);
+                        for(int j = 0; j < list.length ; j ++){
+                          var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
+                          Globals.controller.populateProducts(i, j, productsList);
+                        }
                       }
                       Globals.controller.initCustomer(signedInWithFacebook['id'],
                           signedInWithFacebook['firstName'], signedInWithFacebook['lastName'],
@@ -358,6 +366,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       for(int i = 0; i < Globals.controller.sectors.length ; i ++){
                         var list = await getCategoriesList(Globals.controller.sectors[i].id);
                         Globals.controller.populateCategories(i, list);
+                        for(int j = 0; j < list.length ; j ++){
+                          var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
+                          Globals.controller.populateProducts(i, j, productsList);
+                        }
                       }
 
                       Globals.controller.initCustomer(singedInWithGoogle['id'],

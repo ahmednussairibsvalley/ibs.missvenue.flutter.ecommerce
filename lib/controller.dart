@@ -12,9 +12,6 @@ class Controller{
   /// The Customer object.
   Customer _customer;
 
-  /// List of Product objects.
-  List<Product> _products;
-
   ///List of Product objects which
   ///represents the products which
   ///have offers.
@@ -45,7 +42,6 @@ class Controller{
   }
 
   Controller(){
-    _products = List();
     _offers = List();
     _sectors = List();
   }
@@ -137,23 +133,8 @@ class Controller{
     }
   }
 
-  ///Gets the products list.
-  List<Product> get products => _products;
-
   ///Gets the Customer object.
   Customer get customer => _customer;
-
-  ///Gets a product by its ID.
-  Product getProductById(int id){
-    Product _product;
-    for(int i = 0; i < _products.length ; i++){
-      if(_products[i].id == id){
-        _product = _products[i];
-        break;
-      }
-    }
-    return _product;
-  }
 
   ///Gets an address by its ID.
   Address getAddressById(int id){
@@ -177,6 +158,22 @@ class Controller{
       }
     }
     return order;
+  }
+
+  ///Gets a product by its ID.
+  Product getProductById(int id){
+    Product _product;
+    for(int i = 0; i < sectors.length ; i++){
+      for(int j = 0; j < sectors[i].categories.length ; j++){
+        for(int a = 0; a < sectors[i].categories[j].products.length; a ++){
+          if(sectors[i].categories[j].products[a].id == id){
+            _product = sectors[i].categories[j].products[a];
+            break;
+          }
+        }
+      }
+    }
+    return _product;
   }
 
   ///Gets an item from the customer's
@@ -244,9 +241,8 @@ class Controller{
 
     for(int i = 0; i < _customer.cart.length ; i ++){
       //print('Item price: ${_customer.cart[i].product.price}');
-      if(_customer.cart[i].product.discountPecentage < 100){
-        double discount = _customer.cart[i].product.price * (_customer.cart[i].product.discountPecentage / 100)  ;
-        sum = sum +  ((_customer.cart[i].product.price - discount) * _customer.cart[i].quantity);
+      if(_customer.cart[i].product.sellingPrice < _customer.cart[i].product.price){
+        sum = sum +  (_customer.cart[i].product.sellingPrice * _customer.cart[i].quantity);
       } else {
         sum = sum +  (_customer.cart[i].product.price * _customer.cart[i].quantity);
       }
@@ -264,6 +260,16 @@ class Controller{
   populateCategories(int sectorIndex, List list){
     for(int i = 0; i < list.length ; i++){
       _sectors[sectorIndex].categories.add(Category.fromJson(list[i]));
+    }
+  }
+
+  populateProducts(int sectorIndex, int categoryIndex, List list){
+    for(int i = 0; i < list.length ; i++){
+      Product product = Product.fromJson(list[i]);
+      _sectors[sectorIndex].categories[categoryIndex].products.add(product);
+      if(product.sellingPrice <  product.price){
+        _offers.add(product);
+      }
     }
   }
 
@@ -295,29 +301,29 @@ class Controller{
     _customer.orders.add(orders[1]);
     _customer.orders.add(orders[2]);
 
-    final products = [
-      Product(1, 'White Dress', 'https://i.ebayimg.com/thumbs/images/g/euMAAOSwwXRcejsR/s-l225.jpg',100 , 0xffffffff, 'L', 100),
-      Product(2, 'White Dress', 'https://i.ebayimg.com/thumbs/images/g/euMAAOSwwXRcejsR/s-l225.jpg',100 , 0xffffffff, 'L', 25),
-      Product(3, 'Black Clothes', 'https://images-na.ssl-images-amazon.com/images/I/81OVTBVzAYL._UX569_.jpg', 70, 0xfffef200, 'XL', 100),
-      Product(4, 'Sky Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/61iRHYXKCBL._UX679_.jpg', 80, 0xff66d3f4, 'M', 100),
-      Product(5, 'Sky Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/61iRHYXKCBL._UX679_.jpg', 80, 0xff66d3f4, 'M', 10),
-      Product(6, 'Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/81%2BsN7uMPHL._UX385_.jpg', 90, 0xff0076fe, 'XXL', 100),
-      Product(7, 'Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/81%2BsN7uMPHL._UX385_.jpg', 90, 0xff0076fe, 'XXL', 15),
-    ];
-
-    _products.add(products[0]);
-    _products.add(products[1]);
-    _products.add(products[2]);
-    _products.add(products[3]);
-    _products.add(products[4]);
-    _products.add(products[5]);
-    _products.add(products[6]);
-
-    for(int i = 0; i < _products.length; i++){
-      if(_products[i].discountPecentage < 100){
-        _offers.add(_products[i]);
-      }
-    }
+//    final products = [
+//      Product(1, 'White Dress', 'https://i.ebayimg.com/thumbs/images/g/euMAAOSwwXRcejsR/s-l225.jpg',100 , 0xffffffff, 'L', 100),
+//      Product(2, 'White Dress', 'https://i.ebayimg.com/thumbs/images/g/euMAAOSwwXRcejsR/s-l225.jpg',100 , 0xffffffff, 'L', 25),
+//      Product(3, 'Black Clothes', 'https://images-na.ssl-images-amazon.com/images/I/81OVTBVzAYL._UX569_.jpg', 70, 0xfffef200, 'XL', 100),
+//      Product(4, 'Sky Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/61iRHYXKCBL._UX679_.jpg', 80, 0xff66d3f4, 'M', 100),
+//      Product(5, 'Sky Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/61iRHYXKCBL._UX679_.jpg', 80, 0xff66d3f4, 'M', 10),
+//      Product(6, 'Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/81%2BsN7uMPHL._UX385_.jpg', 90, 0xff0076fe, 'XXL', 100),
+//      Product(7, 'Blue Clothes', 'https://images-na.ssl-images-amazon.com/images/I/81%2BsN7uMPHL._UX385_.jpg', 90, 0xff0076fe, 'XXL', 15),
+//    ];
+//
+//    _products.add(products[0]);
+//    _products.add(products[1]);
+//    _products.add(products[2]);
+//    _products.add(products[3]);
+//    _products.add(products[4]);
+//    _products.add(products[5]);
+//    _products.add(products[6]);
+//
+//    for(int i = 0; i < _products.length; i++){
+//      if(_products[i].discountPecentage < 100){
+//        _offers.add(_products[i]);
+//      }
+//    }
   }
 
 

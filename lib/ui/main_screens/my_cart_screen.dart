@@ -41,9 +41,9 @@ class _MyCartScreenState extends State<MyCartScreen> {
           final double _price = _list[index].product.price;
           final int _quantity = _list[index].quantity;
           final String _imageUrl = _list[index].product.imageUrl;
-          final int _color = _list[index].product.color;
-          final String _size = _list[index].product.size;
-          final double _discountPecentage = _list[index].product.discountPecentage;
+//          final int _color = _list[index].product.color;
+//          final String _size = _list[index].product.size;
+          final double _sellingPrice = _list[index].product.sellingPrice;
 
           int _quantityValue = _quantity;
           return Column(
@@ -56,9 +56,9 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     title: _title,
                     price:  _price,
                     imageUrl: _imageUrl,
-                    color: _color,
-                    size: _size,
-                    discountPercentage: _discountPecentage,
+//                    color: _color,
+//                    size: _size,
+                    sellingPrice: _sellingPrice,
                     onDelete: (){
                       setState(() {
                         Globals.controller.customer.cart.removeAt(index);
@@ -124,13 +124,13 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     bottom: 0.0,
                     child: Container(
                       alignment: Alignment.bottomCenter,
-                      child: _discountPecentage < 100?
+                      child: _sellingPrice < _price?
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.all(4),
-                            child: Text('${(_price - (_price * (_discountPecentage / 100))) * _quantityValue} SR'),
+                            child: Text('${_sellingPrice * _quantityValue} SR'),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(4),
@@ -158,7 +158,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
         padding: const EdgeInsets.all(8.0),
         child: ListTile(
           onTap: (){
-            //debugPrint('The price is ${Globals.controller.calculateTotalPrice()}');
+            debugPrint('The price is ${Globals.controller.calculateTotalPrice()}');
             if(Globals.controller.customer.cart.length > 0){
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => CheckoutScreen()));
             }
@@ -205,9 +205,10 @@ class CartItem extends StatelessWidget {
   final double price;
   final String imageUrl;
   final int quantity;
-  final int color;
-  final double discountPercentage;
-  final String size;
+
+  final double sellingPrice;
+//  final int color;
+//  final String size;
   final VoidCallback onDelete;
 
   CartItem({this.id,
@@ -215,9 +216,9 @@ class CartItem extends StatelessWidget {
         this.price,
         this.imageUrl,
         this.quantity,
-        this.color,
-        this.size,
-        this.discountPercentage,
+//        this.color,
+//        this.size,
+        this.sellingPrice,
 
         this.onDelete,
 
@@ -251,35 +252,36 @@ class CartItem extends StatelessWidget {
 
                                 Container(
                                   alignment: Alignment.centerLeft,
+                                  width: 150,
                                   child: Text('$title',
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text('Size: $size',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text('Color: ${Globals.controller.getColorName(color)}',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+//                                Row(
+//                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                  children: <Widget>[
+//                                    Padding(
+//                                      padding: const EdgeInsets.only(right: 8.0),
+//                                      child: Text('Size: $size',
+//                                        style: TextStyle(
+//                                          fontSize: 15,
+//                                          color: Colors.grey,
+//                                        ),
+//                                      ),
+//                                    ),
+//                                    Padding(
+//                                      padding: const EdgeInsets.all(8.0),
+//                                      child: Text('Color: ${Globals.controller.getColorName(color)}',
+//                                        style: TextStyle(
+//                                          fontSize: 15,
+//                                          color: Colors.grey,
+//                                        ),
+//                                      ),
+//                                    ),
+//                                  ],
+//                                ),
                               ],
                             ),
                           ],

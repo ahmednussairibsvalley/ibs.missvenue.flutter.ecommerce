@@ -15,7 +15,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _notificationNumber = 89;
   int _currentTabIndex = 0;
   int _pageIndex = 0;
-  Map sectorsMap = Map();
+  int _currentSectorIndex = 0;
+  int _currentCategoryIndex = 0;
+  Map<int, List<int>> sectorsMap = Map();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -27,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return _pageIndex == 1
-        ? _products()
+        ? _products(_currentSectorIndex, _currentCategoryIndex)
         : Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.white,
@@ -98,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
   }
 
-  Widget _products() {
+  Widget _products(int sectorIndex, int categoryIndex) {
     return Scaffold(
       backgroundColor: Color(0xfff1f3f2),
       key: _scaffoldKey,
@@ -136,7 +138,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
       ),
-      body: ProductsScreen(),
+      body: ProductsScreen(
+        sectorIndex: sectorIndex,
+        categoryIndex: categoryIndex,
+      ),
     );
   }
 
@@ -173,7 +178,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           TabView(
             sectorIndex: i,
             imageUrl: sectorsList[i].imageUrl,
-            onTap: (){
+            onTap: (categoryIndex){
+              _currentSectorIndex = i;
+              _currentCategoryIndex = categoryIndex;
               setState(() {
                 _pageIndex = 1;
               });
@@ -189,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 class TabView extends StatefulWidget {
   final int sectorIndex;
   final String imageUrl;
-  final void Function() onTap;
+  final void Function(int) onTap;
 
   TabView({@required this.sectorIndex, @required this.imageUrl, @required this.onTap});
   @override
@@ -199,7 +206,7 @@ class TabView extends StatefulWidget {
 class _TabViewState extends State<TabView> {
   final int sectorIndex;
   final String imageUrl;
-  final void Function() onTap;
+  final void Function(int) onTap;
   _TabViewState({@required this.sectorIndex, @required this.imageUrl, @required this.onTap});
   @override
   Widget build(BuildContext context) {
@@ -241,7 +248,7 @@ class _TabViewState extends State<TabView> {
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
           delegate: SliverChildListDelegate(List.generate(Globals.controller.sectors[sectorIndex].categories.length, (index) {
             return _tabViewItem(Globals.controller.sectors[sectorIndex].categories[index].name,
-                Globals.controller.sectors[sectorIndex].categories[index].imageUrl);
+                Globals.controller.sectors[sectorIndex].categories[index].imageUrl, index);
           })),
         ),
       ],
@@ -249,9 +256,9 @@ class _TabViewState extends State<TabView> {
     );
   }
 
-  Widget _tabViewItem(String title, String imageUrl) {
+  Widget _tabViewItem(String title, String imageUrl, int categoryIndex) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => onTap(categoryIndex),
       child: Container(
         padding: EdgeInsets.all(5),
         child: Stack(

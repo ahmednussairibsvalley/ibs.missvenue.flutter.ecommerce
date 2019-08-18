@@ -57,8 +57,8 @@ class _WishlistScreenState extends State<WishlistScreen>{
                   final String _title = _list[index].title;
                   final double _price = _list[index].price;
                   final String _imageUrl = _list[index].imageUrl;
-                  final double _discountPecentage = _list[index].discountPecentage;
-                  return WishListItem(_id, _title, _price, _imageUrl, _discountPecentage, onDelete: (){
+                  final double _sellingPrice = _list[index].sellingPrice;
+                  return WishListItem(_id, _title, _price, _imageUrl, _sellingPrice, onDelete: (){
                     setState(() {
                       Globals.controller.customer.wishList.removeAt(index);
                       _list = Globals.controller.customer.wishList;
@@ -82,10 +82,10 @@ class WishListItem extends StatelessWidget {
   final String _title;
   final double _price;
   final String _imageUrl;
-  final double _discountPecentage;
+  final double _sellingPrice;
   final VoidCallback onDelete;
 
-  WishListItem(this._id, this._title, this._price, this._imageUrl, this._discountPecentage,{this.onDelete});
+  WishListItem(this._id, this._title, this._price, this._imageUrl, this._sellingPrice,{this.onDelete});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -104,44 +104,44 @@ class WishListItem extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: (){
-                  if(!Globals.controller.containsCartItem(_id)) {
-                    Globals.controller.addToCart(
-                        Globals.controller.getProductById(_id), 1);
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        duration: Duration(seconds: 4),
-                        backgroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            side: BorderSide(
-                              style: BorderStyle.none,
-                              width: 1,
-                            )
-                        ),
-                        content: Text('The item is added to the cart',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  }else{
-                    //debugPrint('Added Already');
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        duration: Duration(seconds: 4),
-                        backgroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            side: BorderSide(
-                              style: BorderStyle.none,
-                              width: 1,
-                            )
-                        ),
-                        content: Text('The item has been already added',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  }
+//                  if(!Globals.controller.containsCartItem(_id)) {
+//                    Globals.controller.addToCart(
+//                        Globals.controller.getProductById(_id), 1);
+//                    Scaffold.of(context).showSnackBar(
+//                      SnackBar(
+//                        duration: Duration(seconds: 4),
+//                        backgroundColor: Colors.black87,
+//                        shape: RoundedRectangleBorder(
+//                            borderRadius: BorderRadius.circular(50),
+//                            side: BorderSide(
+//                              style: BorderStyle.none,
+//                              width: 1,
+//                            )
+//                        ),
+//                        content: Text('The item is added to the cart',
+//                          textAlign: TextAlign.center,
+//                        ),
+//                      ),
+//                    );
+//                  }else{
+//                    //debugPrint('Added Already');
+//                    Scaffold.of(context).showSnackBar(
+//                      SnackBar(
+//                        duration: Duration(seconds: 4),
+//                        backgroundColor: Colors.black87,
+//                        shape: RoundedRectangleBorder(
+//                            borderRadius: BorderRadius.circular(50),
+//                            side: BorderSide(
+//                              style: BorderStyle.none,
+//                              width: 1,
+//                            )
+//                        ),
+//                        content: Text('The item has been already added',
+//                          textAlign: TextAlign.center,
+//                        ),
+//                      ),
+//                    );
+//                  }
                 },
                 child: Container(
                     alignment: Alignment.topRight,
@@ -152,28 +152,22 @@ class WishListItem extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(_title),
+            child: Text(_title, maxLines: 2, overflow: TextOverflow.ellipsis,),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              _discountPecentage < 100?
+              _sellingPrice < _price?
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text('${_price * (_discountPecentage / 100)} SR'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text('$_price SR',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          decoration: TextDecoration.lineThrough
-                      ),
+                  Text('$_sellingPrice SR'),
+                  Text('$_price SR',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough
                     ),
-                  )
+                  ),
                 ],
               )
                   : Text('$_price SR'),

@@ -194,7 +194,25 @@ Future<List> getCategoriesList(int sectorId) async{
   return null;
 }
 
+Future<List> getProductsList(int categoryId) async {
+  String apiUrl = '$_baseUrl/api/Category/details?category_id=$categoryId';
+
+  var response = await http.get(apiUrl);
+
+  if(response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202){
+
+    var result = json.decode(response.body);
+    return result['products'];
+  }
+  return null;
+}
+
 Future<bool> isImageAvailable(String imageUrl) async{
+  if(imageUrl.isEmpty || imageUrl == null){
+    return false;
+  }
   var response = await http.get(imageUrl);
 
   if(response.statusCode == 200){
