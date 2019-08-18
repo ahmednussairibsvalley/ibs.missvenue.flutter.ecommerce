@@ -11,13 +11,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+
+  /// the main tabs.
   List<Tab> _tabs;
+
+  /// the number of notifications
   int _notificationNumber = 89;
+
+  /// current tab index
   int _currentTabIndex = 0;
+
+  /// current page index. 0 for the home page, 1 for the products page
   int _pageIndex = 0;
+
+
   int _currentSectorIndex = 0;
   int _currentCategoryIndex = 0;
-  Map<int, List<int>> sectorsMap = Map();
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -132,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
         centerTitle: true,
-        title: Text('Fashion',
+        title: Text(Globals.controller.sectors[sectorIndex].categories[categoryIndex].name,
           style: TextStyle(
             color: Colors.black87,
           ),
@@ -162,13 +172,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           title,
           style: TextStyle(
             color: Colors.black,
-            fontSize: 20,
+            fontSize: 15,
           ),
         ),
       ),
     ));
   }
 
+  ///Generates views for each tab.
   List<Widget> _generateTabViews(List sectorsList){
     List<Widget> widgetList = [];
     for(int i = 0; i < sectorsList.length ; i++){
@@ -192,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
 }
+
 
 class TabView extends StatefulWidget {
   final int sectorIndex;

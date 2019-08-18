@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../globals.dart';
 import '../../utils.dart';
+import 'product_details.dart';
 
 class ProductsScreen extends StatelessWidget {
 
@@ -95,7 +96,16 @@ class _ProductItemState extends State<ProductItem> {
               Center(
                 child: GestureDetector(
                   onTap: (){
-
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ProductDetails(
+                          id: _id,
+                          title:_title,
+                          price: _price,
+                          imageUrl: _imageUrl,
+                          sellingPrice: _sellingPrice,
+                        ),
+                      ),
+                    );
                   },
                   child: FutureBuilder(
                       builder: (context, snapshot){
@@ -111,7 +121,15 @@ class _ProductItemState extends State<ProductItem> {
                             );
                           }
                         }
-                        return CircularProgressIndicator();
+                        return Container(
+                          height: 100,
+                          width: 100,
+                          child: Column(
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                            ],
+                          ),
+                        );
                       },
                     future: isImageAvailable(_imageUrl),
                   ),
