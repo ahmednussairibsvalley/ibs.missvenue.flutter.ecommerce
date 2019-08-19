@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../utils.dart';
 
 /// Displays the product details.
@@ -70,6 +69,32 @@ class _ProductDetailsState extends State<ProductDetails> {
               },
               future: isImageAvailable(imageUrl),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '$title',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                ),
+              ),
+            ),
+            sellingPrice < price ?
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('$sellingPrice SR', textAlign: TextAlign.center,),
+                Text('$price SR',
+                  style: TextStyle(
+                      color: Colors.grey,
+                      decoration: TextDecoration.lineThrough
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            )
+                : Text('$price SR', textAlign: TextAlign.center,),
           ],
         ),
       ),
