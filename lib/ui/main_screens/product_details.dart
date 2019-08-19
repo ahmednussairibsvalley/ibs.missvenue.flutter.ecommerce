@@ -31,6 +31,17 @@ class _ProductDetailsState extends State<ProductDetails> {
     final _height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Icon(Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
         body: ListView(
           children: <Widget>[
             FutureBuilder(

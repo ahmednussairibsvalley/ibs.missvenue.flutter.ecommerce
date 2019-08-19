@@ -4,14 +4,15 @@ import 'drawer_widgets/drawer_view.dart';
 import 'products_screen.dart';
 import '../../utils.dart';
 
-
+///This class represents the first screen which
+///appears to the user or when the user presses
+///the (Home) tab.
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-
   /// the main tabs.
   List<Tab> _tabs;
 
@@ -24,16 +25,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   /// current page index. 0 for the home page, 1 for the products page
   int _pageIndex = 0;
 
-
   int _currentSectorIndex = 0;
   int _currentCategoryIndex = 0;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-   _tabs = _getTabs(Globals.controller.sectors);
+    _tabs = _getTabs(Globals.controller.sectors);
   }
 
   @override
@@ -110,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
   }
 
+  ///Returns the category screen which contains the products list.
   Widget _products(int sectorIndex, int categoryIndex) {
     return Scaffold(
       backgroundColor: Color(0xfff1f3f2),
@@ -142,19 +143,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
         centerTitle: true,
-        title: Text(Globals.controller.sectors[sectorIndex].categories[categoryIndex].name,
+        title: Text(
+          Globals
+              .controller.sectors[sectorIndex].categories[categoryIndex].name,
           style: TextStyle(
             color: Colors.black87,
           ),
         ),
       ),
-      body: ProductsScreen(
-        sectorIndex: sectorIndex,
-        categoryIndex: categoryIndex,
+      body: WillPopScope(
+          child: ProductsScreen(
+            sectorIndex: sectorIndex,
+            categoryIndex: categoryIndex,
+          ),
+          onWillPop: () {
+            setState(() {
+              _pageIndex = 0;
+            });
+            return null;
+          }
       ),
     );
   }
 
+  /// Returns the main tabs.
   List<Tab> _getTabs(List sectorsList) {
     List<Tab> _tabs = List();
     for (int i = 0; i < sectorsList.length; i++) {
@@ -163,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return _tabs;
   }
 
+  ///Returns the single tab.
   Tab _tab(String title) {
     return Tab(
         child: Container(
@@ -180,46 +193,47 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   ///Generates views for each tab.
-  List<Widget> _generateTabViews(List sectorsList){
+  List<Widget> _generateTabViews(List sectorsList) {
     List<Widget> widgetList = [];
-    for(int i = 0; i < sectorsList.length ; i++){
-
-
-      widgetList.add(
-          TabView(
-            sectorIndex: i,
-            imageUrl: sectorsList[i].imageUrl,
-            onTap: (categoryIndex){
-              _currentSectorIndex = i;
-              _currentCategoryIndex = categoryIndex;
-              setState(() {
-                _pageIndex = 1;
-              });
-            },
-          )
-      );
+    for (int i = 0; i < sectorsList.length; i++) {
+      widgetList.add(TabView(
+        sectorIndex: i,
+        imageUrl: sectorsList[i].imageUrl,
+        onTap: (categoryIndex) {
+          _currentSectorIndex = i;
+          _currentCategoryIndex = categoryIndex;
+          setState(() {
+            _pageIndex = 1;
+          });
+        },
+      ));
     }
     return widgetList;
   }
-
 }
 
-
+///The class represents how the tab view should look like.
 class TabView extends StatefulWidget {
   final int sectorIndex;
   final String imageUrl;
   final void Function(int) onTap;
 
-  TabView({@required this.sectorIndex, @required this.imageUrl, @required this.onTap});
+  TabView({@required this.sectorIndex,
+    @required this.imageUrl,
+    @required this.onTap});
   @override
-  _TabViewState createState() => _TabViewState(sectorIndex: sectorIndex, imageUrl: imageUrl, onTap: onTap);
+  _TabViewState createState() =>
+      _TabViewState(sectorIndex: sectorIndex, imageUrl: imageUrl, onTap: onTap);
 }
 
 class _TabViewState extends State<TabView> {
   final int sectorIndex;
   final String imageUrl;
   final void Function(int) onTap;
-  _TabViewState({@required this.sectorIndex, @required this.imageUrl, @required this.onTap});
+
+  _TabViewState({@required this.sectorIndex,
+    @required this.imageUrl,
+    @required this.onTap});
   @override
   Widget build(BuildContext context) {
     final _height = MediaQuery.of(context).size.height;
@@ -229,11 +243,17 @@ class _TabViewState extends State<TabView> {
           delegate: SliverChildListDelegate([
             FutureBuilder(
                 future: isImageAvailable(imageUrl),
-                builder: (context, snapshot){
-                  if(snapshot.hasData){
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
                     bool isAvailable = snapshot.data;
-                    if(isAvailable)
-                      return Image(image: NetworkImage(imageUrl,),fit: BoxFit.fill, height: _height / 4,);
+                    if (isAvailable)
+                      return Image(
+                        image: NetworkImage(
+                          imageUrl,
+                        ),
+                        fit: BoxFit.fill,
+                        height: _height / 4,
+                      );
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -258,13 +278,19 @@ class _TabViewState extends State<TabView> {
         SliverGrid(
           gridDelegate:
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-          delegate: SliverChildListDelegate(List.generate(Globals.controller.sectors[sectorIndex].categories.length, (index) {
-            return _tabViewItem(Globals.controller.sectors[sectorIndex].categories[index].name,
-                Globals.controller.sectors[sectorIndex].categories[index].imageUrl, index);
+          delegate: SliverChildListDelegate(List.generate(
+              Globals.controller.sectors[sectorIndex].categories.length,
+                  (index) {
+                return _tabViewItem(
+                    Globals.controller.sectors[sectorIndex].categories[index]
+                        .name,
+                    Globals
+                        .controller.sectors[sectorIndex].categories[index]
+                        .imageUrl,
+                    index);
           })),
         ),
       ],
-
     );
   }
 
@@ -278,26 +304,30 @@ class _TabViewState extends State<TabView> {
           children: <Widget>[
             FutureBuilder(
               future: isImageAvailable(imageUrl),
-              builder: (context, snapshot){
-                if(snapshot.hasData){
-                  if(snapshot.data){
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data) {
                     return Container(
                       decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.grey,
                           ),
                           borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          image: DecorationImage(image: NetworkImage(imageUrl))),
+                          image:
+                          DecorationImage(image: NetworkImage(imageUrl))),
                     );
                   } else {
                     return Container(
                       decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       ),
-                      child: Text('No Image available', textAlign: TextAlign.center,),
+                      child: Text(
+                        'No Image available',
+                        textAlign: TextAlign.center,
+                      ),
                     );
                   }
                 }
@@ -305,7 +335,7 @@ class _TabViewState extends State<TabView> {
                   children: <Widget>[
                     Container(
                       height: 50,
-                      width:  50,
+                      width: 50,
                       child: CircularProgressIndicator(),
                     )
                   ],
@@ -343,4 +373,3 @@ class _TabViewState extends State<TabView> {
     );
   }
 }
-

@@ -167,16 +167,20 @@ Future<Map> loginWithGoogle() async{
 Future<List> getSectorsList() async {
   String apiUrl = '$_baseUrl/api/Category/Sectors?count=100';
 
-  var response = await http.get(apiUrl);
+  try {
+    var response = await http.get(apiUrl);
 
-  if(response.statusCode == 200 ||
-      response.statusCode == 201 ||
-      response.statusCode == 202){
-
-    var result = json.decode(response.body);
-    return result;
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      var result = json.decode(response.body);
+      return result;
+    }
+    return null;
+  } catch (error) {
+    return null;
   }
-  return null;
+
 }
 
 Future<List> getCategoriesList(int sectorId) async{
@@ -184,29 +188,36 @@ Future<List> getCategoriesList(int sectorId) async{
 
   var response = await http.get(apiUrl);
 
-  if(response.statusCode == 200 ||
-      response.statusCode == 201 ||
-      response.statusCode == 202){
-
-    var result = json.decode(response.body);
-    return result;
+  try {
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      var result = json.decode(response.body);
+      return result;
+    }
+    return null;
+  } catch (e) {
+    return null;
   }
-  return null;
 }
 
 Future<List> getProductsList(int categoryId) async {
   String apiUrl = '$_baseUrl/api/Category/details?category_id=$categoryId';
 
-  var response = await http.get(apiUrl);
+  try {
+    var response = await http.get(apiUrl);
 
-  if(response.statusCode == 200 ||
-      response.statusCode == 201 ||
-      response.statusCode == 202){
-
-    var result = json.decode(response.body);
-    return result['products'];
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      var result = json.decode(response.body);
+      return result['products'];
+    }
+    return null;
+  } catch (e) {
+    return null;
   }
-  return null;
+
 }
 
 Future<bool> isImageAvailable(String imageUrl) async{
