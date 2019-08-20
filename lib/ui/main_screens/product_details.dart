@@ -11,9 +11,12 @@ class ProductDetails extends StatefulWidget {
   final double price;
   final List imagesUrls;
   final double sellingPrice;
+  final int sectorIndex;
+  final int categoryIndex;
 
-  ProductDetails(
-      {@required this.id, @required this.title, @required this.price, @required this.imagesUrls, @required this.sellingPrice});
+  ProductDetails({@required this.id, @required this.title, @required this.price,
+    @required this.imagesUrls, @required this.sellingPrice,
+    @required this.sectorIndex, @required this.categoryIndex});
   @override
   _ProductDetailsState createState() => _ProductDetailsState(
     id: id,
@@ -21,6 +24,8 @@ class ProductDetails extends StatefulWidget {
     price: price,
     imagesUrls: imagesUrls,
     sellingPrice: sellingPrice,
+    sectorIndex: sectorIndex,
+    categoryIndex: categoryIndex,
   );
 }
 
@@ -30,11 +35,15 @@ class _ProductDetailsState extends State<ProductDetails> {
   final double price;
   final List imagesUrls;
   final double sellingPrice;
+  final int sectorIndex;
+  final int categoryIndex;
 
   bool _addedToWishlist = false;
 
   _ProductDetailsState(
-      {@required this.id, @required this.title, @required this.price, @required this.imagesUrls, @required this.sellingPrice});
+      {@required this.id, @required this.title, @required this.price,
+        @required this.imagesUrls, @required this.sellingPrice,
+        @required this.sectorIndex, @required this.categoryIndex});
 
   @override
   void initState() {
@@ -100,6 +109,7 @@ class _ProductDetailsState extends State<ProductDetails> {
             Divider(),
             _productSpecs(),
             Divider(),
+            _relatedProducts(sectorIndex, categoryIndex, _getProductIndex(id)),
           ],
         ),
         bottomNavigationBar: Builder(builder: (context) {
@@ -208,6 +218,20 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 
+  int _getProductIndex(int productId) {
+    int index = 0;
+    for (int i = 0; i <
+        Globals.controller.sectors[sectorIndex].categories[categoryIndex]
+            .products.length; i++) {
+      if (Globals.controller.sectors[sectorIndex].categories[categoryIndex]
+          .products[i].id == productId) {
+        index = i;
+        break;
+      }
+    }
+    return index;
+  }
+
   Widget _productSpecs() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,6 +269,45 @@ class _ProductDetailsState extends State<ProductDetails> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _relatedProducts(int sectorIndex, int categoryIndex,
+      int productIndex) {
+    return Center(
+      child: GridView(
+        padding: EdgeInsets.all(10),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1,
+            crossAxisSpacing: 5,
+            mainAxisSpacing: 5
+        ),
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+
+        children: List.generate(
+            Globals.controller.sectors[sectorIndex].categories[categoryIndex]
+                .products[productIndex].relatedProducts.length, (index) {
+          final int _id = Globals.controller.sectors[sectorIndex]
+              .categories[categoryIndex].products[productIndex]
+              .relatedProducts[index].id;
+          final String _title = Globals.controller.sectors[sectorIndex]
+              .categories[categoryIndex].products[productIndex]
+              .relatedProducts[index].title;
+          final double _price = Globals.controller.sectors[sectorIndex]
+              .categories[categoryIndex].products[productIndex]
+              .relatedProducts[index].price;
+          final List _imagesUrls = Globals.controller.sectors[sectorIndex]
+              .categories[categoryIndex].products[productIndex]
+              .relatedProducts[index].imagesUrls;
+          final double _sellingPrice = Globals.controller.sectors[sectorIndex]
+              .categories[categoryIndex].products[index].sellingPrice;
+          return RelatedProductItem(
+            _id, _title, _price, _imagesUrls, _sellingPrice,
+            sectorIndex: sectorIndex, categoryIndex: categoryIndex,);
+        }),
+      ),
     );
   }
 }
@@ -381,6 +444,219 @@ class _ProductGalleryState extends State<ProductGallery>
         : Center(
       child: Text('No images available for this product',
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+class RelatedProductItem extends StatefulWidget {
+
+  final int _id;
+  final String _title;
+  final double _price;
+  final List _imagesUrls;
+  final double _sellingPrice;
+  final int sectorIndex;
+  final int categoryIndex;
+
+  RelatedProductItem(this._id, this._title, this._price, this._imagesUrls,
+      this._sellingPrice,
+      {@required this.sectorIndex, @required this.categoryIndex});
+
+  @override
+  _RelatedProductItemState createState() =>
+      _RelatedProductItemState(
+          this._id, this._title, this._price, this._imagesUrls,
+          this._sellingPrice, sectorIndex: sectorIndex,
+          categoryIndex: categoryIndex);
+}
+
+class _RelatedProductItemState extends State<RelatedProductItem> {
+
+  final int _id;
+  final String _title;
+  final double _price;
+  final List _imagesUrls;
+  final double _sellingPrice;
+  final int sectorIndex;
+  final int categoryIndex;
+
+  bool _addedToWishlist = false;
+  bool _addedToCart = false;
+
+  _RelatedProductItemState(this._id, this._title, this._price, this._imagesUrls,
+      this._sellingPrice,
+      {@required this.sectorIndex, @required this.categoryIndex});
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < Globals.controller.customer.wishList.length; i++) {
+      if (Globals.controller.customer.wishList.contains(
+          Globals.controller.getProductById(_id))) {
+        _addedToWishlist = true;
+        break;
+      }
+    }
+
+    for (int i = 0; i < Globals.controller.customer.cart.length; i++) {
+      if (Globals.controller.customer.cart[i].product ==
+          Globals.controller.getProductById(_id)) {
+        _addedToCart = true;
+        break;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(5),
+      child: Column(
+        children: <Widget>[
+
+          Stack(
+            children: <Widget>[
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetails(
+                            id: _id,
+                            title: _title,
+                            price: _price,
+                            imagesUrls: _imagesUrls,
+                            sellingPrice: _sellingPrice,
+                            sectorIndex: sectorIndex,
+                            categoryIndex: categoryIndex,
+                          ),
+                    ),
+                    );
+                  },
+                  child: FutureBuilder(
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data) {
+                          return Image.network(_imagesUrls[0],
+                            width: 90,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          return Center(
+                            child: Text('Product Image is not available',
+                              textAlign: TextAlign.center,),
+                          );
+                        }
+                      }
+                      return Container(
+                        height: 100,
+                        width: 100,
+                        child: Column(
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                          ],
+                        ),
+                      );
+                    },
+                    future: isImageAvailable(_imagesUrls[0]),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  if (!Globals.controller.containsCartItem(_id)) {
+                    Globals.controller.addToCart(
+                        Globals.controller.getProductById(_id), 1);
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 4),
+                        backgroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: BorderSide(
+                              style: BorderStyle.none,
+                              width: 1,
+                            )
+                        ),
+                        content: Text('The item is added to the cart',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  } else {
+                    //debugPrint('Added Already');
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 4),
+                        backgroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: BorderSide(
+                              style: BorderStyle.none,
+                              width: 1,
+                            )
+                        ),
+                        content: Text('The item has been already added',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                    alignment: Alignment.topRight,
+                    child: Image.asset(
+                      'assets/add_to_cart.png', width: 35, height: 35,)),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Text(_title, maxLines: 1, overflow: TextOverflow.ellipsis,),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              _sellingPrice < _price ?
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('$_sellingPrice SR'),
+                  Text('$_price SR',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough
+                    ),
+                  ),
+                ],
+              )
+                  : Text('$_price SR'),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _addedToWishlist = _addedToWishlist ? false : true;
+                    if (_addedToWishlist) {
+                      Globals.controller.customer.wishList.add(
+                          Globals.controller.getProductById(_id)
+                      );
+                    } else {
+                      Globals.controller.customer.wishList.remove(
+                          Globals.controller.getProductById(_id)
+                      );
+                    }
+                  });
+                },
+                child: _addedToWishlist ?
+                Icon(Icons.favorite, color: Colors.red, size: 30,)
+                    : Icon(Icons.favorite_border, color: Colors.red, size: 30,),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

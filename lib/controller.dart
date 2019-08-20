@@ -265,7 +265,7 @@ class Controller{
 
   populateProducts(int sectorIndex, int categoryIndex, List list){
     for(int i = 0; i < list.length ; i++){
-      Product product = Product.fromJson(list[i]);
+      Product product = Product.fromJsonWithRelatedProducts(list[i]);
       _sectors[sectorIndex].categories[categoryIndex].products.add(product);
       if(product.sellingPrice <  product.price){
         _offers.add(product);

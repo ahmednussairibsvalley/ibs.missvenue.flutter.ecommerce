@@ -11,6 +11,7 @@ class Product{
   List _imagesUrls;
   List<ProductSpecification> _specifications;
   List<Attribute> _attributes;
+  List<Product> _relatedProducts;
 
   Product(this._id, this._title, this._price, this._sellingPrice,) {
     _color = 0;
@@ -18,6 +19,38 @@ class Product{
     _imagesUrls = List();
     _specifications = List();
     _attributes = List();
+    _relatedProducts = List();
+  }
+
+  Product.fromJsonWithRelatedProducts(Map json){
+    _id = json['id'];
+    _title = json['Name'];
+    _price = json['Price'];
+    _imagesUrls = json['Images'];
+    _sellingPrice = json['SellingPrice'];
+    _color = 0;
+    _size = '';
+
+    _attributes = List();
+    _specifications = List();
+    _relatedProducts = List();
+
+    List attributes = json['Attributes'];
+    List specs = json['SpecificationAttribute'];
+    List relatedProducts = json['RelatedProducts'];
+
+    for (int i = 0; i < attributes.length; i ++) {
+      _attributes.add(Attribute.fromJson(attributes[i]));
+    }
+
+    for (int i = 0; i < specs.length; i++) {
+      ProductSpecification spec = ProductSpecification.fromJson(specs[i]);
+      _specifications.add(spec);
+    }
+
+    for (int i = 0; i < relatedProducts.length; i ++) {
+      _relatedProducts.add(Product.fromJson(relatedProducts[i]));
+    }
   }
 
   Product.fromJson(Map json){
@@ -98,6 +131,12 @@ class Product{
 
   set imagesUrls(List value) {
     _imagesUrls = value;
+  }
+
+  List<Product> get relatedProducts => _relatedProducts;
+
+  set relatedProducts(List<Product> value) {
+    _relatedProducts = value;
   }
 
 

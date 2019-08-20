@@ -32,14 +32,14 @@ class ProductsScreen extends StatelessWidget {
           final List _imagesUrls = Globals.controller.sectors[sectorIndex]
               .categories[categoryIndex].products[index].imagesUrls;
           final double _sellingPrice = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].sellingPrice;
-          return ProductItem(_id, _title, _price, _imagesUrls, _sellingPrice);
+          return ProductItem(_id, _title, _price, _imagesUrls, _sellingPrice,
+            sectorIndex: sectorIndex, categoryIndex: categoryIndex,);
         }),
       ),
     );
 
   }
 }
-
 
 class ProductItem extends StatefulWidget {
 
@@ -48,13 +48,17 @@ class ProductItem extends StatefulWidget {
   final double _price;
   final List _imagesUrls;
   final double _sellingPrice;
+  final int sectorIndex;
+  final int categoryIndex;
 
   ProductItem(this._id, this._title, this._price, this._imagesUrls,
-      this._sellingPrice);
+      this._sellingPrice,
+      {@required this.sectorIndex, @required this.categoryIndex});
   @override
   _ProductItemState createState() =>
       _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
-          this._sellingPrice);
+          this._sellingPrice, sectorIndex: sectorIndex,
+          categoryIndex: categoryIndex);
 }
 
 class _ProductItemState extends State<ProductItem> {
@@ -64,12 +68,15 @@ class _ProductItemState extends State<ProductItem> {
   final double _price;
   final List _imagesUrls;
   final double _sellingPrice;
+  final int sectorIndex;
+  final int categoryIndex;
 
   bool _addedToWishlist = false;
   bool _addedToCart = false;
 
   _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
-      this._sellingPrice);
+      this._sellingPrice,
+      {@required this.sectorIndex, @required this.categoryIndex});
 
   @override
   void initState() {
@@ -102,41 +109,45 @@ class _ProductItemState extends State<ProductItem> {
                 child: GestureDetector(
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => ProductDetails(
-                          id: _id,
-                          title:_title,
-                          price: _price,
-                          imagesUrls: _imagesUrls,
-                          sellingPrice: _sellingPrice,
-                        ),
-                      ),
+                      builder: (context) =>
+                          ProductDetails(
+                            id: _id,
+                            title: _title,
+                            price: _price,
+                            imagesUrls: _imagesUrls,
+                            sellingPrice: _sellingPrice,
+                            sectorIndex: sectorIndex,
+                            categoryIndex: categoryIndex,
+                          ),
+                    ),
                     );
                   },
                   child: FutureBuilder(
-                      builder: (context, snapshot){
-                        if(snapshot.hasData){
-                          if(snapshot.data){
-                            return Image.network(_imagesUrls[0],
-                              width: 90,
-                              height: 80,
-                              fit: BoxFit.cover,
-                            );
-                          } else {
-                            return Center(
-                              child: Text('Product Image is not available', textAlign: TextAlign.center,),
-                            );
-                          }
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data) {
+                          return Image.network(_imagesUrls[0],
+                            width: 90,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          return Center(
+                            child: Text('Product Image is not available',
+                              textAlign: TextAlign.center,),
+                          );
                         }
-                        return Container(
-                          height: 100,
-                          width: 100,
-                          child: Column(
-                            children: <Widget>[
-                              CircularProgressIndicator(),
-                            ],
-                          ),
-                        );
-                      },
+                      }
+                      return Container(
+                        height: 100,
+                        width: 100,
+                        child: Column(
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                          ],
+                        ),
+                      );
+                    },
                     future: isImageAvailable(_imagesUrls[0]),
                   ),
                 ),
@@ -163,26 +174,26 @@ class _ProductItemState extends State<ProductItem> {
                     );
                   }else{
                     //debugPrint('Added Already');
-                   Scaffold.of(context).showSnackBar(
-                       SnackBar(
-                         duration: Duration(seconds: 4),
-                           backgroundColor: Colors.black87,
-                           shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(50),
-                             side: BorderSide(
-                               style: BorderStyle.none,
-                               width: 1,
-                             )
-                           ),
-                           content: Text('The item has been already added',
-                             textAlign: TextAlign.center,
-                           ),
-                       ),
-                   );
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 4),
+                        backgroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: BorderSide(
+                              style: BorderStyle.none,
+                              width: 1,
+                            )
+                        ),
+                        content: Text('The item has been already added',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
                   }
                 },
                 child: Container(
-                  alignment: Alignment.topRight,
+                    alignment: Alignment.topRight,
                     child: Image.asset('assets/add_to_cart.png', width: 35, height: 35,)),
               ),
             ],
@@ -195,18 +206,18 @@ class _ProductItemState extends State<ProductItem> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               _sellingPrice < _price?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text('$_sellingPrice SR'),
-                      Text('$_price SR',
-                        style: TextStyle(
-                            color: Colors.grey,
-                            decoration: TextDecoration.lineThrough
-                        ),
-                      ),
-                    ],
-                  )
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('$_sellingPrice SR'),
+                  Text('$_price SR',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough
+                    ),
+                  ),
+                ],
+              )
                   : Text('$_price SR'),
               GestureDetector(
                 onTap: (){
@@ -214,7 +225,7 @@ class _ProductItemState extends State<ProductItem> {
                     _addedToWishlist = _addedToWishlist?false: true;
                     if(_addedToWishlist){
                       Globals.controller.customer.wishList.add(
-                        Globals.controller.getProductById(_id)
+                          Globals.controller.getProductById(_id)
                       );
                     } else {
                       Globals.controller.customer.wishList.remove(
