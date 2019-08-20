@@ -1,4 +1,5 @@
 import 'product_specification.dart';
+import 'attribute.dart';
 
 class Product{
   int _id;
@@ -9,12 +10,14 @@ class Product{
   String _size;
   double _sellingPrice;
   List<ProductSpecification> _specifications;
+  List<Attribute> _attributes;
 
   Product(this._id, this._title, this._imageUrl, this._price,
       this._sellingPrice,) {
     _color = 0;
     _size = '';
     _specifications = List();
+    _attributes = List();
   }
 
   Product.fromJson(Map json){
@@ -28,8 +31,15 @@ class Product{
     _color = 0;
     _size = '';
 
+    _attributes = List();
     _specifications = List();
+
+    List attributes = json['Attributes'];
     List specs = json['SpecificationAttribute'];
+
+    for (int i = 0; i < attributes.length; i ++) {
+      _attributes.add(Attribute.fromJson(attributes[i]));
+    }
 
     for (int i = 0; i < specs.length; i++) {
       ProductSpecification spec = ProductSpecification.fromJson(specs[i]);
