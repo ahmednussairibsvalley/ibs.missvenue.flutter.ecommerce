@@ -99,6 +99,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 : Text('$price SR', textAlign: TextAlign.center,),
             Divider(),
             _productSpecs(),
+            Divider(),
           ],
         ),
         bottomNavigationBar: Builder(builder: (context) {

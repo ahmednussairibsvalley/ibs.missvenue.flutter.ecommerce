@@ -204,19 +204,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   }
                   Globals.customerId = accepted['Customer']['Customer_Id'];
-//                  String fullName = accepted['Customer']['FullName'];
-//                  List names = fullName.split(' ');
-//
-//                  String firstName = '';
-//                  String lastName = '';
-//                  if(names.length >= 2){
-//                    firstName = names[0];
-//                    lastName = names[1];
-//                  } else if(names.length == 1){
-//                    firstName = names[0];
-//                  }
-//                  Globals.controller.initCustomer(accepted['Customer']['Customer_Id'],
-//                    firstName, lastName, accepted['Customer']['Email'],);
+                  String fullName = accepted['Customer']['FullName'];
+                  List names = fullName.split(' ');
+
+                  String firstName = '';
+                  String lastName = '';
+                  if (names.length >= 2) {
+                    firstName = names[0];
+                    lastName = names[1];
+                  } else if (names.length == 1) {
+                    firstName = names[0];
+                  }
+                  Globals.controller.initCustomer(
+                    accepted['Customer']['Customer_Id'],
+                    firstName, lastName, accepted['Customer']['Email'],
+                    accepted['Customer']['Customer_Phone'],);
 
                   Globals.controller.initCustomerFromJson(accepted);
                   Navigator.of(context).pushReplacementNamed('/home');
