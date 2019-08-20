@@ -64,7 +64,8 @@ class _ProductDetailsState extends State<ProductDetails> {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
     final int _productIndex = _getProductIndex(sectorIndex, categoryIndex, id);
-    return SafeArea(
+    return sectorIndex > -1 && categoryIndex > -1 ?
+    SafeArea(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -219,22 +220,41 @@ class _ProductDetailsState extends State<ProductDetails> {
           );
         }),
       ),
+    )
+        : SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Icon(Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        body: Container(),
+      ),
     );
   }
 
   int _getProductIndex(int sectorIndex, int categoryIndex, int productId) {
-    int index = -1;
-    for (int i = 0; i <
-        Globals.controller.sectors[sectorIndex].categories[categoryIndex]
-            .products.length; i++) {
-      if (Globals.controller.sectors[sectorIndex].categories[categoryIndex]
-          .products[i].id == productId) {
-        index = i;
-        break;
+    int result = -1;
+    try {
+      List list = Globals.controller.sectors[sectorIndex]
+          .categories[categoryIndex].products;
+      for (int i = 0; i < list.length; i++) {
+        if (list[i].id == productId) {
+          result = i;
+          break;
+        }
       }
+    } catch (e) {
+
     }
 
-    return index;
+    return result;
   }
 
   Widget _productSpecs() {
