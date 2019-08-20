@@ -56,7 +56,7 @@ class _WishlistScreenState extends State<WishlistScreen>{
                   final int _id = _list[index].id;
                   final String _title = _list[index].title;
                   final double _price = _list[index].price;
-                  final String _imageUrl = _list[index].imageUrl;
+                  final String _imageUrl = _list[index].imagesUrls[0];
                   final double _sellingPrice = _list[index].sellingPrice;
                   return WishListItem(_id, _title, _price, _imageUrl, _sellingPrice, onDelete: (){
                     setState(() {
@@ -104,44 +104,44 @@ class WishListItem extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: (){
-//                  if(!Globals.controller.containsCartItem(_id)) {
-//                    Globals.controller.addToCart(
-//                        Globals.controller.getProductById(_id), 1);
-//                    Scaffold.of(context).showSnackBar(
-//                      SnackBar(
-//                        duration: Duration(seconds: 4),
-//                        backgroundColor: Colors.black87,
-//                        shape: RoundedRectangleBorder(
-//                            borderRadius: BorderRadius.circular(50),
-//                            side: BorderSide(
-//                              style: BorderStyle.none,
-//                              width: 1,
-//                            )
-//                        ),
-//                        content: Text('The item is added to the cart',
-//                          textAlign: TextAlign.center,
-//                        ),
-//                      ),
-//                    );
-//                  }else{
-//                    //debugPrint('Added Already');
-//                    Scaffold.of(context).showSnackBar(
-//                      SnackBar(
-//                        duration: Duration(seconds: 4),
-//                        backgroundColor: Colors.black87,
-//                        shape: RoundedRectangleBorder(
-//                            borderRadius: BorderRadius.circular(50),
-//                            side: BorderSide(
-//                              style: BorderStyle.none,
-//                              width: 1,
-//                            )
-//                        ),
-//                        content: Text('The item has been already added',
-//                          textAlign: TextAlign.center,
-//                        ),
-//                      ),
-//                    );
-//                  }
+                  if (!Globals.controller.containsCartItem(_id)) {
+                    Globals.controller.addToCart(
+                        Globals.controller.getProductById(_id), 1);
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 4),
+                        backgroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: BorderSide(
+                              style: BorderStyle.none,
+                              width: 1,
+                            )
+                        ),
+                        content: Text('The item is added to the cart',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  } else {
+                    //debugPrint('Added Already');
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 4),
+                        backgroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: BorderSide(
+                              style: BorderStyle.none,
+                              width: 1,
+                            )
+                        ),
+                        content: Text('The item has been already added',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                     alignment: Alignment.topRight,

@@ -59,13 +59,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             alignment: Alignment.topLeft,
                             child: CircleAvatar(
                               backgroundColor: Colors.red,
-                              maxRadius: 12,
+                              maxRadius: 13,
                               child: Text(
                                 _notificationNumber >= 100
                                     ? '+99'
                                     : '$_notificationNumber',
                                 style: TextStyle(
                                   color: Colors.white,
+                                    fontSize: 13
                                 ),
                               ),
                             ),

@@ -40,7 +40,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
           final String _title = _list[index].product.title;
           final double _price = _list[index].product.price;
           final int _quantity = _list[index].quantity;
-          final String _imageUrl = _list[index].product.imageUrl;
+          final String _imageUrl = _list[index].product.imagesUrls[0];
 //          final int _color = _list[index].product.color;
 //          final String _size = _list[index].product.size;
           final double _sellingPrice = _list[index].product.sellingPrice;

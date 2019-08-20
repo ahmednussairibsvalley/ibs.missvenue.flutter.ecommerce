@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import '../../globals.dart';
 import '../../utils.dart';
 
@@ -67,31 +68,8 @@ class _ProductDetailsState extends State<ProductDetails> {
         ),
         body: ListView(
           children: <Widget>[
-            FutureBuilder(
-              builder: (context, snapshot){
-                if(snapshot.hasData){
-                  if(snapshot.data){
-                    return Image.network(imagesUrls[0],
-                      width: _width,
-                      height: _width,
-                    );
-                  } else {
-                    return Center(
-                      child: Text('Product Image is not available', textAlign: TextAlign.center,),
-                    );
-                  }
-                }
-                return Column(
-                  children: <Widget>[
-                    Container(
-                      height: 100,
-                      width: 100,
-                      child: CircularProgressIndicator(),
-                    )
-                  ],
-                );
-              },
-              future: isImageAvailable(imagesUrls[0]),
+            ProductGallery(
+              list: imagesUrls,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -271,14 +249,139 @@ class _ProductDetailsState extends State<ProductDetails> {
 }
 
 class ProductGallery extends StatefulWidget {
+  final List list;
+
+  ProductGallery({@required this.list});
+
   @override
-  _ProductGalleryState createState() => _ProductGalleryState();
+  _ProductGalleryState createState() => _ProductGalleryState(list: list);
 }
 
-class _ProductGalleryState extends State<ProductGallery> {
+class _ProductGalleryState extends State<ProductGallery>
+    with TickerProviderStateMixin {
+
+  final List list;
+
+  int _current = 0;
+
+  _ProductGalleryState({@required this.list});
+
+  List<T> map<T>(List list, Function handler) {
+    List<T> result = [];
+    for (var i = 0; i < list.length; i++) {
+      result.add(handler(i, list[i]));
+    }
+
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    final _width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final List child = map<Widget>(
+      list,
+          (index, i) {
+        return FutureBuilder(
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data) {
+                return Image.network(i,
+                  width: _width,
+                  height: _width,
+                  fit: BoxFit.cover,
+                );
+              } else {
+                return Center(
+                  child: Text('Product Image is not available',
+                    textAlign: TextAlign.center,),
+                );
+              }
+            }
+            return Column(
+              children: <Widget>[
+                Container(
+                  height: 100,
+                  width: 100,
+                  child: CircularProgressIndicator(),
+                )
+              ],
+            );
+          },
+          future: isImageAvailable(i),
+        );
+      },
+    ).toList();
+
+    return list.length > 1 ? Stack(children: [
+      CarouselSlider(
+        items: child,
+        aspectRatio: 1.0, viewportFraction: 1.0,
+        onPageChanged: (index) {
+          setState(() {
+            _current = index;
+          });
+        },
+      ),
+      Positioned(
+        bottom: 0.0,
+        left: 0.0,
+        right: 0.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: map<Widget>(
+            list,
+                (index, url) {
+              return Container(
+                width: 8.0,
+                height: 8.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _current == index
+                        ? Color.fromRGBO(0, 0, 0, 0.9)
+                        : Color.fromRGBO(0, 0, 0, 0.4)),
+              );
+            },
+          ),
+        ),
+      ),
+    ])
+        : list.length == 1 ? FutureBuilder(
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data) {
+            return Image.network(list[0],
+              width: _width,
+              height: _width,
+              fit: BoxFit.cover,
+            );
+          } else {
+            return Center(
+              child: Text(
+                'Product Image is not available', textAlign: TextAlign.center,),
+            );
+          }
+        }
+        return Column(
+          children: <Widget>[
+            Container(
+              height: 100,
+              width: 100,
+              child: CircularProgressIndicator(),
+            )
+          ],
+        );
+      },
+      future: isImageAvailable(list[0]),
+    )
+        : Center(
+      child: Text('No images available for this product',
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 }
 
