@@ -686,7 +686,8 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                         final String _title = Globals.controller.customer.cart[index].product.title;
                         final double _price = Globals.controller.customer.cart[index].product.price;
                         final int _quantity = Globals.controller.customer.cart[index].quantity;
-                        final String _imageUrl = Globals.controller.customer.cart[index].product.imageUrl;
+                        final String _imageUrl = Globals.controller.customer
+                            .cart[index].product.imagesUrls[0];
 //                        final int _color = Globals.controller.customer.cart[index].product.color;
 //                        final String _size = Globals.controller.customer.cart[index].product.size;
                         final double _sellingPrice = Globals.controller.customer.cart[index].product.sellingPrice;

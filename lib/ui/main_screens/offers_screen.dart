@@ -30,7 +30,8 @@ class OffersScreen extends StatelessWidget {
           final int _id = Globals.controller.offers[index].id;
           final String _title = Globals.controller.offers[index].title;
           final double _price = Globals.controller.offers[index].price;
-          final String _imageUrl = Globals.controller.offers[index].imageUrl;
+          final String _imageUrl = Globals.controller.offers[index]
+              .imagesUrls[0];
           final double _sellingPrice = Globals.controller.offers[index].sellingPrice;
           return OfferItem(_id, _title, _price, _imageUrl, _sellingPrice);
         }),

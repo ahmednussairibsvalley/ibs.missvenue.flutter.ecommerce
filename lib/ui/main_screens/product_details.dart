@@ -8,12 +8,18 @@ class ProductDetails extends StatefulWidget {
   final int id;
   final String title;
   final double price;
-  final String imageUrl;
+  final List imagesUrls;
   final double sellingPrice;
-  ProductDetails({@required this.id, @required this.title, @required this.price, @required this.imageUrl, @required this.sellingPrice});
+
+  ProductDetails(
+      {@required this.id, @required this.title, @required this.price, @required this.imagesUrls, @required this.sellingPrice});
   @override
   _ProductDetailsState createState() => _ProductDetailsState(
-    id: id, title: title, price: price, imageUrl: imageUrl, sellingPrice: sellingPrice,
+    id: id,
+    title: title,
+    price: price,
+    imagesUrls: imagesUrls,
+    sellingPrice: sellingPrice,
   );
 }
 
@@ -21,12 +27,13 @@ class _ProductDetailsState extends State<ProductDetails> {
   final int id;
   final String title;
   final double price;
-  final String imageUrl;
+  final List imagesUrls;
   final double sellingPrice;
 
   bool _addedToWishlist = false;
 
-  _ProductDetailsState({@required this.id, @required this.title, @required this.price, @required this.imageUrl, @required this.sellingPrice});
+  _ProductDetailsState(
+      {@required this.id, @required this.title, @required this.price, @required this.imagesUrls, @required this.sellingPrice});
 
   @override
   void initState() {
@@ -64,7 +71,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               builder: (context, snapshot){
                 if(snapshot.hasData){
                   if(snapshot.data){
-                    return Image.network(imageUrl,
+                    return Image.network(imagesUrls[0],
                       width: _width,
                       height: _width,
                     );
@@ -84,7 +91,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ],
                 );
               },
-              future: isImageAvailable(imageUrl),
+              future: isImageAvailable(imagesUrls[0]),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -262,3 +269,16 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 }
+
+class ProductGallery extends StatefulWidget {
+  @override
+  _ProductGalleryState createState() => _ProductGalleryState();
+}
+
+class _ProductGalleryState extends State<ProductGallery> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+

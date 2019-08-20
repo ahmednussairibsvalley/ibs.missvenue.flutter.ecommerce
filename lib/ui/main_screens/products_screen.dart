@@ -29,9 +29,10 @@ class ProductsScreen extends StatelessWidget {
           final int _id = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].id;
           final String _title = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].title;
           final double _price = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].price;
-          final String _imageUrl = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].imageUrl;
+          final List _imagesUrls = Globals.controller.sectors[sectorIndex]
+              .categories[categoryIndex].products[index].imagesUrls;
           final double _sellingPrice = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].sellingPrice;
-          return ProductItem(_id, _title, _price, _imageUrl, _sellingPrice);
+          return ProductItem(_id, _title, _price, _imagesUrls, _sellingPrice);
         }),
       ),
     );
@@ -45,12 +46,15 @@ class ProductItem extends StatefulWidget {
   final int _id;
   final String _title;
   final double _price;
-  final String _imageUrl;
+  final List _imagesUrls;
   final double _sellingPrice;
 
-  ProductItem(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
+  ProductItem(this._id, this._title, this._price, this._imagesUrls,
+      this._sellingPrice);
   @override
-  _ProductItemState createState() => _ProductItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
+  _ProductItemState createState() =>
+      _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
+          this._sellingPrice);
 }
 
 class _ProductItemState extends State<ProductItem> {
@@ -58,13 +62,14 @@ class _ProductItemState extends State<ProductItem> {
   final int _id;
   final String _title;
   final double _price;
-  final String _imageUrl;
+  final List _imagesUrls;
   final double _sellingPrice;
 
   bool _addedToWishlist = false;
   bool _addedToCart = false;
 
-  _ProductItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
+  _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
+      this._sellingPrice);
 
   @override
   void initState() {
@@ -101,7 +106,7 @@ class _ProductItemState extends State<ProductItem> {
                           id: _id,
                           title:_title,
                           price: _price,
-                          imageUrl: _imageUrl,
+                          imagesUrls: _imagesUrls,
                           sellingPrice: _sellingPrice,
                         ),
                       ),
@@ -111,7 +116,7 @@ class _ProductItemState extends State<ProductItem> {
                       builder: (context, snapshot){
                         if(snapshot.hasData){
                           if(snapshot.data){
-                            return Image.network(_imageUrl,
+                            return Image.network(_imagesUrls[0],
                               width: 90,
                               height: 80,
                               fit: BoxFit.cover,
@@ -132,7 +137,7 @@ class _ProductItemState extends State<ProductItem> {
                           ),
                         );
                       },
-                    future: isImageAvailable(_imageUrl),
+                    future: isImageAvailable(_imagesUrls[0]),
                   ),
                 ),
               ),
