@@ -176,6 +176,38 @@ class Controller{
     return _product;
   }
 
+  ///Returns the product's sector index.
+  int getProductSectorIndex(int productId) {
+    int index = -1;
+    for (int i = 0; i < sectors.length; i++) {
+      for (int j = 0; j < sectors[i].categories.length; j++) {
+        for (int a = 0; a < sectors[i].categories[j].products.length; a ++) {
+          if (sectors[i].categories[j].products[a].id == productId) {
+            index = i;
+            break;
+          }
+        }
+      }
+    }
+    return index;
+  }
+
+  ///Returns the product's category index.
+  int getProductCategoryIndex(int productId) {
+    int index = -1;
+    for (int i = 0; i < sectors.length; i++) {
+      for (int j = 0; j < sectors[i].categories.length; j++) {
+        for (int a = 0; a < sectors[i].categories[j].products.length; a ++) {
+          if (sectors[i].categories[j].products[a].id == productId) {
+            index = j;
+            break;
+          }
+        }
+      }
+    }
+    return index;
+  }
+
   ///Gets an item from the customer's
   ///cart using the cart item's ID.
   CartItem getCartItemById (int id){

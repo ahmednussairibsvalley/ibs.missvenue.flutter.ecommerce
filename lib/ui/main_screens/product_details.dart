@@ -40,6 +40,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   bool _addedToWishlist = false;
 
+
   _ProductDetailsState(
       {@required this.id, @required this.title, @required this.price,
         @required this.imagesUrls, @required this.sellingPrice,
@@ -62,6 +63,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
+    final int _productIndex = _getProductIndex(sectorIndex, categoryIndex, id);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -109,7 +111,9 @@ class _ProductDetailsState extends State<ProductDetails> {
             Divider(),
             _productSpecs(),
             Divider(),
-            _relatedProducts(sectorIndex, categoryIndex, _getProductIndex(id)),
+            _productIndex >= 0 && sectorIndex >= 0 && categoryIndex >= 0 ?
+            _relatedProducts(sectorIndex, categoryIndex, _productIndex) :
+            Container(),
           ],
         ),
         bottomNavigationBar: Builder(builder: (context) {
@@ -218,8 +222,8 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 
-  int _getProductIndex(int productId) {
-    int index = 0;
+  int _getProductIndex(int sectorIndex, int categoryIndex, int productId) {
+    int index = -1;
     for (int i = 0; i <
         Globals.controller.sectors[sectorIndex].categories[categoryIndex]
             .products.length; i++) {
@@ -229,6 +233,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         break;
       }
     }
+
     return index;
   }
 
@@ -246,7 +251,8 @@ class _ProductDetailsState extends State<ProductDetails> {
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
+          child: Globals.controller.getProductById(id) != null ?
+          Column(
             children: List.generate(Globals.controller
                 .getProductById(id)
                 .specifications
@@ -266,7 +272,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ],
               );
             }),
-          ),
+          ) : Container(),
         ),
       ],
     );
@@ -274,40 +280,61 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   Widget _relatedProducts(int sectorIndex, int categoryIndex,
       int productIndex) {
-    return Center(
-      child: GridView(
-        padding: EdgeInsets.all(10),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 5
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('You May Also Like',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
+        Center(
+          child: GridView(
+            padding: EdgeInsets.all(10),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5
+            ),
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
 
-        children: List.generate(
-            Globals.controller.sectors[sectorIndex].categories[categoryIndex]
-                .products[productIndex].relatedProducts.length, (index) {
-          final int _id = Globals.controller.sectors[sectorIndex]
-              .categories[categoryIndex].products[productIndex]
-              .relatedProducts[index].id;
-          final String _title = Globals.controller.sectors[sectorIndex]
-              .categories[categoryIndex].products[productIndex]
-              .relatedProducts[index].title;
-          final double _price = Globals.controller.sectors[sectorIndex]
-              .categories[categoryIndex].products[productIndex]
-              .relatedProducts[index].price;
-          final List _imagesUrls = Globals.controller.sectors[sectorIndex]
-              .categories[categoryIndex].products[productIndex]
-              .relatedProducts[index].imagesUrls;
-          final double _sellingPrice = Globals.controller.sectors[sectorIndex]
-              .categories[categoryIndex].products[index].sellingPrice;
-          return RelatedProductItem(
-            _id, _title, _price, _imagesUrls, _sellingPrice,
-            sectorIndex: sectorIndex, categoryIndex: categoryIndex,);
-        }),
-      ),
+            children: List.generate(
+                Globals.controller.sectors[sectorIndex]
+                    .categories[categoryIndex]
+                    .products[productIndex].relatedProducts.length, (index) {
+              final int _id = Globals.controller.sectors[sectorIndex]
+                  .categories[categoryIndex].products[productIndex]
+                  .relatedProducts[index].id;
+              final String _title = Globals.controller.sectors[sectorIndex]
+                  .categories[categoryIndex].products[productIndex]
+                  .relatedProducts[index].title;
+              final double _price = Globals.controller.sectors[sectorIndex]
+                  .categories[categoryIndex].products[productIndex]
+                  .relatedProducts[index].price;
+              final List _imagesUrls = Globals.controller.sectors[sectorIndex]
+                  .categories[categoryIndex].products[productIndex]
+                  .relatedProducts[index].imagesUrls;
+              final double _sellingPrice = Globals.controller
+                  .sectors[sectorIndex]
+                  .categories[categoryIndex].products[productIndex]
+                  .relatedProducts[index].sellingPrice;
+
+              final int _sectorIndex = Globals.controller.getProductSectorIndex(
+                  _id);
+              final int _categoryIndex = Globals.controller
+                  .getProductCategoryIndex(_id);
+              return RelatedProductItem(
+                _id, _title, _price, _imagesUrls, _sellingPrice,
+                sectorIndex: _sectorIndex, categoryIndex: _categoryIndex,);
+            }),
+          ),
+        ),
+      ],
     );
   }
 }
