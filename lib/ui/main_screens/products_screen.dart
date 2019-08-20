@@ -114,6 +114,7 @@ class _ProductItemState extends State<ProductItem> {
                             return Image.network(_imageUrl,
                               width: 90,
                               height: 80,
+                              fit: BoxFit.cover,
                             );
                           } else {
                             return Center(

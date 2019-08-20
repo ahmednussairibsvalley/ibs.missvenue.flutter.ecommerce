@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<Tab> _tabs;
 
   /// the number of notifications
-  int _notificationNumber = 89;
+  int _notificationNumber = 100;
 
   /// current tab index
   int _currentTabIndex = 0;
@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             alignment: Alignment.topLeft,
                             child: CircleAvatar(
                               backgroundColor: Colors.red,
-                              maxRadius: 14,
+                              maxRadius: 12,
                               child: Text(
                                 _notificationNumber >= 100
                                     ? '+99'
@@ -311,10 +311,12 @@ class _TabViewState extends State<TabView> {
                       decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.grey,
+                              style: BorderStyle.none
                           ),
                           borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           image:
-                          DecorationImage(image: NetworkImage(imageUrl))),
+                          DecorationImage(image: NetworkImage(imageUrl),
+                              fit: BoxFit.cover)),
                     );
                   } else {
                     return Container(
@@ -354,7 +356,7 @@ class _TabViewState extends State<TabView> {
                   children: <Widget>[
                     Text(
                       title,
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                      style: TextStyle(color: Colors.black, fontSize: 20),
                     ),
                     Container(
                       alignment: Alignment.bottomRight,

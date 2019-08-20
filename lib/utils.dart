@@ -19,23 +19,25 @@ final _baseUrl = 'http://40.85.116.121:8678';
 Future<Map> authenticate(String email, String password) async {
   Map result;
   String apiUrl = '$_baseUrl/api/customer/login';
-  var response =
-      await http.post(apiUrl,
-          body: {'Email': email, 'Password': password},);
+
+
+  try {
+    var response =
+    await http.post(apiUrl,
+      body: {'Email': email, 'Password': password},);
 
 //  var response =
 //  await http.post(apiUrl,
 //    body: {'Email': 'ismail3@mycompany.com', 'Password': '38954857213'},);
-  print(response.body);
+    print(response.body);
 
-  if(response.statusCode == 200 ||
-      response.statusCode == 201 ||
-      response.statusCode == 202){
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      result = json.decode(response.body);
 
-    result = json.decode(response.body);
 
-
-    print('${result.toString()}');
+      print('${result.toString()}');
 //    Globals.customerId =
 //    result['Result'] == true ? result['Customer_Id']
 //        : result['Result'] == false ? 0
@@ -43,6 +45,13 @@ Future<Map> authenticate(String email, String password) async {
 //    return result['Result'] == true ? true
 //        : result['Result'] == false ? false
 //        : null;
+    }
+  } on SocketException catch (e) {
+    print('$e');
+    result = null;
+  } catch (e) {
+    print('$e');
+    result = null;
   }
 
   return result;
@@ -140,18 +149,20 @@ Future<Map> loginWithGoogle() async{
     //print('${result.displayName}');
     //print('${result.id}');
     //print('${result.photoUrl}');
-    map = Map();
-    map['id'] = result.id;
+    Map tmpMap = Map();
+    tmpMap['id'] = result.id;
     List names = result.displayName.split(' ');
-    map['firstName'] = names[0];
-    map['lastName'] = names[1];
-    map['email'] = result.email;
-    map['imageUrl'] = result.photoUrl;
+    tmpMap['firstName'] = names[0];
+    tmpMap['lastName'] = names[1];
+    tmpMap['email'] = result.email;
+    tmpMap['imageUrl'] = result.photoUrl;
 
-    Map customerMap = await register(map['firstName'], map['lastName'], map['email'], '', '123', '123');
-    Globals.customerId = customerMap['customer_id'];
-    map['id'] = customerMap['customer_id'];
-    print('${map['id']}');
+    map = await register(
+        tmpMap['firstName'], tmpMap['lastName'], tmpMap['email'], '', '123',
+        '123');
+//    Globals.customerId = customerMap['customer_id'];
+//    map['id'] = customerMap['customer_id'];
+    print('$map');
     //return true;
   }on SocketException catch (_) {
     map = null;
