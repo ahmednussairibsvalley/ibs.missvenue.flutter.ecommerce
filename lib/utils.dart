@@ -212,6 +212,8 @@ Future<List> getCategoriesList(int sectorId) async{
   }
 }
 
+/// Gets the products list for a category specified
+/// by its ID categoryId from the API.
 Future<List> getProductsList(int categoryId) async {
   String apiUrl = '$_baseUrl/api/Category/details?category_id=$categoryId';
 
@@ -231,6 +233,27 @@ Future<List> getProductsList(int categoryId) async {
 
 }
 
+/// Gets the brands list for a category specified
+/// by its ID categoryId from the API.
+Future<List> getBrandsList(int categoryId) async {
+  String apiUrl = '$_baseUrl/api/Category/details?category_id=$categoryId';
+
+  try {
+    var response = await http.get(apiUrl);
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      var result = json.decode(response.body);
+      return result['Brands'];
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+///Is the image accessible by its URL.
 Future<bool> isImageAvailable(String imageUrl) async{
   if(imageUrl.isEmpty || imageUrl == null){
     return false;

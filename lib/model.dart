@@ -7,3 +7,4 @@ export 'model/order.dart';
 export 'model/product.dart';
 export 'model/cart_item.dart';
 export 'model/sector.dart';
+export 'model/brand.dart';

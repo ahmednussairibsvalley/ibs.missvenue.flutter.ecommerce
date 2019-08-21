@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'product_attributes_controllers.dart';
 import '../../globals.dart';
 import '../../utils.dart';
 
@@ -94,22 +95,41 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ),
               ),
             ),
-            sellingPrice < price ?
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('$sellingPrice SR', textAlign: TextAlign.center,),
-                Text('$price SR',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      decoration: TextDecoration.lineThrough
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: sellingPrice < price ?
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text('$sellingPrice SR', textAlign: TextAlign.center,),
+                  Text('$price SR',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            )
-                : Text('$price SR', textAlign: TextAlign.center,),
+                ],
+              )
+                  : Text('$price SR', textAlign: TextAlign.center,),
+            ),
             Divider(),
+            Column(
+              children: List.generate(Globals.controller
+                  .getProductById(id)
+                  .attributes
+                  .length, (index) {
+                return Column(
+                  children: <Widget>[
+                    Text('${Globals.controller
+                        .getProductById(id)
+                        .attributes[index].name}'),
+
+                    Divider(),
+                  ],
+                );
+              }),
+            ),
             _productSpecs(),
             Divider(),
             _productIndex >= 0 && sectorIndex >= 0 && categoryIndex >= 0 ?

@@ -201,6 +201,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     for(int j = 0; j < list.length ; j ++){
                       var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
                       Globals.controller.populateProducts(i, j, productsList);
+
+                      var brandsList = await getBrandsList(
+                          Globals.controller.sectors[i].categories[j].id);
+                      Globals.controller.populateBrands(i, j, brandsList);
                     }
                   }
                   Globals.customerId = accepted['Customer']['Customer_Id'];
@@ -326,6 +330,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         for(int j = 0; j < list.length ; j ++){
                           var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
                           Globals.controller.populateProducts(i, j, productsList);
+
+                          var brandsList = await getBrandsList(Globals
+                              .controller.sectors[i].categories[j].id);
+                          Globals.controller.populateBrands(i, j, brandsList);
                         }
                       }
                       Globals.controller.initCustomer(signedInWithFacebook['id'],
@@ -371,6 +379,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         for(int j = 0; j < list.length ; j ++){
                           var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
                           Globals.controller.populateProducts(i, j, productsList);
+
+                          var brandsList = await getBrandsList(Globals
+                              .controller.sectors[i].categories[j].id);
+                          Globals.controller.populateBrands(i, j, brandsList);
                         }
                       }
 
