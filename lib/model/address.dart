@@ -11,6 +11,16 @@ class Address{
       this._country);
 
 
+  Address.fromJson(Map json){
+    _id = json['address_Id'];
+    _address1 = json['Address1'];
+    _address2 = json['Address2'];
+    _phone = json['PhoneNumber'];
+    _city = json['City'];
+    _state = json['State'];
+    _country = json['Country'];
+  }
+
   int get id => _id;
 
   set id(int value) {

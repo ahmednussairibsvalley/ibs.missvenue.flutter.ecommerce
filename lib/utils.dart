@@ -15,29 +15,28 @@ import 'globals.dart';
 
 final _baseUrl = 'http://40.85.116.121:8678';
 
-
 Future<Map> authenticate(String email, String password) async {
   Map result;
   String apiUrl = '$_baseUrl/api/customer/login';
 
-
   try {
-    var response =
-    await http.post(apiUrl,
-      body: {'Email': email, 'Password': password},);
+    var response = await http.post(
+      apiUrl,
+      body: {'Email': email, 'Password': password},
+    );
 
 //  var response =
 //  await http.post(apiUrl,
 //    body: {'Email': 'ismail3@mycompany.com', 'Password': '38954857213'},);
-    print(response.body);
+//    print(response.body);
 
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
         response.statusCode == 202) {
       result = json.decode(response.body);
 
-
-      print('${result.toString()}');
+      Globals.customerId = result['Customer']['Customer_Id'];
+//      print('${result.toString()}');
 //    Globals.customerId =
 //    result['Result'] == true ? result['Customer_Id']
 //        : result['Result'] == false ? 0
@@ -55,62 +54,86 @@ Future<Map> authenticate(String email, String password) async {
   }
 
   return result;
+}
 
+Future<Map> getCustomerDetails(int id) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
+Future<List> getCountriesFromApi() async {
+  List result;
+  String apiUrl = '$_baseUrl/api/address/country_list?Id=null';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
 }
 
 Future<String> sendForPasswordRecovery(String email) async {
   String apiUrl = '$_baseUrl/Customer/mobile_PasswordRecoverySend';
-  var response = await http.post(apiUrl, body: {'Email': email,});
-  if(response.statusCode == 200 ||
+  var response = await http.post(apiUrl, body: {
+    'Email': email,
+  });
+  if (response.statusCode == 200 ||
       response.statusCode == 201 ||
-      response.statusCode == 202){
+      response.statusCode == 202) {
     Map result = json.decode(response.body);
-    Globals.customerId =
-    result['Result'] == true ? result['Customer_Id']
-        : result['Result'] == false ? 0
-        : 0;
+    Globals.customerId = result['Result'] == true
+        ? result['Customer_Id']
+        : result['Result'] == false ? 0 : 0;
     return result['Result'];
   } else {
     return null;
   }
 }
 
-Future<Map> register(String firstName, String lastName,
-    String email, String phone,
-    String password, String passwordConfirm) async{
+Future<Map> register(String firstName, String lastName, String email,
+    String phone, String password, String passwordConfirm) async {
   String apiUrl = '$_baseUrl/api/customer/register';
-  var _userName = '$firstName $lastName';
-  var response = await http.post(apiUrl,
-      body: {'firstName' : firstName, 'lastName' : lastName, 'email' : email, 'phone_No' : phone, 'password' : password});
+  var response = await http.post(apiUrl, body: {
+    'firstName': firstName,
+    'lastName': lastName,
+    'email': email,
+    'phone_No': phone,
+    'password': password
+  });
 
-  if(response.statusCode == 200 ||
+  if (response.statusCode == 200 ||
       response.statusCode == 201 ||
-      response.statusCode == 202){
+      response.statusCode == 202) {
     Map result = json.decode(response.body);
 
     return result;
-
   }
 
   return null;
-
 }
 
-Future<Map> loginWithFacebook() async{
+Future<Map> loginWithFacebook() async {
   Map map;
-  try{
+  try {
     final facebookLogin = FacebookLogin();
     final result = await facebookLogin.logInWithReadPermissions(['email']);
     final token = result.accessToken.token;
     final graphResponse = await http.get(
         'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,cover,picture.type(large),email&access_token=$token');
-    print('${graphResponse.statusCode}');
-    if(graphResponse.statusCode == 200){
+//    print('${graphResponse.statusCode}');
+    if (graphResponse.statusCode == 200) {
       final profile = json.decode(graphResponse.body);
-      print('${profile.toString()}, token: $token');
-      print('${profile['first_name']}');
+//      print('${profile.toString()}, token: $token');
+//      print('${profile['first_name']}');
       //return true;
-
 
       map = profile;
       map['id'] = profile['id'];
@@ -119,20 +142,21 @@ Future<Map> loginWithFacebook() async{
       map['email'] = profile['email'];
       map['imageUrl'] = profile['picture']['data']['url'];
 
-      Map customerMap = await register(profile['firstName'], profile['lastName'], profile['email'], '', '123', '123');
+      Map customerMap = await register(profile['firstName'],
+          profile['lastName'], profile['email'], '', '123', '123');
       Globals.customerId = customerMap['customer_id'];
       map['id'] = customerMap['customer_id'];
-      print('${map['id']}');
+//      print('${map['id']}');
     }
-  } catch(error){
+  } catch (error) {
     map = null;
   }
 
-  print('${map.toString()}');
+//  print('${map.toString()}');
   return map;
 }
 
-Future<Map> loginWithGoogle() async{
+Future<Map> loginWithGoogle() async {
   Map map;
   GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
@@ -157,14 +181,13 @@ Future<Map> loginWithGoogle() async{
     tmpMap['email'] = result.email;
     tmpMap['imageUrl'] = result.photoUrl;
 
-    map = await register(
-        tmpMap['firstName'], tmpMap['lastName'], tmpMap['email'], '', '123',
-        '123');
-//    Globals.customerId = customerMap['customer_id'];
+    map = await register(tmpMap['firstName'], tmpMap['lastName'],
+        tmpMap['email'], '', '123', '123');
+    Globals.customerId = map['customer_id'];
 //    map['id'] = customerMap['customer_id'];
-    print('$map');
+//    print('$map');
     //return true;
-  }on SocketException catch (_) {
+  } on SocketException catch (_) {
     map = null;
     print('not connected');
   } catch (error) {
@@ -191,10 +214,9 @@ Future<List> getSectorsList() async {
   } catch (error) {
     return null;
   }
-
 }
 
-Future<List> getCategoriesList(int sectorId) async{
+Future<List> getCategoriesList(int sectorId) async {
   String apiUrl = '$_baseUrl/api/Category/home?count=100&sector_id=$sectorId';
 
   var response = await http.get(apiUrl);
@@ -230,7 +252,6 @@ Future<List> getProductsList(int categoryId) async {
   } catch (e) {
     return null;
   }
-
 }
 
 /// Gets the brands list for a category specified
@@ -254,14 +275,67 @@ Future<List> getBrandsList(int categoryId) async {
 }
 
 ///Is the image accessible by its URL.
-Future<bool> isImageAvailable(String imageUrl) async{
-  if(imageUrl.isEmpty || imageUrl == null){
+Future<bool> isImageAvailable(String imageUrl) async {
+  if (imageUrl.isEmpty || imageUrl == null) {
     return false;
   }
   var response = await http.get(imageUrl);
 
-  if(response.statusCode == 200){
+  if (response.statusCode == 200) {
     return true;
   }
   return false;
+}
+
+///Adds a product specified by its productId with
+///specified quantity to the customer's cart.
+Future<Map> addToCart(int productId, int quantity) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/Cart/add';
+  var response = await http.post(
+    apiUrl,
+    body: {
+      'ShoppingCartTypeId': '2',
+      'customerId': '${Globals.customerId}',
+      'productId': '$productId',
+      'quantity': '$quantity'
+    },
+  );
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
+///Adds a product specified by its productId
+///to the customer's wishlist
+Future<Map> addToWishList(int productId) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/Cart/add';
+  print('${Globals.customerId}');
+  try {
+    var response = await http.post(
+      apiUrl,
+      body: {
+        "ShoppingCartTypeId": "1",
+        "customerId": "${Globals.customerId}",
+        "productId": "$productId",
+        "quantity": "1"
+      },
+    );
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
+      result = json.decode(response.body);
+    }
+  } on SocketException catch (e) {
+    print('$e');
+  } catch (e) {
+    print('$e');
+  }
+
+  return result;
 }

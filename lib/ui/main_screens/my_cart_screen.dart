@@ -60,11 +60,11 @@ class _MyCartScreenState extends State<MyCartScreen> {
 //                    size: _size,
                     sellingPrice: _sellingPrice,
                     onDelete: (){
-                      setState(() {
-                        Globals.controller.customer.cart.removeAt(index);
-                        _list = Globals.controller.customer.cart;
-                        _totalPrice = Globals.controller.calculateTotalPrice();
-                      });
+//                      setState(() {
+//                        Globals.controller.customer.cart.removeAt(index);
+//                        _list = Globals.controller.customer.cart;
+//                        _totalPrice = Globals.controller.calculateTotalPrice();
+//                      });
                     },
                   ),
                   Container(
@@ -74,11 +74,11 @@ class _MyCartScreenState extends State<MyCartScreen> {
                       children: <Widget>[
                         GestureDetector(
                           onTap: (){
-                            setState(() {
-                              _quantityValue ++;
-                              Globals.controller.customer.cart[index].quantity = _quantityValue;
-                              _totalPrice = Globals.controller.calculateTotalPrice();
-                            });
+//                            setState(() {
+//                              _quantityValue ++;
+//                              Globals.controller.customer.cart[index].quantity = _quantityValue;
+//                              _totalPrice = Globals.controller.calculateTotalPrice();
+//                            });
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -100,13 +100,13 @@ class _MyCartScreenState extends State<MyCartScreen> {
                         ),
                         GestureDetector(
                           onTap: (){
-                            if(_quantityValue > 1){
-                              setState(() {
-                                _quantityValue --;
-                                Globals.controller.customer.cart[index].quantity = _quantityValue;;
-                                _totalPrice = Globals.controller.calculateTotalPrice();
-                              });
-                            }
+//                            if(_quantityValue > 1){
+//                              setState(() {
+//                                _quantityValue --;
+//                                Globals.controller.customer.cart[index].quantity = _quantityValue;;
+//                                _totalPrice = Globals.controller.calculateTotalPrice();
+//                              });
+//                            }
 
                           },
                           child: Padding(

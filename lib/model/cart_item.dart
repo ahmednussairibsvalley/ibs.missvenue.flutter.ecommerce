@@ -7,6 +7,13 @@ class CartItem{
 
   CartItem(this._id, this._product, this._quantity);
 
+
+  CartItem.fromJson(Map json){
+    _id = json['ProductId'];
+    _quantity = json['Quantity'];
+    _product = Product.fromJson(json['Product']);
+  }
+
   int get quantity => _quantity;
 
   set quantity(int value) {

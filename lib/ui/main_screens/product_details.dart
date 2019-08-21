@@ -52,13 +52,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     // TODO: implement initState
     super.initState();
     super.initState();
-    for (int i = 0; i < Globals.controller.customer.wishList.length; i++) {
-      if (Globals.controller.customer.wishList.contains(
-          Globals.controller.getProductById(id))) {
-        _addedToWishlist = true;
-        break;
-      }
-    }
+    _addedToWishlist = Globals.controller.containsWishListItem(id);
   }
   @override
   Widget build(BuildContext context) {
@@ -143,19 +137,31 @@ class _ProductDetailsState extends State<ProductDetails> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _addedToWishlist = _addedToWishlist ? false : true;
-                      if (_addedToWishlist) {
-                        Globals.controller.customer.wishList.add(
-                            Globals.controller.getProductById(id)
-                        );
-                      } else {
-                        Globals.controller.customer.wishList.remove(
-                            Globals.controller.getProductById(id)
-                        );
+                  onTap: () async {
+                    if (!_addedToWishlist) {
+                      Map addedToWishList = await addToWishList(id);
+                      if (addedToWishList != null &&
+                          addedToWishList['result'] == true) {
+                        setState(() {
+                          _addedToWishlist = true;
+                          Globals.controller.customer.wishList.add(
+                              Globals.controller.getProductById(id)
+                          );
+                        });
                       }
-                    });
+                    }
+//                    setState(() {
+//                      _addedToWishlist = _addedToWishlist ? false : true;
+//                      if (_addedToWishlist) {
+//                        Globals.controller.customer.wishList.add(
+//                            Globals.controller.getProductById(id)
+//                        );
+//                      } else {
+//                        Globals.controller.customer.wishList.remove(
+//                            Globals.controller.getProductById(id)
+//                        );
+//                      }
+//                    });
                   },
                   child: Container(
                     width: _width / 10,
@@ -703,19 +709,31 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
               )
                   : Text('$_price SR'),
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _addedToWishlist = _addedToWishlist ? false : true;
-                    if (_addedToWishlist) {
-                      Globals.controller.customer.wishList.add(
-                          Globals.controller.getProductById(_id)
-                      );
-                    } else {
-                      Globals.controller.customer.wishList.remove(
-                          Globals.controller.getProductById(_id)
-                      );
+                onTap: () async {
+                  if (!_addedToWishlist) {
+                    Map addedToWishlistMap = await addToWishList(_id);
+                    if (addedToWishlistMap != null &&
+                        addedToWishlistMap['result']) {
+                      setState(() {
+                        _addedToWishlist = true;
+                        Globals.controller.customer.wishList.add(
+                            Globals.controller.getProductById(_id)
+                        );
+                      });
                     }
-                  });
+                  }
+//                  setState(() {
+//                    _addedToWishlist = _addedToWishlist ? false : true;
+//                    if (_addedToWishlist) {
+//                      Globals.controller.customer.wishList.add(
+//                          Globals.controller.getProductById(_id)
+//                      );
+//                    } else {
+//                      Globals.controller.customer.wishList.remove(
+//                          Globals.controller.getProductById(_id)
+//                      );
+//                    }
+//                  });
                 },
                 child: _addedToWishlist ?
                 Icon(Icons.favorite, color: Colors.red, size: 30,)

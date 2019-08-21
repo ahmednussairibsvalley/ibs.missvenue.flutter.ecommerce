@@ -63,6 +63,7 @@ class _OfferItemState extends State<OfferItem> {
 
   double _discountPercentage;
   bool _addedToWishlist = false;
+  bool _addedToCart = false;
 
   _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
 
@@ -70,12 +71,22 @@ class _OfferItemState extends State<OfferItem> {
   void initState() {
     super.initState();
     _discountPercentage = 100 - ((_sellingPrice / _price) * 100);
-    for(int i = 0; i < Globals.controller.customer.wishList.length ; i++){
-      if(Globals.controller.customer.wishList.contains(Globals.controller.getProductById(_id))){
-        _addedToWishlist = true;
-        break;
-      }
-    }
+//    for(int i = 0; i < Globals.controller.customer.wishList.length ; i++){
+//      if(Globals.controller.customer.wishList[i].id == _id){
+//        _addedToWishlist = true;
+//        break;
+//      }
+//    }
+
+    _addedToWishlist = Globals.controller.containsWishListItem(_id);
+    _addedToCart = Globals.controller.containsCartItem(_id);
+
+//    for(int i = 0; i < Globals.controller.customer.cart.length ; i++){
+//      if(Globals.controller.customer.cart[i].product.id == _id){
+//        _addedToCart = true;
+//        break;
+//      }
+//    }
   }
   @override
   Widget build(BuildContext context) {
@@ -113,25 +124,33 @@ class _OfferItemState extends State<OfferItem> {
                 ),
               ),
               GestureDetector(
-                onTap: (){
-                  if(!Globals.controller.containsCartItem(_id)){
-                    Globals.controller.addToCart(Globals.controller.getProductById(_id), 1);
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        duration: Duration(seconds: 4),
-                        backgroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            side: BorderSide(
-                              style: BorderStyle.none,
-                              width: 1,
-                            )
+                onTap: () async {
+                  if (!_addedToCart) {
+                    Map addedToCart = await addToCart(_id, 1);
+                    if (addedToCart != null && addedToCart['result']) {
+                      Globals.controller.addToCart(
+                          Globals.controller.getProductById(_id), 1);
+                      setState(() {
+                        _addedToCart = true;
+                      });
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          duration: Duration(seconds: 4),
+                          backgroundColor: Colors.black87,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                              side: BorderSide(
+                                style: BorderStyle.none,
+                                width: 1,
+                              )
+                          ),
+                          content: Text('The item is added to the cart',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                        content: Text('The item is added to the cart',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
+                      );
+                    }
+
                   }else{
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
@@ -196,19 +215,19 @@ class _OfferItemState extends State<OfferItem> {
                 ],
               ),
               GestureDetector(
-                onTap: (){
-                  setState(() {
-                    _addedToWishlist = _addedToWishlist?false: true;
-                    if(_addedToWishlist){
-                      Globals.controller.customer.wishList.add(
-                          Globals.controller.getProductById(_id)
-                      );
-                    } else {
-                      Globals.controller.customer.wishList.remove(
-                          Globals.controller.getProductById(_id)
-                      );
+                onTap: () async {
+                  if (!_addedToWishlist) {
+                    Map addedToWishList = await addToWishList(_id);
+                    if (addedToWishList != null &&
+                        addedToWishList['result'] == true) {
+                      setState(() {
+                        _addedToWishlist = true;
+                        Globals.controller.customer.wishList.add(
+                            Globals.controller.getProductById(_id)
+                        );
+                      });
                     }
-                  });
+                  }
                 },
                 child: _addedToWishlist?
                 Icon(Icons.favorite, color: Colors.red, size: 30,)

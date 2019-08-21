@@ -18,9 +18,22 @@ class Controller {
   ///List of Sector objects
   List<Sector> _sectors;
 
+  ///List of countries returned from the API
+  Map _countries;
+
   Controller() {
     _offers = List();
     _sectors = List();
+    _countries = Map();
+  }
+
+
+  ///Gets the countries list.
+  Map get countries => _countries;
+
+  ///Sets the countries list.
+  set countries(Map value) {
+    _countries = value;
   }
 
   /// Initialize the Customer object.
@@ -231,6 +244,20 @@ class Controller {
     return value;
   }
 
+  ///Does the customer's wishlist contain
+  ///the product whose id is the
+  ///productId?
+  bool containsWishListItem(int productId) {
+    bool value = false;
+    for (int i = 0; i < _customer.wishList.length; i++) {
+      if (_customer.wishList[i].id == productId) {
+        value = true;
+        break;
+      }
+    }
+    return value;
+  }
+
   ///Calculates the total price of the
   ///items in the customer's cart and
   ///returns it.
@@ -340,24 +367,30 @@ class Controller {
     return result;
   }
 
+  populateCountries(List json) {
+    for (int i = 0; i < json.length; i++) {
+      countries[json[i]['Id']] = json[i]['Name'];
+    }
+  }
+
   ///It's just test data to populate
   ///fields and objects as there is no
   ///ready API for the project
   _testData() {
-    final addresses = [
-      Address(1, '40, The 10th District, Nasr City', 'First Floor, Suite 3',
-          '+201118301953', 'Nasr City', 'Cairo', 'Egypt'),
-      Address(
-          2,
-          '100, Al-Maadi',
-          '',
-          '+201118551353',
-          'Al-Maadi',
-          'Cairo',
-          'Egypt'),
-    ];
-    _customer.addresses.add(addresses[0]);
-    _customer.addresses.add(addresses[1]);
+//    final addresses = [
+//      Address(1, '40, The 10th District, Nasr City', 'First Floor, Suite 3',
+//          '+201118301953', 'Nasr City', 'Cairo', 'Egypt'),
+//      Address(
+//          2,
+//          '100, Al-Maadi',
+//          '',
+//          '+201118551353',
+//          'Al-Maadi',
+//          'Cairo',
+//          'Egypt'),
+//    ];
+//    _customer.addresses.add(addresses[0]);
+//    _customer.addresses.add(addresses[1]);
 
     final orders = [
       Order(10023, 'Pending', DateTime.utc(2019, 4, 20)),

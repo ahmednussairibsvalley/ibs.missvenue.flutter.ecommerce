@@ -175,6 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // The login button ..
           ListTile(
             onTap: () async{
+              FocusScope.of(context).requestFocus(FocusNode());
               var connectivityResult = await Connectivity().checkConnectivity();
               if (connectivityResult != ConnectivityResult.mobile &&
                   connectivityResult != ConnectivityResult.wifi){
@@ -183,15 +184,16 @@ class _LoginScreenState extends State<LoginScreen> {
               }
 
               if (_formKey.currentState.validate()) {
-
                 setState(() {
                   _waiting = true;
                 });
                 Map accepted = await authenticate(_email, _password);
 
 
-
                 if(accepted != null && accepted['Login_Result']['login_result'] == true){
+
+                  ///Preparing the products.
+                  //---------------------------------------------------------
                   var list = await getSectorsList();
                   Globals.controller.populateSectors(list);
 
@@ -207,34 +209,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       Globals.controller.populateBrands(i, j, brandsList);
                     }
                   }
-                  Globals.customerId = accepted['Customer']['Customer_Id'];
-                  String fullName = accepted['Customer']['FullName'];
-                  List names = fullName.split(' ');
+                  //---------------------------------------------------------
 
-                  String firstName = '';
-                  String lastName = '';
-                  if (names.length >= 2) {
-                    firstName = names[0];
-                    lastName = names[1];
-                  } else if (names.length == 1) {
-                    firstName = names[0];
-                  }
-                  Globals.controller.initCustomer(
-                    accepted['Customer']['Customer_Id'],
-                    firstName, lastName, accepted['Customer']['Email'],
-                    accepted['Customer']['Customer_Phone'],);
+                  ///Preparing the countries.
+                  /////---------------------------------------------------------
+                  List countriesList = await getCountriesFromApi();
 
-                  Globals.controller.initCustomerFromJson(accepted);
+                  Globals.controller.populateCountries(countriesList);
+
+//                  for(int i = 0; i < Globals.controller.countries.keys.toList().length; i ++){
+//                    print('${Globals.controller.countries[Globals.controller.countries.keys.toList()[i]]}');
+//                  }
+
+                  //---------------------------------------------------------
+
+                  ///Preparing the customer data.
+                  ///--------------------------------------------------------
+//                  Globals.customerId = accepted['Customer']['Customer_Id'];
+
+                  Map customerMap = await getCustomerDetails(
+                      accepted['Customer']['Customer_Id']);
+                  Globals.controller.initCustomerFromJson(customerMap);
                   Navigator.of(context).pushReplacementNamed('/home');
                 } else {
                   setState(() {
                     _waiting = false;
-
                   });
                   _showInvalidEmailOrPasswordDialog();
                 }
-
-
               }
 
             },
@@ -305,16 +307,18 @@ class _LoginScreenState extends State<LoginScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+
+              ///Facebook Login.
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                 child: GestureDetector(
                   onTap: () async{
+                    FocusScope.of(context).requestFocus(FocusNode());
                     var connectivityResult = await Connectivity().checkConnectivity();
                     if (connectivityResult != ConnectivityResult.mobile &&
                         connectivityResult != ConnectivityResult.wifi){
                       _showNoConnectivityDialog();
                       return;
-
                     }
                     setState(() {
                       _waiting = true;
@@ -336,9 +340,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           Globals.controller.populateBrands(i, j, brandsList);
                         }
                       }
-                      Globals.controller.initCustomer(signedInWithFacebook['id'],
-                          signedInWithFacebook['firstName'], signedInWithFacebook['lastName'],
-                          signedInWithFacebook['email'], '');
+
+                      ///Preparing the countries.
+                      /////---------------------------------------------------------
+                      List countriesList = await getCountriesFromApi();
+
+                      Globals.controller.populateCountries(countriesList);
+
+//                  for(int i = 0; i < Globals.controller.countries.keys.toList().length; i ++){
+//                    print('${Globals.controller.countries[Globals.controller.countries.keys.toList()[i]]}');
+//                  }
+
+                      //---------------------------------------------------------
+
+
+//                      Globals.controller.initCustomer(signedInWithFacebook['id'],
+//                          signedInWithFacebook['firstName'], signedInWithFacebook['lastName'],
+//                          signedInWithFacebook['email'], '');
+                      Map customerMap = await getCustomerDetails(
+                          Globals.customerId);
+                      Globals.controller.initCustomerFromJson(customerMap);
                       Navigator.of(context).pushReplacementNamed('/home');
                       //debugPrint('${signedInWithFacebook.toString()}');
                     } else {
@@ -354,16 +375,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+
+              ///Google+ Login
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                 child: GestureDetector(
                   onTap: () async{
+                    FocusScope.of(context).requestFocus(FocusNode());
                     var connectivityResult = await Connectivity().checkConnectivity();
                     if (connectivityResult != ConnectivityResult.mobile &&
                         connectivityResult != ConnectivityResult.wifi){
                       _showNoConnectivityDialog();
                       return;
-
                     }
                     setState(() {
                       _waiting = true;
@@ -386,9 +409,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       }
 
-                      Globals.controller.initCustomer(singedInWithGoogle['id'],
-                          singedInWithGoogle['firstName'], singedInWithGoogle['lastName'],
-                          singedInWithGoogle['email'], '');
+                      ///Preparing the countries.
+                      /////---------------------------------------------------------
+                      List countriesList = await getCountriesFromApi();
+
+                      Globals.controller.populateCountries(countriesList);
+
+//                  for(int i = 0; i < Globals.controller.countries.keys.toList().length; i ++){
+//                    print('${Globals.controller.countries[Globals.controller.countries.keys.toList()[i]]}');
+//                  }
+
+                      //---------------------------------------------------------
+//                      Globals.controller.initCustomer(singedInWithGoogle['id'],
+//                          singedInWithGoogle['firstName'], singedInWithGoogle['lastName'],
+//                          singedInWithGoogle['email'], '');
+                      Map customerMap = await getCustomerDetails(
+                          Globals.customerId);
+                      Globals.controller.initCustomerFromJson(customerMap);
                       Navigator.of(context).pushReplacementNamed('/home');
                       //debugPrint('${singedInWithGoogle.toString()}');
                     } else {

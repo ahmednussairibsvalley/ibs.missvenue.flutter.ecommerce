@@ -108,15 +108,17 @@ class _AddressItemState extends State<AddressItem> {
                 fontSize: 20,
               ),
             ),
-            _address2.isEmpty || _address2 == ''
+            _address2 == null || _address2 == ''
                 ? Text(
-                    _address1,
+              _address1 != null ? _address1 : '',
                     style: TextStyle(
                       fontSize: 20,
                     ),
                   )
                 : Text(
-                    '$_address1\n$_address2',
+              _address1 != null && _address2 != null
+                  ? '$_address1\n$_address2'
+                  : '',
                     style: TextStyle(
                       fontSize: 20,
                     ),

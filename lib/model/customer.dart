@@ -23,25 +23,40 @@ class Customer {
   }
 
   Customer.fromJson(Map json){
-    _id = json['Customer']['Customer_Id'];
-    _email = json['Customer']['Email'];
-    _phone = json['Customer']['Customer_Phone'];
-    String fullName = json['Customer']['FullName'];
+    _id = json['Id'];
+    _email = json['Email'];
+    _phone = json['Mobile'];
+    String fullName = json['FullName'];
     List names = fullName.split(' ');
-    if(names.length >= 2){
+    _firstName = '';
+    _lastName = '';
+    if (names.length > 1) {
       _firstName = names[0];
       _lastName = names[1];
-    } else if(names.length == 1){
+    } else if (names.length > 0) {
       _firstName = names[0];
-      _lastName = '';
-    } else {
-      _firstName = '';
-      _lastName = '';
     }
+
+
     _orders = List();
     _addresses = List();
     _wishList = List();
     _cart = List();
+
+    List addresses = json['Addresses'];
+    for (int i = 0; i < addresses.length; i ++) {
+      _addresses.add(Address.fromJson(addresses[i]));
+    }
+
+    List wishlists = json['wishlists'];
+    for (int i = 0; i < wishlists.length; i ++) {
+      _wishList.add(Product.fromJson(wishlists[i]['Product']));
+    }
+
+    List cartItems = json['shoppingcarts'];
+    for (int i = 0; i < cartItems.length; i++) {
+      _cart.add(CartItem.fromJson(cartItems[i]));
+    }
   }
 
   String get email => _email;
