@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../globals.dart';
 import '../../utils.dart';
+import 'product_details.dart';
 
 class OffersScreen extends StatelessWidget {
   @override
@@ -30,10 +31,10 @@ class OffersScreen extends StatelessWidget {
           final int _id = Globals.controller.offers[index].id;
           final String _title = Globals.controller.offers[index].title;
           final double _price = Globals.controller.offers[index].price;
-          final String _imageUrl = Globals.controller.offers[index]
-              .imagesUrls[0];
+          final List _imagesUrls = Globals.controller.offers[index]
+              .imagesUrls;
           final double _sellingPrice = Globals.controller.offers[index].sellingPrice;
-          return OfferItem(_id, _title, _price, _imageUrl, _sellingPrice);
+          return OfferItem(_id, _title, _price, _imagesUrls, _sellingPrice,);
         }),
       ),
     );
@@ -45,12 +46,15 @@ class OfferItem extends StatefulWidget {
   final int _id;
   final String _title;
   final double _price;
-  final String _imageUrl;
+  final List _imagesUrls;
   final double _sellingPrice;
 
-  OfferItem(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
+  OfferItem(this._id, this._title, this._price, this._imagesUrls,
+      this._sellingPrice,);
   @override
-  _OfferItemState createState() => _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
+  _OfferItemState createState() =>
+      _OfferItemState(this._id, this._title, this._price, this._imagesUrls,
+        this._sellingPrice,);
 }
 
 class _OfferItemState extends State<OfferItem> {
@@ -58,35 +62,21 @@ class _OfferItemState extends State<OfferItem> {
   final int _id;
   final String _title;
   final double _price;
-  final String _imageUrl;
+  final List _imagesUrls;
   final double _sellingPrice;
 
   double _discountPercentage;
   bool _addedToWishlist = false;
-  bool _addedToCart = false;
 
-  _OfferItemState(this._id, this._title, this._price, this._imageUrl, this._sellingPrice);
+  _OfferItemState(this._id, this._title, this._price, this._imagesUrls,
+      this._sellingPrice,);
 
   @override
   void initState() {
     super.initState();
     _discountPercentage = 100 - ((_sellingPrice / _price) * 100);
-//    for(int i = 0; i < Globals.controller.customer.wishList.length ; i++){
-//      if(Globals.controller.customer.wishList[i].id == _id){
-//        _addedToWishlist = true;
-//        break;
-//      }
-//    }
 
     _addedToWishlist = Globals.controller.containsWishListItem(_id);
-    _addedToCart = Globals.controller.containsCartItem(_id);
-
-//    for(int i = 0; i < Globals.controller.customer.cart.length ; i++){
-//      if(Globals.controller.customer.cart[i].product.id == _id){
-//        _addedToCart = true;
-//        break;
-//      }
-//    }
   }
   @override
   Widget build(BuildContext context) {
@@ -101,14 +91,28 @@ class _OfferItemState extends State<OfferItem> {
               Center(
                 child: GestureDetector(
                   onTap: (){
-
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetails(
+                            id: _id,
+                            title: _title,
+                            price: _price,
+                            imagesUrls: _imagesUrls,
+                            sellingPrice: _sellingPrice,
+                            sectorIndex: Globals.controller
+                                .getProductSectorIndex(_id),
+                            categoryIndex: Globals.controller
+                                .getProductCategoryIndex(_id),
+                          ),
+                    ),
+                    );
                   },
                   child: FutureBuilder(
-                    future: isImageAvailable(_imageUrl),
+                      future: isImageAvailable(_imagesUrls[0]),
                       builder: (context, snapshot){
                         if(snapshot.hasData){
                           if(snapshot.data){
-                            return Image.network(_imageUrl,
+                            return Image.network(_imagesUrls[0],
                               width: 90,
                               height: 80,
                             );
@@ -130,9 +134,6 @@ class _OfferItemState extends State<OfferItem> {
                     if (addedToCart != null && addedToCart['result']) {
                       Globals.controller.addToCart(
                           Globals.controller.getProductById(_id), 1);
-                      setState(() {
-                        _addedToCart = true;
-                      });
                       Scaffold.of(context).showSnackBar(
                         SnackBar(
                           duration: Duration(seconds: 4),
