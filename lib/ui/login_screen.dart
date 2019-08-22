@@ -715,13 +715,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       }
 
+
                       if(_key.currentState.validate()){
 
                         Navigator.of(context).pop();
-                        //debugPrint('Right Email.');
 
-                        _showPasswordRecoveryResultDialog( _email);
-
+                        setState(() {
+                          _waiting = true;
+                        });
+                        Map sentForPasswordRecovery = await sendForPasswordRecovery(
+                            _email);
+                        setState(() {
+                          _waiting = false;
+                        });
+                        if (sentForPasswordRecovery != null) {
+                          _showPasswordRecoveryResultDialog(
+                              _email, sentForPasswordRecovery['user_message']);
+                        } else {
+                          _showPasswordRecoveryResultDialog(
+                              _email, 'Something wrong! .. Please try again.');
+                        }
 
                       }
                       //Navigator.of(context).pop();
@@ -752,100 +765,87 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  _showPasswordRecoveryResultDialog(String email) async{
+  _showPasswordRecoveryResultDialog(String email, String message) async {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
 
-    String _result;
+    showDialog(
+        builder: (context) {
+          return CustomAlertDialog(
+            titlePadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              width: _width / 2,
+              height: _height / 2,
 
-    setState(() {
-      _waiting = true;
-    });
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(33.0)),
+              ),
 
-    _result = await sendForPasswordRecovery(email);
-
-    //debugPrint('$_result');
-    if(_result.isNotEmpty && _result != null){
-      setState(() {
-        _waiting = false;
-
-      });
-      showDialog(
-          builder: (context){
-            return CustomAlertDialog(
-              titlePadding: EdgeInsets.all(0),
-              contentPadding: EdgeInsets.all(0),
-              content: Container(
-                width: _width /2,
-                height: _height / 2,
-
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(33.0)),
-                ),
-
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Stack(
-                      children: <Widget>[
-                        Image.asset('assets/dialog_header.png', fit: BoxFit.cover,),
-                        Positioned(
-                          right: 0.0,
-                          left: 0.0,
-                          top: 0.0,
-                          bottom: 0.0,
-                          child: Center(
-                            child: Icon(Icons.lock_outline,
-                              color: Colors.white,
-                              size: 40,
-                            ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/dialog_header.png', fit: BoxFit.cover,),
+                      Positioned(
+                        right: 0.0,
+                        left: 0.0,
+                        top: 0.0,
+                        bottom: 0.0,
+                        child: Center(
+                          child: Icon(Icons.lock_outline,
+                            color: Colors.white,
+                            size: 40,
                           ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                        child: Container(
-                          child: Text(_result,
-                            style: TextStyle(
-                              color: Color(0xff471fa4),
-                              fontSize: 20,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.all(10),
-                        )
-                    ),
-                    ListTile(
-                      onTap: (){
-                        Navigator.of(context).pop();
-                      },
-                      title: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Container(
-                          child: Text('Close',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Color(0xff471fa4),
-                            borderRadius: BorderRadius.all(Radius.circular(50)),
-                          ),
-                          padding: EdgeInsets.all(10),
                         ),
                       ),
+                    ],
+                  ),
+                  Expanded(
+                      child: Container(
+                        child: Text(message,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xff471fa4),
+                            fontSize: 20,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(10),
+                      )
+                  ),
+                  ListTile(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    title: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        child: Text('Close',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color(0xff471fa4),
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                        ),
+                        padding: EdgeInsets.all(10),
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          }, context: context
-      );
-    }
+            ),
+          );
+        }, context: context
+    );
 
 
   }

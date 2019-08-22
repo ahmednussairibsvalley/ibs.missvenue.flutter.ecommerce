@@ -80,19 +80,16 @@ Future<List> getCountriesFromApi() async {
   return result;
 }
 
-Future<String> sendForPasswordRecovery(String email) async {
-  String apiUrl = '$_baseUrl/Customer/mobile_PasswordRecoverySend';
+Future<Map> sendForPasswordRecovery(String email) async {
+  String apiUrl = '$_baseUrl/api/password/recovery';
   var response = await http.post(apiUrl, body: {
-    'Email': email,
+    'email': email,
   });
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||
       response.statusCode == 202) {
     Map result = json.decode(response.body);
-    Globals.customerId = result['Result'] == true
-        ? result['Customer_Id']
-        : result['Result'] == false ? 0 : 0;
-    return result['Result'];
+    return result;
   } else {
     return null;
   }
