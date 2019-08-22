@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'product_attributes_controllers.dart';
 import '../../globals.dart';
 import '../../utils.dart';
 
@@ -57,7 +56,6 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
-    final _height = MediaQuery.of(context).size.height;
     final int _productIndex = _getProductIndex(sectorIndex, categoryIndex, id);
     return sectorIndex > -1 && categoryIndex > -1 ?
     SafeArea(
@@ -559,7 +557,6 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
   final int categoryIndex;
 
   bool _addedToWishlist = false;
-  bool _addedToCart = false;
 
   _RelatedProductItemState(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
@@ -568,24 +565,8 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
   @override
   void initState() {
     super.initState();
-//    for (int i = 0; i < Globals.controller.customer.wishList.length; i++) {
-//      if (Globals.controller.customer.wishList.contains(
-//          Globals.controller.getProductById(_id))) {
-//        _addedToWishlist = true;
-//        break;
-//      }
-//    }
 
     _addedToWishlist = Globals.controller.containsWishListItem(_id);
-    _addedToCart = Globals.controller.containsCartItem(_id);
-
-//    for (int i = 0; i < Globals.controller.customer.cart.length; i++) {
-//      if (Globals.controller.customer.cart[i].product ==
-//          Globals.controller.getProductById(_id)) {
-//        _addedToCart = true;
-//        break;
-//      }
-//    }
   }
 
   @override
@@ -648,13 +629,10 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
               ),
               GestureDetector(
                 onTap: () async {
-                  if (!_addedToCart) {
+                  if (!Globals.controller.containsCartItem(_id)) {
                     Map addedToCartApi = await addToCart(_id, 1);
 //                    print('$addedToCartApi');
                     if (addedToCartApi != null && addedToCartApi['result']) {
-                      setState(() {
-                        _addedToCart = true;
-                      });
                       Globals.controller.addToCart(
                           Globals.controller.getProductById(_id), 1);
                       Scaffold.of(context).showSnackBar(
@@ -751,18 +729,6 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                       });
                     }
                   }
-//                  setState(() {
-//                    _addedToWishlist = _addedToWishlist ? false : true;
-//                    if (_addedToWishlist) {
-//                      Globals.controller.customer.wishList.add(
-//                          Globals.controller.getProductById(_id)
-//                      );
-//                    } else {
-//                      Globals.controller.customer.wishList.remove(
-//                          Globals.controller.getProductById(_id)
-//                      );
-//                    }
-//                  });
                 },
                 child: _addedToWishlist ?
                 Icon(Icons.favorite, color: Colors.red, size: 30,)

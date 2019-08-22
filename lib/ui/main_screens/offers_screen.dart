@@ -125,7 +125,7 @@ class _OfferItemState extends State<OfferItem> {
               ),
               GestureDetector(
                 onTap: () async {
-                  if (!_addedToCart) {
+                  if (!Globals.controller.containsCartItem(_id)) {
                     Map addedToCart = await addToCart(_id, 1);
                     if (addedToCart != null && addedToCart['result']) {
                       Globals.controller.addToCart(

@@ -63,7 +63,7 @@ class Controller {
   ///Adds a product with specified quantitiy to
   ///the customer's cart.
   addToCart(Product product, int quantity) {
-    CartItem item = CartItem(_customer.cart.length, product, quantity);
+    CartItem item = CartItem(product.id, product, quantity);
     bool _added = false;
     if (_customer != null) {
       for (int i = 0; i < _customer.cart.length; i++) {

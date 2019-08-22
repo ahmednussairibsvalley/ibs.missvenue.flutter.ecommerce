@@ -72,7 +72,6 @@ class _ProductItemState extends State<ProductItem> {
   final int categoryIndex;
 
   bool _addedToWishlist = false;
-  bool _addedToCart = false;
 
   _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
@@ -81,23 +80,7 @@ class _ProductItemState extends State<ProductItem> {
   @override
   void initState() {
     super.initState();
-//    for(int i = 0; i < Globals.controller.customer.wishList.length ; i++){
-////      if(Globals.controller.customer.wishList[i].id == _id){
-////        _addedToWishlist = true;
-////        break;
-////      }
-////    }
-
     _addedToWishlist = Globals.controller.containsWishListItem(_id);
-
-    _addedToCart = Globals.controller.containsCartItem(_id);
-
-//    for(int i = 0; i < Globals.controller.customer.cart.length ; i++){
-//      if(Globals.controller.customer.cart[i].product.id == _id){
-//        _addedToCart = true;
-//        break;
-//      }
-//    }
   }
   @override
   Widget build(BuildContext context) {
@@ -158,14 +141,11 @@ class _ProductItemState extends State<ProductItem> {
               ),
               GestureDetector(
                 onTap: () async {
-                  if (!_addedToCart) {
+                  if (!Globals.controller.containsCartItem(_id)) {
                     Map addedToCartMap = await addToCart(_id, 1);
                     if (addedToCartMap != null && addedToCartMap['result']) {
                       Globals.controller.addToCart(
                           Globals.controller.getProductById(_id), 1);
-                      setState(() {
-                        _addedToCart = true;
-                      });
                       Scaffold.of(context).showSnackBar(
                         SnackBar(
                           duration: Duration(seconds: 4),
