@@ -18,7 +18,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _waiting = false;
 
   ///Shows the failure dialog.
-  _showRegistrationFailureDialog(){
+  _showRegistrationFailureDialog(String title) {
     showDialog(
         context: context,
         builder: (context){
@@ -57,7 +57,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   Expanded(
                       child: Container(
-                        child: Text('Registration Failed.',
+                        child: Text(title,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Color(0xff471fa4),
                             fontSize: 20,
@@ -97,7 +98,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   ///Shows the success dialog.
-  _showRegistrationSuccessDialog(){
+  _showRegistrationSuccessDialog(String title) {
     showDialog(
         context: context,
         builder: (context){
@@ -136,7 +137,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   Expanded(
                       child: Container(
-                        child: Text('Registration Complete.',
+                        child: Text(title,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Color(0xff471fa4),
                             fontSize: 20,
@@ -317,16 +319,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   Map registered = await register(_firstName, _lastName,_email, _phone,
                                       _password, _passwordConfirm);
 
-                                  if(registered != null){
+                                  print('$registered');
+                                  if (registered != null &&
+                                      registered['result']) {
                                     setState(() {
                                       _waiting = false;
                                     });
-                                    _showRegistrationSuccessDialog();
+                                    _showRegistrationSuccessDialog(
+                                        registered['result_message']);
                                   } else {
                                     setState(() {
                                       _waiting = false;
                                     });
-                                    _showRegistrationFailureDialog();
+                                    _showRegistrationFailureDialog(
+                                        registered['result_message']);
                                   }
 
 

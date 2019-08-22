@@ -65,7 +65,6 @@ class _WishlistScreenState extends State<WishlistScreen>{
 //                    print('${Globals.customerId}');
 //                    print('$_id');
                         Map removedFromWishList = await removeFromWishList(_id);
-                        print('$removedFromWishList');
                         if (removedFromWishList != null &&
                             removedFromWishList['result']) {
                           setState(() {

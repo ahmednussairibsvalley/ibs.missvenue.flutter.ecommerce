@@ -62,7 +62,6 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     sellingPrice: _sellingPrice,
                     onDelete: () async {
                       Map removedFromCartApi = await removeFromCart(_id);
-                      print('$removedFromCartApi');
                       if (removedFromCartApi != null &&
                           removedFromCartApi['result']) {
                         setState(() {
@@ -81,12 +80,20 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     child: Column(
                       children: <Widget>[
                         GestureDetector(
-                          onTap: (){
-//                            setState(() {
-//                              _quantityValue ++;
-//                              Globals.controller.customer.cart[index].quantity = _quantityValue;
-//                              _totalPrice = Globals.controller.calculateTotalPrice();
-//                            });
+                          onTap: () async {
+                            _quantityValue ++;
+                            Map updatedCartItemQuantity = await updateCartItem(
+                                _id, _quantityValue);
+                            if (updatedCartItemQuantity != null &&
+                                updatedCartItemQuantity['result']) {
+                              setState(() {
+                                Globals.controller.customer.cart[index]
+                                    .quantity = _quantityValue;
+                                _totalPrice =
+                                    Globals.controller.calculateTotalPrice();
+                              });
+                            }
+
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -107,14 +114,22 @@ class _MyCartScreenState extends State<MyCartScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: (){
-//                            if(_quantityValue > 1){
-//                              setState(() {
-//                                _quantityValue --;
-//                                Globals.controller.customer.cart[index].quantity = _quantityValue;;
-//                                _totalPrice = Globals.controller.calculateTotalPrice();
-//                              });
-//                            }
+                          onTap: () async {
+                            if (_quantityValue > 1) {
+                              _quantityValue --;
+                              Map updatedCartItemQuantity = await updateCartItem(
+                                  _id, _quantityValue);
+                              if (updatedCartItemQuantity != null &&
+                                  updatedCartItemQuantity['result']) {
+                                setState(() {
+                                  Globals.controller.customer.cart[index]
+                                      .quantity = _quantityValue;
+                                  ;
+                                  _totalPrice =
+                                      Globals.controller.calculateTotalPrice();
+                                });
+                              }
+                            }
 
                           },
                           child: Padding(

@@ -331,6 +331,27 @@ Future<Map> removeFromCart(int productId) async {
   return result;
 }
 
+///Updates the cart item quantity.
+Future<Map> updateCartItem(int productId, int quantity) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/Cart/update';
+  var response = await http.post(
+    apiUrl,
+    body: {
+      'ShoppingCartTypeId': '2',
+      'customerId': '${Globals.customerId}',
+      'productId': '$productId',
+      'quantity': '$quantity'
+    },
+  );
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
 ///Adds a product specified by its productId
 ///to the customer's wishlist
 Future<Map> addToWishList(int productId) async {

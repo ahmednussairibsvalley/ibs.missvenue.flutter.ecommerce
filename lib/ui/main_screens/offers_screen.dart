@@ -222,10 +222,22 @@ class _OfferItemState extends State<OfferItem> {
                         addedToWishList['result'] == true) {
                       setState(() {
                         _addedToWishlist = true;
-                        Globals.controller.customer.wishList.add(
-                            Globals.controller.getProductById(_id)
-                        );
+
                       });
+                      Globals.controller.customer.wishList.add(
+                          Globals.controller.getProductById(_id)
+                      );
+                    }
+                  } else {
+                    Map removedFromWishListApi = await removeFromWishList(_id);
+                    if (removedFromWishListApi != null &&
+                        removedFromWishListApi['result']) {
+                      setState(() {
+                        _addedToWishlist = false;
+                      });
+                      Globals.controller.customer.wishList.remove(
+                          Globals.controller.getProductById(_id)
+                      );
                     }
                   }
                 },

@@ -44,7 +44,7 @@ class Customer {
     _cart = List();
 
     List addresses = json['Addresses'];
-    for (int i = 0; i < addresses.length; i ++) {
+    for (int i = 1; i < addresses.length; i ++) {
       _addresses.add(Address.fromJson(addresses[i]));
     }
 
