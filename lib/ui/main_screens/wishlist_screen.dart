@@ -59,11 +59,22 @@ class _WishlistScreenState extends State<WishlistScreen>{
                   final double _price = _list[index].price;
                   final String _imageUrl = _list[index].imagesUrls[0];
                   final double _sellingPrice = _list[index].sellingPrice;
-                  return WishListItem(_id, _title, _price, _imageUrl, _sellingPrice, onDelete: (){
-//                    setState(() {
-//                      Globals.controller.customer.wishList.removeAt(index);
-//                      _list = Globals.controller.customer.wishList;
-//                    });
+                  return WishListItem(
+                      _id, _title, _price, _imageUrl, _sellingPrice,
+                      onDelete: () async {
+//                    print('${Globals.customerId}');
+//                    print('$_id');
+                        Map removedFromWishList = await removeFromWishList(_id);
+                        print('$removedFromWishList');
+                        if (removedFromWishList != null &&
+                            removedFromWishList['result']) {
+                          setState(() {
+                            Globals.controller.customer.wishList.removeAt(
+                                index);
+                            _list = Globals.controller.customer.wishList;
+                          });
+                        }
+
                   });
                 })),
               ),

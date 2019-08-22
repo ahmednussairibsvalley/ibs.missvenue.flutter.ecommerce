@@ -144,24 +144,23 @@ class _ProductDetailsState extends State<ProductDetails> {
                           addedToWishList['result'] == true) {
                         setState(() {
                           _addedToWishlist = true;
-                          Globals.controller.customer.wishList.add(
-                              Globals.controller.getProductById(id)
-                          );
                         });
+                        Globals.controller.customer.wishList.add(
+                            Globals.controller.getProductById(id)
+                        );
+                      }
+                    } else {
+                      Map removedFromWishListApi = await removeFromWishList(id);
+                      if (removedFromWishListApi != null &&
+                          removedFromWishListApi['result']) {
+                        setState(() {
+                          _addedToWishlist = false;
+                        });
+                        Globals.controller.customer.wishList.remove(
+                            Globals.controller.getProductById(id)
+                        );
                       }
                     }
-//                    setState(() {
-//                      _addedToWishlist = _addedToWishlist ? false : true;
-//                      if (_addedToWishlist) {
-//                        Globals.controller.customer.wishList.add(
-//                            Globals.controller.getProductById(id)
-//                        );
-//                      } else {
-//                        Globals.controller.customer.wishList.remove(
-//                            Globals.controller.getProductById(id)
-//                        );
-//                      }
-//                    });
                   },
                   child: Container(
                     width: _width / 10,
@@ -184,26 +183,31 @@ class _ProductDetailsState extends State<ProductDetails> {
                   padding: const EdgeInsets.only(
                       right: 8.0, top: 8.0, bottom: 8.0),
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       if (!Globals.controller.containsCartItem(id)) {
-                        Globals.controller.addToCart(
-                            Globals.controller.getProductById(id), 1);
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 4),
-                            backgroundColor: Colors.black87,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                                side: BorderSide(
-                                  style: BorderStyle.none,
-                                  width: 1,
-                                )
+                        Map addedToCartApi = await addToCart(id, 1);
+                        if (addedToCartApi != null &&
+                            addedToCartApi['result']) {
+                          Globals.controller.addToCart(
+                              Globals.controller.getProductById(id), 1);
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              duration: Duration(seconds: 4),
+                              backgroundColor: Colors.black87,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                  side: BorderSide(
+                                    style: BorderStyle.none,
+                                    width: 1,
+                                  )
+                              ),
+                              content: Text('The item is added to the cart',
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            content: Text('The item is added to the cart',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
+                          );
+                        }
+
                       } else {
                         //debugPrint('Added Already');
                         Scaffold.of(context).showSnackBar(
@@ -564,21 +568,24 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < Globals.controller.customer.wishList.length; i++) {
-      if (Globals.controller.customer.wishList.contains(
-          Globals.controller.getProductById(_id))) {
-        _addedToWishlist = true;
-        break;
-      }
-    }
+//    for (int i = 0; i < Globals.controller.customer.wishList.length; i++) {
+//      if (Globals.controller.customer.wishList.contains(
+//          Globals.controller.getProductById(_id))) {
+//        _addedToWishlist = true;
+//        break;
+//      }
+//    }
 
-    for (int i = 0; i < Globals.controller.customer.cart.length; i++) {
-      if (Globals.controller.customer.cart[i].product ==
-          Globals.controller.getProductById(_id)) {
-        _addedToCart = true;
-        break;
-      }
-    }
+    _addedToWishlist = Globals.controller.containsWishListItem(_id);
+    _addedToCart = Globals.controller.containsCartItem(_id);
+
+//    for (int i = 0; i < Globals.controller.customer.cart.length; i++) {
+//      if (Globals.controller.customer.cart[i].product ==
+//          Globals.controller.getProductById(_id)) {
+//        _addedToCart = true;
+//        break;
+//      }
+//    }
   }
 
   @override
@@ -640,26 +647,34 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  if (!Globals.controller.containsCartItem(_id)) {
-                    Globals.controller.addToCart(
-                        Globals.controller.getProductById(_id), 1);
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        duration: Duration(seconds: 4),
-                        backgroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            side: BorderSide(
-                              style: BorderStyle.none,
-                              width: 1,
-                            )
+                onTap: () async {
+                  if (!_addedToCart) {
+                    Map addedToCartApi = await addToCart(_id, 1);
+//                    print('$addedToCartApi');
+                    if (addedToCartApi != null && addedToCartApi['result']) {
+                      setState(() {
+                        _addedToCart = true;
+                      });
+                      Globals.controller.addToCart(
+                          Globals.controller.getProductById(_id), 1);
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          duration: Duration(seconds: 4),
+                          backgroundColor: Colors.black87,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                              side: BorderSide(
+                                style: BorderStyle.none,
+                                width: 1,
+                              )
+                          ),
+                          content: Text('The item is added to the cart',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                        content: Text('The item is added to the cart',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
+                      );
+                    }
+
                   } else {
                     //debugPrint('Added Already');
                     Scaffold.of(context).showSnackBar(
@@ -717,6 +732,20 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                       setState(() {
                         _addedToWishlist = true;
                         Globals.controller.customer.wishList.add(
+                            Globals.controller.getProductById(_id)
+                        );
+                      });
+                    }
+                  } else {
+                    Map removeFromWishListApi = await removeFromWishList(_id);
+                    if (removeFromWishListApi != null &&
+                        removeFromWishListApi['result']) {
+                      setState(() {
+                        _addedToWishlist = false;
+                      });
+                      setState(() {
+                        _addedToWishlist = true;
+                        Globals.controller.customer.wishList.remove(
                             Globals.controller.getProductById(_id)
                         );
                       });

@@ -309,6 +309,28 @@ Future<Map> addToCart(int productId, int quantity) async {
   return result;
 }
 
+///Removes a product specified by its productId with
+///specified quantity from the customer's cart.
+Future<Map> removeFromCart(int productId) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/Cart/update';
+  var response = await http.post(
+    apiUrl,
+    body: {
+      'ShoppingCartTypeId': '2',
+      'customerId': '${Globals.customerId}',
+      'productId': '$productId',
+      'quantity': '0'
+    },
+  );
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
 ///Adds a product specified by its productId
 ///to the customer's wishlist
 Future<Map> addToWishList(int productId) async {
@@ -337,5 +359,29 @@ Future<Map> addToWishList(int productId) async {
     print('$e');
   }
 
+  return result;
+}
+
+///Removes a product specified by its productId
+///from the customer's wishlist
+Future<Map> removeFromWishList(int productId) async {
+  print('Customer ID: ${Globals.customerId}');
+  print('Product ID: $productId');
+  Map result;
+  String apiUrl = '$_baseUrl/api/Cart/update';
+  var response = await http.post(
+    apiUrl,
+    body: {
+      'ShoppingCartTypeId': '1',
+      'customerId': '${Globals.customerId}',
+      'productId': '$productId',
+      'quantity': '0'
+    },
+  );
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
   return result;
 }

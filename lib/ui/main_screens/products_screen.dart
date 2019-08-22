@@ -244,6 +244,17 @@ class _ProductItemState extends State<ProductItem> {
                           Globals.controller.getProductById(_id)
                       );
                     }
+                  } else {
+                    Map removedFromWishListApi = await removeFromWishList(_id);
+                    if (removedFromWishListApi != null &&
+                        removedFromWishListApi['result']) {
+                      setState(() {
+                        _addedToWishlist = false;
+                      });
+                      Globals.controller.customer.wishList.remove(
+                          Globals.controller.getProductById(_id)
+                      );
+                    }
                   }
 //                  Map addedToWishList = await addToWishList(_id);
 //                  if(addedToWishList != null && addedToWishList['result'] == true){

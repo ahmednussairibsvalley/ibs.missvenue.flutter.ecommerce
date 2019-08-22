@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miss_venue/utils.dart';
 
 import '../../globals.dart';
 import 'checkout/checkout_screen.dart';
@@ -59,12 +60,19 @@ class _MyCartScreenState extends State<MyCartScreen> {
 //                    color: _color,
 //                    size: _size,
                     sellingPrice: _sellingPrice,
-                    onDelete: (){
-//                      setState(() {
-//                        Globals.controller.customer.cart.removeAt(index);
-//                        _list = Globals.controller.customer.cart;
-//                        _totalPrice = Globals.controller.calculateTotalPrice();
-//                      });
+                    onDelete: () async {
+                      Map removedFromCartApi = await removeFromCart(_id);
+                      print('$removedFromCartApi');
+                      if (removedFromCartApi != null &&
+                          removedFromCartApi['result']) {
+                        setState(() {
+                          Globals.controller.customer.cart.removeAt(index);
+                          _list = Globals.controller.customer.cart;
+                          _totalPrice =
+                              Globals.controller.calculateTotalPrice();
+                        });
+                      }
+
                     },
                   ),
                   Container(
