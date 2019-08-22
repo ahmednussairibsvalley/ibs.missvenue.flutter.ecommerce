@@ -636,17 +636,26 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Column(
+                      child: Globals.controller.customer.addresses.length > 0
+                          ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text('${Globals.controller.customer.firstName} ${Globals.controller.customer.lastName}'),
                           Text('${Globals.controller.customer.email}'),
                           Text('+20 110 434 9535'),
-                          Text('${Globals.controller.customer.addresses[0].address1}'),
-                          Text('${Globals.controller.customer.addresses[0].address2}'),
-                          Text('${Globals.controller.customer.addresses[0].city}, ${Globals.controller.customer.addresses[0].state}, ${Globals.controller.customer.addresses[0].country}'),
+
+                          Text('${Globals.controller.customer.addresses[0]
+                              .address1}'),
+                          Text('${Globals.controller.customer.addresses[0]
+                              .address2}'),
+                          Text('${Globals.controller.customer.addresses[0]
+                              .city}, ${Globals.controller.customer.addresses[0]
+                              .state}, ${Globals.controller.customer
+                              .addresses[0].country}'),
+
                         ],
-                      ),
+                      )
+                          : Container(),
                     ),
                     Row(
                       children: <Widget>[
