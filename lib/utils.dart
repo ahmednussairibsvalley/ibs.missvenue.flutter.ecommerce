@@ -22,7 +22,7 @@ Future<Map> authenticate(String email, String password) async {
   try {
     var response = await http.post(
       apiUrl,
-      body: {'Email': email, 'Password': password},
+      body: {'Email': email, 'Password': password, 'RegistrationType': '1'},
     );
 
 //  var response =
@@ -80,6 +80,7 @@ Future<List> getCountriesFromApi() async {
   return result;
 }
 
+///Sends to the API for password recovery.
 Future<Map> sendForPasswordRecovery(String email) async {
   String apiUrl = '$_baseUrl/api/password/recovery';
   var response = await http.post(apiUrl, body: {
@@ -93,6 +94,43 @@ Future<Map> sendForPasswordRecovery(String email) async {
   } else {
     return null;
   }
+}
+
+///Updates the password.
+Future<Map> updatePassword(String oldPassword, String newPassword) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/password/update';
+  var response = await http.post(apiUrl, body: {
+    "customerid": '${Globals.customerId}',
+    "oldpassword": oldPassword,
+    "newpassword": newPassword
+  });
+
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
+Future<Map> updateCustomerProfile(String firstName, String lastName,
+    String email, String phone) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/update';
+  var response = await http.post(apiUrl, body: {
+    "customerid": '${Globals.customerId}',
+    "firstname": firstName,
+    "lastname": lastName,
+    "email": email,
+    "phone": phone
+  });
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
 }
 
 Future<Map> register(String firstName, String lastName, String email,

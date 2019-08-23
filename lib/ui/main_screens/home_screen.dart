@@ -79,10 +79,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               title: Image(image: AssetImage('assets/home_page_title.png')),
               actions: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(4.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Icon(
                     Icons.search,
-                    size: 40,
+                    size: 30,
                     color: Color(0xff727272),
                   ),
                 ),
