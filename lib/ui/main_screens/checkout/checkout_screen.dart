@@ -650,8 +650,8 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                               .address2}'),
                           Text('${Globals.controller.customer.addresses[0]
                               .city}, ${Globals.controller.customer.addresses[0]
-                              .state}, ${Globals.controller.customer
-                              .addresses[0].country}'),
+                              .state.name}, ${Globals.controller.customer
+                              .addresses[0].country.name}'),
 
                         ],
                       )

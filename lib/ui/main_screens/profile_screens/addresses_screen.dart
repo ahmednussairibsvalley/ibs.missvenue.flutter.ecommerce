@@ -41,9 +41,11 @@ class Addresses extends StatelessWidget {
               final _address1 = Globals.controller.customer.addresses[index].address1;
               final _address2 = Globals.controller.customer.addresses[index].address2;
               final _phone = Globals.controller.customer.addresses[index].phone;
-              final _state = Globals.controller.customer.addresses[index].state;
+              final _state = Globals.controller.customer.addresses[index].state
+                  .name;
               final _city = Globals.controller.customer.addresses[index].city;
-              final _country = Globals.controller.customer.addresses[index].country;
+              final _country = Globals.controller.customer.addresses[index]
+                  .country.name;
               return Column(
                 children: <Widget>[
                   AddressItem(_address1, _address2, _phone, _city, _state, _country),
