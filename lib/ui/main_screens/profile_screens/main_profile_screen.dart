@@ -387,6 +387,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(10),
                                   child: TextFormField(
+                                    obscureText: true,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -406,6 +407,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(10),
                                   child: TextFormField(
+                                    obscureText: true,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -425,6 +427,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(10),
                                   child: TextFormField(
+                                    obscureText: true,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(Radius.circular(10)),
