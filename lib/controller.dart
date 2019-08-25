@@ -43,6 +43,9 @@ class Controller {
     _testData();
   }
 
+  ///Initialize the customer data
+  ///using the data retrieved from
+  ///the API.
   initCustomerFromJson(Map json) {
     _customer = Customer.fromJson(json);
     _testData();
@@ -328,6 +331,9 @@ class Controller {
     }
   }
 
+  ///Gets the attributes for the product specified with its
+  ///productIndex, and its category specified by its categoryIndex,
+  ///with its sector specified by its sectorIndex.
   Map<String, Map<int, String>> getAttributes(int sectorIndex,
       int categoryIndex,
       int productIndex,) {
@@ -352,6 +358,10 @@ class Controller {
     return result;
   }
 
+  ///Gets values of an attribute specified by its attributeIndex
+  ///for the product specified with its productIndex,
+  ///and its category specified by its categoryIndex,
+  ///with its sector specified by its sectorIndex.
   Map<int, String> getAttributesValues(int sectorIndex,
       int categoryIndex,
       int productIndex,
@@ -383,18 +393,22 @@ class Controller {
     return result;
   }
 
+  ///Populates the countries list.
   populateCountries(List json) {
     for (int i = 0; i < json.length; i++) {
       _countries.add(Country.fromJson(json[i]));
     }
   }
 
+  ///Populates the states list for a country
+  ///specified by its countryIndex.
   populateStates(int countryIndex, List json) {
     for (int i = 0; i < json.length; i++) {
       countries[countryIndex].states.add(State.fromJson(json[i]));
     }
   }
 
+  ///Lists the customer addresses.
   List listCustomerAddresses(Map customerData) {
     return customerData['Addresses'];
   }
