@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:miss_venue/model/brand.dart';
 import 'package:miss_venue/model/country.dart';
 import 'package:miss_venue/model/state.dart';
@@ -94,8 +93,8 @@ class Controller {
 
   ///Adds an address to the customer's
   ///addresses list.
-  addAddress(Address address) {
-    if (_customer != null) _customer.addresses.add(address);
+  addAddress(Map address) {
+    if (_customer != null) _customer.addresses.add(Address.fromJson(address));
   }
 
   ///Removes an address from the customer's
@@ -396,7 +395,9 @@ class Controller {
     }
   }
 
-
+  List listCustomerAddresses(Map customerData) {
+    return customerData['Addresses'];
+  }
   ///It's just test data to populate
   ///fields and objects as there is no
   ///ready API for the project

@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
 
 import '../../../globals.dart';
+import '../../../utils.dart';
 
-class Addresses extends StatelessWidget {
+class Addresses extends StatefulWidget {
+  @override
+  _AddressesState createState() => _AddressesState();
+}
 
+class _AddressesState extends State<Addresses> {
+  List _list;
+
+  @override
+  void initState() {
+    super.initState();
+    _list = Globals.controller.customer.addresses;
+  }
+
+  _showAddAddressDialog(Function onAddingAddress) {
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: GestureDetector(
         onTap: (){
-
+          _showAddAddressDialog(() async {
+            Map customerMap = await getCustomerDetails(Globals.customerId);
+            List addressesList = customerMap['Addresses'];
+            Globals.controller.addAddress(
+                addressesList[addressesList.length - 1]);
+            setState(() {
+              _list = Globals.controller.customer.addresses;
+            });
+          });
         },
         child: ListTile(
           title: Padding(
             padding: const EdgeInsets.all(20),
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: Colors.black87
+                  borderRadius: BorderRadius.circular(50),
+                  color: Colors.black87
               ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -36,19 +60,28 @@ class Addresses extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.only(top: 10.0),
         child: ListView.builder(
-            itemCount: Globals.controller.customer.addresses.length,
+            itemCount: _list.length,
             itemBuilder: (context, index) {
-              final _address1 = Globals.controller.customer.addresses[index].address1;
-              final _address2 = Globals.controller.customer.addresses[index].address2;
-              final _phone = Globals.controller.customer.addresses[index].phone;
-              final _state = Globals.controller.customer.addresses[index].state
-                  .name;
-              final _city = Globals.controller.customer.addresses[index].city;
-              final _country = Globals.controller.customer.addresses[index]
-                  .country.name;
+              final _firstName = _list[index].firstName;
+              final _lastName = _list[index].lastName;
+              final _address1 = _list[index].address1;
+              final _address2 = _list[index].address2;
+              final _phone = _list[index].phone;
+              final _state = _list[index].state.name;
+              final _city = _list[index].city;
+              final _country = _list[index].country.name;
               return Column(
                 children: <Widget>[
-                  AddressItem(_address1, _address2, _phone, _city, _state, _country),
+                  AddressItem(
+                    firstName: _firstName,
+                    lastName: _lastName,
+                    address1: _address1,
+                    address2: _address2,
+                    phone: _phone,
+                    state: _state,
+                    city: _city,
+                    country: _country,
+                  ),
                   Divider(),
                 ],
               );
@@ -60,28 +93,48 @@ class Addresses extends StatelessWidget {
 
 class AddressItem extends StatefulWidget {
 
-  final _address1;
-  final _address2;
-  final _phone;
-  final _state;
-  final _city;
-  final _country;
+  final firstName;
+  final lastName;
+  final address1;
+  final address2;
+  final phone;
+  final state;
+  final city;
+  final country;
 
-  AddressItem(this._address1, this._address2, this._phone, this._city, this._state, this._country);
+  AddressItem({@required this.firstName, @required this.lastName,
+    @required this.address1, @required this.address2,
+    @required this.phone, @required this.city,
+    @required this.state, @required this.country});
   @override
-  _AddressItemState createState() => _AddressItemState(_address1, _address2, _phone, _state, _city, _country);
+  _AddressItemState createState() =>
+      _AddressItemState(
+        firstName: firstName,
+        lastName: lastName,
+        address1: address1,
+        address2: address2,
+        phone: phone,
+        state: state,
+        city: city,
+        country: country,
+      );
 }
 
 class _AddressItemState extends State<AddressItem> {
 
-  final _address1;
-  final _address2;
-  final _phone;
-  final _state;
-  final _city;
-  final _country;
+  final firstName;
+  final lastName;
+  final address1;
+  final address2;
+  final phone;
+  final state;
+  final city;
+  final country;
 
-  _AddressItemState(this._address1, this._address2, this._phone, this._city, this._state, this._country);
+  _AddressItemState({@required this.firstName, @required this.lastName,
+    @required this.address1, @required this.address2,
+    @required this.phone, @required this.city,
+    @required this.state, @required this.country});
 
   @override
   Widget build(BuildContext context) {
@@ -105,28 +158,28 @@ class _AddressItemState extends State<AddressItem> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              _phone,
+              phone,
               style: TextStyle(
                 fontSize: 20,
               ),
             ),
-            _address2 == null || _address2 == ''
+            address2 == null || address2 == ''
                 ? Text(
-              _address1 != null ? _address1 : '',
+              address1 != null ? address1 : '',
                     style: TextStyle(
                       fontSize: 20,
                     ),
                   )
                 : Text(
-              _address1 != null && _address2 != null
-                  ? '$_address1\n$_address2'
+              address1 != null && address2 != null
+                  ? '$address1\n$address2'
                   : '',
                     style: TextStyle(
                       fontSize: 20,
                     ),
                   ),
             Text(
-              '$_city, $_state, $_country',
+              '$city, $state, $country',
               style: TextStyle(
                 fontSize: 20,
               ),

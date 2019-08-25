@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-//import 'package:intl/intl.dart';
 import 'globals.dart';
 
 /*
@@ -13,8 +13,10 @@ import 'globals.dart';
 *
 */
 
+///The base URL.
 final _baseUrl = 'http://40.85.116.121:8678';
 
+///Used for login.
 Future<Map> authenticate(String email, String password) async {
   Map result;
   String apiUrl = '$_baseUrl/api/customer/login';
@@ -56,6 +58,7 @@ Future<Map> authenticate(String email, String password) async {
   return result;
 }
 
+///Gets the customer details
 Future<Map> getCustomerDetails(int id) async {
   Map result;
   String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
@@ -129,6 +132,7 @@ Future<Map> updatePassword(String oldPassword, String newPassword) async {
   return result;
 }
 
+///Updates the customer profile.
 Future<Map> updateCustomerProfile(String firstName, String lastName,
     String email, String phone) async {
   Map result;
@@ -148,6 +152,7 @@ Future<Map> updateCustomerProfile(String firstName, String lastName,
   return result;
 }
 
+///Used for signing up.
 Future<Map> register(String firstName, String lastName, String email,
     String phone, String password, String passwordConfirm) async {
   String apiUrl = '$_baseUrl/api/customer/register';
@@ -170,6 +175,7 @@ Future<Map> register(String firstName, String lastName, String email,
   return null;
 }
 
+///Used for login with Facebook.
 Future<Map> loginWithFacebook() async {
   Map map;
   try {
@@ -206,6 +212,7 @@ Future<Map> loginWithFacebook() async {
   return map;
 }
 
+///Used for login with Google+.
 Future<Map> loginWithGoogle() async {
   Map map;
   GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -266,6 +273,8 @@ Future<List> getSectorsList() async {
   }
 }
 
+///Gets the list of categories for a sector
+///specified by its sectorId from the API.
 Future<List> getCategoriesList(int sectorId) async {
   String apiUrl = '$_baseUrl/api/Category/home?count=100&sector_id=$sectorId';
 
@@ -436,8 +445,8 @@ Future<Map> addToWishList(int productId) async {
 ///Removes a product specified by its productId
 ///from the customer's wishlist
 Future<Map> removeFromWishList(int productId) async {
-  print('Customer ID: ${Globals.customerId}');
-  print('Product ID: $productId');
+//  print('Customer ID: ${Globals.customerId}');
+//  print('Product ID: $productId');
   Map result;
   String apiUrl = '$_baseUrl/api/Cart/update';
   var response = await http.post(
@@ -447,6 +456,37 @@ Future<Map> removeFromWishList(int productId) async {
       'customerId': '${Globals.customerId}',
       'productId': '$productId',
       'quantity': '0'
+    },
+  );
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
+///Adds new address to the user's addresses.
+Future<Map> addAddress({
+  @required String address1, @required String address2,
+  @required String firstName, @required String lastName,
+  @required String city, @required int countryId, @required int stateId,
+  @required String email,
+}) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/address/add';
+  var response = await http.post(
+    apiUrl,
+    body: {
+      'customerid': '${Globals.customerId}',
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'city': city,
+      'address1': address1,
+      'address2': address2,
+      'countryId': countryId,
+      'stateProvinceId': stateId
     },
   );
   if (response.statusCode == 200 ||

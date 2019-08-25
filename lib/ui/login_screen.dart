@@ -197,30 +197,56 @@ class _LoginScreenState extends State<LoginScreen> {
                   var list = await getSectorsList();
                   Globals.controller.populateSectors(list);
 
-                  for(int i = 0; i < Globals.controller.sectors.length ; i ++){
-                    var list = await getCategoriesList(Globals.controller.sectors[i].id);
-                    Globals.controller.populateCategories(i, list);
-                    for(int j = 0; j < list.length ; j ++){
-                      var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
-                      Globals.controller.populateProducts(i, j, productsList);
 
-                      var brandsList = await getBrandsList(
-                          Globals.controller.sectors[i].categories[j].id);
-                      Globals.controller.populateBrands(i, j, brandsList);
+                  if (list != null) {
+                    for (int i = 0; i <
+                        Globals.controller.sectors.length; i ++) {
+                      var list = await getCategoriesList(
+                          Globals.controller.sectors[i].id);
+                      Globals.controller.populateCategories(i, list);
+                      for (int j = 0; j < list.length; j ++) {
+                        var productsList = await getProductsList(
+                            Globals.controller.sectors[i].categories[j].id);
+                        Globals.controller.populateProducts(i, j, productsList);
+
+                        var brandsList = await getBrandsList(
+                            Globals.controller.sectors[i].categories[j].id);
+                        Globals.controller.populateBrands(i, j, brandsList);
+                      }
                     }
+                  } else {
+                    _showConnectionProblemDialog(() {
+                      setState(() {
+                        _waiting = false;
+                      });
+                    });
+                    return;
                   }
+
                   //---------------------------------------------------------
 
-//                  ///Preparing the countries.
-//                  /////---------------------------------------------------------
-//                  List countriesList = await getCountriesFromApi();
-//
-//                  Globals.controller.populateCountries(countriesList);
-//
-//                  for(int i = 0; i < Globals.controller.countries.length; i++){
-//                    List statesList = await getStatesFromApi(Globals.controller.countries[i].id);
-//                    Globals.controller.populateStates(i, statesList);
-//                  }
+                  ///Preparing the countries.
+                  /////---------------------------------------------------------
+                  List countriesList = await getCountriesFromApi();
+
+                  if (countriesList != null) {
+                    Globals.controller.populateCountries(countriesList);
+
+                    for (int i = 0; i <
+                        Globals.controller.countries.length; i++) {
+                      List statesList = await getStatesFromApi(
+                          Globals.controller.countries[i].id);
+                      Globals.controller.populateStates(i, statesList);
+                    }
+                  } else {
+                    _showConnectionProblemDialog(() {
+                      setState(() {
+                        _waiting = false;
+                      });
+                    });
+                    return;
+                  }
+
 
                   //---------------------------------------------------------
 
@@ -230,8 +256,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   Map customerMap = await getCustomerDetails(
                       accepted['Customer']['Customer_Id']);
-                  Globals.controller.initCustomerFromJson(customerMap);
-                  Navigator.of(context).pushReplacementNamed('/home');
+
+                  if (customerMap != null) {
+                    Globals.controller.initCustomerFromJson(customerMap);
+                    Navigator.of(context).pushReplacementNamed('/home');
+                  } else {
+                    _showConnectionProblemDialog(() {
+                      setState(() {
+                        _waiting = false;
+                      });
+                    });
+                  }
                 } else {
                   setState(() {
                     _waiting = false;
@@ -849,5 +884,87 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
 
+  }
+
+  _showConnectionProblemDialog(Function function) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomAlertDialog(
+            titlePadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              width: 260.0,
+              height: 230.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(33.0)),
+              ),
+
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/dialog_header.png', fit: BoxFit.cover,),
+                      Positioned(
+                        right: 0.0,
+                        left: 0.0,
+                        top: 0.0,
+                        bottom: 0.0,
+                        child: Center(child: Text('Problem!!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                      child: Container(
+                        child: Text(
+                          'There is a problem now. Please try again later.',
+                          style: TextStyle(
+                            color: Color(0xff471fa4),
+                            fontSize: 20,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(10),
+                      )
+                  ),
+                  ListTile(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      function();
+                    },
+                    title: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        child: Text('Close',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color(0xff471fa4),
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                        ),
+                        padding: EdgeInsets.all(10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+    );
   }
 }
