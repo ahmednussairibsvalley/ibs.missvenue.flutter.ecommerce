@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../controller.dart';
 import '../globals.dart';
-import '../utils.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

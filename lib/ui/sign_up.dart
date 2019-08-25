@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../utils.dart';
 import 'custom_widgets/CustomShowDialog.dart';
 
-String _firstName, _lastName, _email, _phone, _password, _passwordConfirm;
+
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -14,6 +14,8 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  String _firstName, _lastName, _email, _phone, _password, _passwordConfirm;
 
   bool _waiting = false;
 
@@ -215,11 +217,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ],
                     ),
+
+                    //The registration form.
                     Form(
                       key: _formKey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+
                           // The First Name ..
                           Padding(
                             padding: const EdgeInsets.only(left: 20, right: 20),
@@ -275,6 +280,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               return null;
                             }, false),
                           ),
+
+                          // The password.
                           Padding(
                             padding: const EdgeInsets.only(left: 20, right: 20),
                             child: _field(Icon(Icons.lock_outline), 'Password:', (value){
@@ -286,6 +293,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               return null;
                             }, true),
                           ),
+
+                          //The password confirmation.
                           Padding(
                             padding: const EdgeInsets.only(left: 20, right: 20),
                             child: _field(Icon(Icons.lock_outline), 'Confirm Password:', (value){
@@ -299,6 +308,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               return null;
                             }, true),
                           ),
+
+                          //The signing up button.
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: ListTile(
@@ -359,6 +370,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                           ),
+
+                          // The terms & agreement text
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text.rich(
