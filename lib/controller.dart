@@ -195,6 +195,22 @@ class Controller {
     return index;
   }
 
+  ///Returns the product index.
+  int getProductIndex(int productId) {
+    int index = -1;
+    for (int i = 0; i < sectors.length; i++) {
+      for (int j = 0; j < sectors[i].categories.length; j++) {
+        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
+          if (sectors[i].categories[j].products[a].id == productId) {
+            index = a;
+            break;
+          }
+        }
+      }
+    }
+    return index;
+  }
+
   ///Gets an item from the customer's
   ///cart using the cart item's ID.
   CartItem getCartItemById(int id) {

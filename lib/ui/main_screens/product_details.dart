@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../../globals.dart';
 import '../../utils.dart';
+import 'attributes_controllers/checkboxes.dart';
+import 'attributes_controllers/drop_down_list.dart';
+import 'attributes_controllers/radio_list.dart';
+import 'product_attributes_controllers.dart';
 
 /// Displays the product details.
 
@@ -48,7 +52,6 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     super.initState();
     _addedToWishlist = Globals.controller.containsWishListItem(id);
@@ -111,12 +114,37 @@ class _ProductDetailsState extends State<ProductDetails> {
                   .getProductById(id)
                   .attributes
                   .length, (index) {
+                int controlType = Globals.controller
+                    .getProductById(id)
+                    .attributes[index]
+                    .controlType;
                 return Column(
                   children: <Widget>[
                     Text('${Globals.controller
                         .getProductById(id)
                         .attributes[index].name}'),
-
+                    controlType == AttributesController.dropDownListControlType
+                        ?
+                    DropDownList(
+                      sectorIndex: sectorIndex,
+                      categoryIndex: categoryIndex,
+                      productIndex: Globals.controller.getProductIndex(id),
+                      attributeIndex: index,
+                    )
+                        :
+                    controlType == AttributesController.radioListControlType ?
+                    RadioList(
+                      sectorIndex: sectorIndex,
+                      categoryIndex: categoryIndex,
+                      productIndex: Globals.controller.getProductIndex(id),
+                      attributeIndex: index,
+                    ) :
+                    CheckBoxes(
+                      sectorIndex: sectorIndex,
+                      categoryIndex: categoryIndex,
+                      productIndex: Globals.controller.getProductIndex(id),
+                      attributeIndex: index,
+                    ),
                     Divider(),
                   ],
                 );
