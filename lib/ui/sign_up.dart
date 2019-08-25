@@ -394,6 +394,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
                 _waiting?
+                // if waiting for the API's response show the circular progress indicator
                   Positioned(
                     top: 0.0,
                     bottom: 0.0,
@@ -413,6 +414,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     )
                   )
+
+                //Otherwise, show nothing.
                   : Container(),
               ],
             ),
@@ -422,6 +425,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  /// The form field
   Widget _field(Icon icon, String label, Function validator, bool obsecured) {
     return TextFormField(
       obscureText: obsecured,
@@ -441,6 +445,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  ///Shows No Connectivity dialog when the device is disconnected to the internet.
   _showNoConnectivityDialog(BuildContext context){
     showDialog(
         context: context,
