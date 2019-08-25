@@ -68,9 +68,24 @@ Future<Map> getCustomerDetails(int id) async {
   return result;
 }
 
+///Gets the countries list from the API.
 Future<List> getCountriesFromApi() async {
   List result;
   String apiUrl = '$_baseUrl/api/address/country_list?Id=null';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
+///Gets the states list for the country
+///specified by its countryId from the API.
+Future<List> getStatesFromApi(int countryId) async {
+  List result;
+  String apiUrl = '$_baseUrl/api/address/state_list?Id=null&country_id=$countryId';
   var response = await http.get(apiUrl);
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||

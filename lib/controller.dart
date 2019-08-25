@@ -1,4 +1,7 @@
+import 'package:intl/intl.dart';
 import 'package:miss_venue/model/brand.dart';
+import 'package:miss_venue/model/country.dart';
+import 'package:miss_venue/model/state.dart';
 
 import 'model.dart';
 
@@ -19,20 +22,18 @@ class Controller {
   List<Sector> _sectors;
 
   ///List of countries returned from the API
-  Map _countries;
+  List<Country> _countries;
 
   Controller() {
     _offers = List();
     _sectors = List();
-    _countries = Map();
+    _countries = List();
   }
 
 
-  ///Gets the countries list.
-  Map get countries => _countries;
+  List<Country> get countries => _countries;
 
-  ///Sets the countries list.
-  set countries(Map value) {
+  set countries(List<Country> value) {
     _countries = value;
   }
 
@@ -369,9 +370,16 @@ class Controller {
 
   populateCountries(List json) {
     for (int i = 0; i < json.length; i++) {
-      countries[json[i]['Id']] = json[i]['Name'];
+      _countries.add(Country.fromJson(json[i]));
     }
   }
+
+  populateStates(int countryIndex, List json) {
+    for (int i = 0; i < json.length; i++) {
+      countries[countryIndex].states.add(State.fromJson(json[i]));
+    }
+  }
+
 
   ///It's just test data to populate
   ///fields and objects as there is no
