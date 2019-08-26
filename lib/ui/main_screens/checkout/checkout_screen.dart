@@ -94,6 +94,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
           backgroundColor: Colors.white,
           leading: GestureDetector(
             onTap: () {
+              Globals.controller.resetCustomer();
               Navigator.of(context).pop();
             },
             child: Icon(

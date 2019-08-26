@@ -11,31 +11,57 @@ class ProductsScreen extends StatelessWidget {
   ProductsScreen ({@required this.sectorIndex, @required this.categoryIndex,});
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: getProductsList(
+          Globals.controller.sectors[sectorIndex].categories[categoryIndex].id),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Globals.controller.populateProducts(
+              sectorIndex, categoryIndex, snapshot.data);
+          return Center(
+            child: GridView(
+              padding: EdgeInsets.all(10),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 5
+              ),
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
 
-
-    return Center(
-      child: GridView(
-        padding: EdgeInsets.all(10),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 5
-        ),
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-
-        children: List.generate(Globals.controller.sectors[sectorIndex].categories[categoryIndex].products.length, (index){
-          final int _id = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].id;
-          final String _title = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].title;
-          final double _price = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].price;
-          final List _imagesUrls = Globals.controller.sectors[sectorIndex]
-              .categories[categoryIndex].products[index].imagesUrls;
-          final double _sellingPrice = Globals.controller.sectors[sectorIndex].categories[categoryIndex].products[index].sellingPrice;
-          return ProductItem(_id, _title, _price, _imagesUrls, _sellingPrice,
-            sectorIndex: sectorIndex, categoryIndex: categoryIndex,);
-        }),
-      ),
+              children: List.generate(Globals.controller.sectors[sectorIndex]
+                  .categories[categoryIndex].products.length, (index) {
+                final int _id = Globals.controller.sectors[sectorIndex]
+                    .categories[categoryIndex].products[index].id;
+                final String _title = Globals.controller.sectors[sectorIndex]
+                    .categories[categoryIndex].products[index].title;
+                final double _price = Globals.controller.sectors[sectorIndex]
+                    .categories[categoryIndex].products[index].price;
+                final List _imagesUrls = Globals.controller.sectors[sectorIndex]
+                    .categories[categoryIndex].products[index].imagesUrls;
+                final double _sellingPrice = Globals.controller
+                    .sectors[sectorIndex].categories[categoryIndex]
+                    .products[index].sellingPrice;
+                return ProductItem(
+                  _id, _title, _price, _imagesUrls, _sellingPrice,
+                  sectorIndex: sectorIndex, categoryIndex: categoryIndex,);
+              }),
+            ),
+          );
+        } else {
+          return Container(
+            height: 100,
+            width: 100,
+            alignment: Alignment.center,
+            child: Column(
+              children: <Widget>[
+                CircularProgressIndicator(),
+              ],
+            ),
+          );
+        }
+      },
     );
 
   }
@@ -81,6 +107,7 @@ class _ProductItemState extends State<ProductItem> {
   void initState() {
     super.initState();
     _addedToWishlist = Globals.controller.containsWishListItem(_id);
+    //getCustomerDetails(Globals.customerId)
   }
   @override
   Widget build(BuildContext context) {
@@ -144,8 +171,8 @@ class _ProductItemState extends State<ProductItem> {
                   if (!Globals.controller.containsCartItem(_id)) {
                     Map addedToCartMap = await addToCart(_id, 1);
                     if (addedToCartMap != null && addedToCartMap['result']) {
-                      Globals.controller.addToCart(
-                          Globals.controller.getProductById(_id), 1);
+//                      Globals.controller.addToCart(
+//                          Globals.controller.getProductById(_id), 1);
                       Scaffold.of(context).showSnackBar(
                         SnackBar(
                           duration: Duration(seconds: 4),
@@ -220,9 +247,9 @@ class _ProductItemState extends State<ProductItem> {
                       setState(() {
                         _addedToWishlist = true;
                       });
-                      Globals.controller.customer.wishList.add(
-                          Globals.controller.getProductById(_id)
-                      );
+//                      Globals.controller.customer.wishList.add(
+//                          Globals.controller.getProductById(_id)
+//                      );
                     }
                   } else {
                     Map removedFromWishListApi = await removeFromWishList(_id);
@@ -231,26 +258,11 @@ class _ProductItemState extends State<ProductItem> {
                       setState(() {
                         _addedToWishlist = false;
                       });
-                      Globals.controller.customer.wishList.remove(
-                          Globals.controller.getProductById(_id)
-                      );
+//                      Globals.controller.customer.wishList.remove(
+//                          Globals.controller.getProductById(_id)
+//                      );
                     }
                   }
-//                  Map addedToWishList = await addToWishList(_id);
-//                  if(addedToWishList != null && addedToWishList['result'] == true){
-//                    setState(() {
-//                      _addedToWishlist = _addedToWishlist?false: true;
-//                      if(_addedToWishlist){
-//                        Globals.controller.customer.wishList.add(
-//                            Globals.controller.getProductById(_id)
-//                        );
-//                      } else {
-//                        Globals.controller.customer.wishList.remove(
-//                            Globals.controller.getProductById(_id)
-//                        );
-//                      }
-//                    });
-//                  }
 
                 },
                 child: _addedToWishlist?

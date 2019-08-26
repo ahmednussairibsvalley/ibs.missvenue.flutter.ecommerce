@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   ///Preparing the customer data.
                   ///--------------------------------------------------------
-                  print('${Globals.customerId}');
+
                   Map customerMap = await getCustomerDetails(
                       Globals.customerId);
 
@@ -205,37 +205,41 @@ class _LoginScreenState extends State<LoginScreen> {
                   var list = await getSectorsList();
                   Globals.controller.populateSectors(list);
 
+//                  var categoriesList = await getCategoriesList(Globals.controller.sectors[0].id);
+//
+//                  Globals.controller.populateCategories(0, categoriesList);
 
-                  for (int i = 0; i <
-                      Globals.controller.sectors.length; i ++) {
-                    var list = await getCategoriesList(
-                        Globals.controller.sectors[i].id);
-                    Globals.controller.populateCategories(i, list);
-                    for (int j = 0; j < list.length; j ++) {
-                      var productsList = await getProductsList(
-                          Globals.controller.sectors[i].categories[j].id);
-                      Globals.controller.populateProducts(i, j, productsList);
 
-                      var brandsList = await getBrandsList(
-                          Globals.controller.sectors[i].categories[j].id);
-                      Globals.controller.populateBrands(i, j, brandsList);
-                    }
-                  }
+//                  for (int i = 0; i <
+//                      Globals.controller.sectors.length; i ++) {
+//                    var list = await getCategoriesList(
+//                        Globals.controller.sectors[i].id);
+//                    Globals.controller.populateCategories(i, list);
+//                    for (int j = 0; j < list.length; j ++) {
+//                      var productsList = await getProductsList(
+//                          Globals.controller.sectors[i].categories[j].id);
+//                      Globals.controller.populateProducts(i, j, productsList);
+//
+//                      var brandsList = await getBrandsList(
+//                          Globals.controller.sectors[i].categories[j].id);
+//                      Globals.controller.populateBrands(i, j, brandsList);
+//                    }
+//                  }
 
                   //---------------------------------------------------------
 
-                  ///Preparing the countries.
-                  /////---------------------------------------------------------
-                  List countriesList = await getCountriesFromApi();
-
-                  Globals.controller.populateCountries(countriesList);
-
-                  for (int i = 0; i <
-                      Globals.controller.countries.length; i++) {
-                    List statesList = await getStatesFromApi(
-                        Globals.controller.countries[i].id);
-                    Globals.controller.populateStates(i, statesList);
-                  }
+//                  ///Preparing the countries.
+//                  /////---------------------------------------------------------
+//                  List countriesList = await getCountriesFromApi();
+//
+//                  Globals.controller.populateCountries(countriesList);
+//
+//                  for (int i = 0; i <
+//                      Globals.controller.countries.length; i++) {
+//                    List statesList = await getStatesFromApi(
+//                        Globals.controller.countries[i].id);
+//                    Globals.controller.populateStates(i, statesList);
+//                  }
 
                   Navigator.of(context).pushReplacementNamed('/home');
 
@@ -342,24 +346,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       var list = await getSectorsList();
                       Globals.controller.populateSectors(list);
 
-                      for(int i = 0; i < Globals.controller.sectors.length ; i ++){
-                        var list = await getCategoriesList(Globals.controller.sectors[i].id);
-                        Globals.controller.populateCategories(i, list);
-                        for(int j = 0; j < list.length ; j ++){
-                          var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
-                          Globals.controller.populateProducts(i, j, productsList);
+//                      for(int i = 0; i < Globals.controller.sectors.length ; i ++){
+//                        var list = await getCategoriesList(Globals.controller.sectors[i].id);
+//                        Globals.controller.populateCategories(i, list);
+//                        for(int j = 0; j < list.length ; j ++){
+//                          var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
+//                          Globals.controller.populateProducts(i, j, productsList);
+//
+//                          var brandsList = await getBrandsList(Globals
+//                              .controller.sectors[i].categories[j].id);
+//                          Globals.controller.populateBrands(i, j, brandsList);
+//                        }
+//                      }
 
-                          var brandsList = await getBrandsList(Globals
-                              .controller.sectors[i].categories[j].id);
-                          Globals.controller.populateBrands(i, j, brandsList);
-                        }
-                      }
-
-                      ///Preparing the countries.
-                      /////---------------------------------------------------------
-                      List countriesList = await getCountriesFromApi();
-
-                      Globals.controller.populateCountries(countriesList);
+//                      ///Preparing the countries.
+//                      /////---------------------------------------------------------
+//                      List countriesList = await getCountriesFromApi();
+//
+//                      Globals.controller.populateCountries(countriesList);
 
 //                  for(int i = 0; i < Globals.controller.countries.keys.toList().length; i ++){
 //                    print('${Globals.controller.countries[Globals.controller.countries.keys.toList()[i]]}');
@@ -413,14 +417,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       for(int i = 0; i < Globals.controller.sectors.length ; i ++){
                         var list = await getCategoriesList(Globals.controller.sectors[i].id);
                         Globals.controller.populateCategories(i, list);
-                        for(int j = 0; j < list.length ; j ++){
-                          var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
-                          Globals.controller.populateProducts(i, j, productsList);
-
-                          var brandsList = await getBrandsList(Globals
-                              .controller.sectors[i].categories[j].id);
-                          Globals.controller.populateBrands(i, j, brandsList);
-                        }
+//                        for(int j = 0; j < list.length ; j ++){
+//                          var productsList = await getProductsList(Globals.controller.sectors[i].categories[j].id);
+//                          Globals.controller.populateProducts(i, j, productsList);
+//
+//                          var brandsList = await getBrandsList(Globals
+//                              .controller.sectors[i].categories[j].id);
+//                          Globals.controller.populateBrands(i, j, brandsList);
+//                        }
                       }
 
                       ///Preparing the countries.

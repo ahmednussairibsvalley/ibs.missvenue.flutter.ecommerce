@@ -71,6 +71,42 @@ Future<Map> getCustomerDetails(int id) async {
   return result;
 }
 
+Future<Map> getCustomerWishList(int id) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result['WishList'];
+}
+
+Future<Map> getCustomerCart(int id) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result['ShoppingCart'];
+}
+
+Future<List> getCustomerAddresses(int id) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result['Addresses'];
+}
+
 ///Gets the countries list from the API.
 Future<List> getCountriesFromApi() async {
   List result;

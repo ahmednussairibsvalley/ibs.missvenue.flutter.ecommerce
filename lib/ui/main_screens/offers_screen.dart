@@ -6,6 +6,7 @@ import 'product_details.dart';
 class OffersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Globals.controller.resetCustomer();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

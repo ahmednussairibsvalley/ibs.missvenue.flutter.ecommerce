@@ -1,6 +1,7 @@
 import 'package:miss_venue/model/brand.dart';
 import 'package:miss_venue/model/country.dart';
 import 'package:miss_venue/model/state.dart';
+import 'package:miss_venue/ui/login_screen.dart';
 
 import 'model.dart';
 
@@ -309,7 +310,9 @@ class Controller {
   ///Populates categories list for each sector.
   populateCategories(int sectorIndex, List list) {
     for (int i = 0; i < list.length; i++) {
-      _sectors[sectorIndex].categories.add(Category.fromJson(list[i]));
+      Category item = Category.fromJson(list[i]);
+      if (!_sectorContainsCategory(sectors[sectorIndex].id, item.id))
+        _sectors[sectorIndex].categories.add(item);
     }
   }
 
@@ -317,11 +320,136 @@ class Controller {
   populateProducts(int sectorIndex, int categoryIndex, List list) {
     for (int i = 0; i < list.length; i++) {
       Product product = Product.fromJsonWithRelatedProducts(list[i]);
-      _sectors[sectorIndex].categories[categoryIndex].products.add(product);
-      if (product.sellingPrice < product.price) {
-        _offers.add(product);
+      if (!_categoryContainsProduct(sectors[sectorIndex].id,
+          sectors[sectorIndex].categories[categoryIndex].id, product.id))
+        _sectors[sectorIndex].categories[categoryIndex].products.add(product);
+//      if (product.sellingPrice < product.price) {
+//        if(!_offers.contains(product))
+//          _offers.add(product);
+//      }
+    }
+  }
+
+  populateWishList(List list) {
+    for (int i = 0; i < list.length; i++) {
+      Product item = Product.fromJson(list[i]['Product']);
+      if (!_wishListContains(item.id))
+        customer.wishList.add(Product.fromJson(list[i]['Product']));
+    }
+  }
+
+  populateCart(List list) {
+    for (int i = 0; i < list.length; i++) {
+      CartItem item = CartItem.fromJson(list[i]);
+      if (!_cartContains(item.id))
+        customer.cart.add(item);
+    }
+  }
+
+  populateAddresses(List list) {
+    for (int i = 0; i < list.length; i++) {
+      Address address = Address.fromJson(list[i]);
+      if (!_customerHasAddress(address.id)) {
+        customer.addresses.add(address);
       }
     }
+  }
+
+//  populateOrders(List list){
+//    for(int i = 0; i < list.length; i++){
+//      Order order = Order.
+//    }
+//  }
+
+  bool _wishListContains(int itemId) {
+    bool result = false;
+    for (int i = 0; i < customer.wishList.length; i++) {
+      if (customer.wishList[i].id == itemId) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  bool _cartContains(int itemId) {
+    bool result = false;
+    for (int i = 0; i < customer.cart.length; i++) {
+      if (customer.cart[i].id == itemId) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  bool _customerHasAddress(int addressId) {
+    bool result = false;
+    for (int i = 0; i < customer.addresses.length; i++) {
+      if (customer.addresses[i].id == addressId) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  bool _customerHasOrder(int orderId) {
+    bool result = false;
+    for (int i = 0; i < customer.orders.length; i++) {
+      if (customer.orders[i].id == orderId) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  bool _sectorContainsCategory(int sectorId, int categoryId) {
+    bool result = false;
+    Sector _sector;
+    for (int i = 0; i < sectors.length; i++) {
+      if (sectors[i].id == sectorId) {
+        _sector = sectors[i];
+        break;
+      }
+    }
+
+    for (int i = 0; i < _sector.categories.length; i++) {
+      if (_sector.categories[i].id == categoryId) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  bool _categoryContainsProduct(int sectorId, int categoryId, int productId) {
+    bool result = false;
+    Sector _sector;
+    Category _category;
+
+    for (int i = 0; i < sectors.length; i++) {
+      if (sectors[i].id == sectorId) {
+        _sector = sectors[i];
+        break;
+      }
+    }
+
+    for (int i = 0; i < _sector.categories.length; i++) {
+      if (_sector.categories[i].id == categoryId) {
+        _category = _sector.categories[i];
+        break;
+      }
+    }
+
+    for (int i = 0; i < _category.products.length; i++) {
+      if (_category.products[i].id == productId) {
+        result = true;
+        break;
+      }
+    }
+    return result;
   }
 
   ///Populates brands list for each category from each sector.
@@ -442,4 +570,13 @@ class Controller {
     _customer.orders.add(orders[1]);
     _customer.orders.add(orders[2]);
   }
+
+  resetCustomer() {
+    customer.wishList = List();
+    customer.cart = List();
+    customer.addresses = List();
+    //customer.orders = List();
+  }
+
+
 }

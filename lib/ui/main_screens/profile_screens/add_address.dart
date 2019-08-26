@@ -249,6 +249,10 @@ class _AddAddressState extends State<AddAddress> {
                                             .states.length <=
                                         0) {
                                       _stateId = 0;
+                                    } else {
+                                      _stateId =
+                                          Globals.controller.countries[index]
+                                              .states[_stateIndex].id;
                                     }
                                   });
                                 },

@@ -64,18 +64,19 @@ class Product{
 
     _attributes = List();
     _specifications = List();
+    _relatedProducts = List();
 
-    List attributes = json['Attributes'];
-    List specs = json['SpecificationAttribute'];
-
-    for (int i = 0; i < attributes.length; i ++) {
-      _attributes.add(Attribute.fromJson(attributes[i]));
-    }
-
-    for (int i = 0; i < specs.length; i++) {
-      ProductSpecification spec = ProductSpecification.fromJson(specs[i]);
-      _specifications.add(spec);
-    }
+//    List attributes = json['Attributes'];
+//    List specs = json['SpecificationAttribute'];
+//
+//    for (int i = 0; i < attributes.length; i ++) {
+//      _attributes.add(Attribute.fromJson(attributes[i]));
+//    }
+//
+//    for (int i = 0; i < specs.length; i++) {
+//      ProductSpecification spec = ProductSpecification.fromJson(specs[i]);
+//      _specifications.add(spec);
+//    }
   }
 
 

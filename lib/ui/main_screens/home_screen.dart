@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../globals.dart';
 import 'drawer_widgets/drawer_view.dart';
 import 'products_screen.dart';
-import '../../utils.dart';
+import '../../utils.dart' as utils;
 
 ///This class represents the first screen which
 ///appears to the user or when the user presses
@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   /// the main tabs.
   List<Tab> _tabs;
 
+  List categoriesList;
   /// the number of notifications
   int _notificationNumber = 100;
 
@@ -34,10 +35,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabs = _getTabs(Globals.controller.sectors);
+    Globals.controller.resetCustomer();
   }
 
   @override
   Widget build(BuildContext context) {
+//    List list = await utils.getCategoriesList(Globals.controller.sectors[_currentSectorIndex].id);
+//    Globals.controller.populateCategories(_currentSectorIndex, list);
     return _pageIndex == 1
         ? _products(_currentSectorIndex, _currentCategoryIndex)
         : Scaffold(
@@ -99,12 +103,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     isScrollable: true,
                     //controller: TabController(length: 5, vsync: this, initialIndex: 3,),
                     indicatorColor: Colors.black,
-                    onTap: (index) => _currentTabIndex = index,
+                    onTap: (index) {
+                      _currentTabIndex = index;
+                    },
                     tabs: _tabs,
                   ),
                 ),
                 body: TabBarView(
                   children: _generateTabViews(Globals.controller.sectors),
+                  physics: NeverScrollableScrollPhysics(),
                 ),
               ),
             ),
@@ -235,63 +242,91 @@ class _TabViewState extends State<TabView> {
   _TabViewState({@required this.sectorIndex,
     @required this.imageUrl,
     @required this.onTap});
+
+//  initCategories() async {
+//    List list = await utils.getCategoriesList(Globals.controller.sectors[sectorIndex].id);
+//    Globals.controller.populateCategories(sectorIndex, list);
+//  }
+
   @override
   Widget build(BuildContext context) {
     final _height = MediaQuery.of(context).size.height;
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverList(
-          delegate: SliverChildListDelegate([
-            FutureBuilder(
-                future: isImageAvailable(imageUrl),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    bool isAvailable = snapshot.data;
-                    if (isAvailable)
-                      return Image(
-                        image: NetworkImage(
-                          imageUrl,
-                        ),
-                        fit: BoxFit.fill,
-                        height: _height / 4,
-                      );
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('No Image Available'),
-                      ),
-                    );
-                  }
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        child: CircularProgressIndicator(),
-                        width: 50,
-                        height: 50,
-                      )
-                    ],
-                  );
-                }),
-            Image.asset('assets/banner.png'),
-          ]),
-        ),
-        SliverGrid(
-          gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-          delegate: SliverChildListDelegate(List.generate(
-              Globals.controller.sectors[sectorIndex].categories.length,
-                  (index) {
-                return _tabViewItem(
-                    Globals.controller.sectors[sectorIndex].categories[index]
-                        .name,
-                    Globals
-                        .controller.sectors[sectorIndex].categories[index]
-                        .imageUrl,
-                    index);
-          })),
-        ),
-      ],
+    return FutureBuilder(
+      future: utils.getCategoriesList(
+          Globals.controller.sectors[sectorIndex].id),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Globals.controller.populateCategories(sectorIndex, snapshot.data);
+          return CustomScrollView(
+            slivers: <Widget>[
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  FutureBuilder(
+                      future: utils.isImageAvailable(imageUrl),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          bool isAvailable = snapshot.data;
+                          if (isAvailable)
+                            return Image(
+                              image: NetworkImage(
+                                imageUrl,
+                              ),
+                              fit: BoxFit.fill,
+                              height: _height / 4,
+                            );
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('No Image Available'),
+                            ),
+                          );
+                        }
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              child: CircularProgressIndicator(),
+                              width: 50,
+                              height: 50,
+                            )
+                          ],
+                        );
+                      }),
+                  Image.asset('assets/banner.png'),
+                ]),
+              ),
+              SliverGrid(
+                gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                delegate: SliverChildListDelegate(List.generate(
+                    Globals.controller.sectors[sectorIndex].categories.length,
+                        (index) {
+                      return _tabViewItem(
+                          Globals.controller.sectors[sectorIndex]
+                              .categories[index]
+                              .name,
+                          Globals
+                              .controller.sectors[sectorIndex].categories[index]
+                              .imageUrl,
+                          index);
+                    })),
+              ),
+            ],
+          );
+        } else {
+          return Center(
+            child: Container(
+              height: 100,
+              width: 100,
+              child: Column(
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                ],
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -304,7 +339,7 @@ class _TabViewState extends State<TabView> {
           fit: StackFit.expand,
           children: <Widget>[
             FutureBuilder(
-              future: isImageAvailable(imageUrl),
+              future: utils.isImageAvailable(imageUrl),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   if (snapshot.data) {

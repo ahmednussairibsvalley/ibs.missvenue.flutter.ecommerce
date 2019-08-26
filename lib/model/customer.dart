@@ -43,20 +43,20 @@ class Customer {
     _wishList = List();
     _cart = List();
 
-    List addresses = json['Addresses'];
-    for (int i = 1; i < addresses.length; i ++) {
-      _addresses.add(Address.fromJson(addresses[i]));
-    }
-
-    List wishlists = json['WishList']['Items'];
-    for (int i = 0; i < wishlists.length; i ++) {
-      _wishList.add(Product.fromJson(wishlists[i]['Product']));
-    }
-
-    List cartItems = json['ShoppingCart']['Items'];
-    for (int i = 0; i < cartItems.length; i++) {
-      _cart.add(CartItem.fromJson(cartItems[i]));
-    }
+//    List addresses = json['Addresses'];
+//    for (int i = 1; i < addresses.length; i ++) {
+//      _addresses.add(Address.fromJson(addresses[i]));
+//    }
+//
+//    List wishlists = json['WishList']['Items'];
+//    for (int i = 0; i < wishlists.length; i ++) {
+//      _wishList.add(Product.fromJson(wishlists[i]['Product']));
+//    }
+//
+//    List cartItems = json['ShoppingCart']['Items'];
+//    for (int i = 0; i < cartItems.length; i++) {
+//      _cart.add(CartItem.fromJson(cartItems[i]));
+//    }
   }
 
   String get email => _email;
@@ -97,6 +97,22 @@ class Customer {
   List<Address> get addresses => _addresses;
 
   List<Order> get orders => _orders;
+
+  set cart(List<CartItem> value) {
+    _cart = value;
+  }
+
+  set wishList(List<Product> value) {
+    _wishList = value;
+  }
+
+  set addresses(List<Address> value) {
+    _addresses = value;
+  }
+
+  set orders(List<Order> value) {
+    _orders = value;
+  }
 
 
 }

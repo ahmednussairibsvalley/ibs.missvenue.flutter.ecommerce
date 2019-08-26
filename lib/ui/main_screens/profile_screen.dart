@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../globals.dart';
 import 'profile_screens/addresses_screen.dart';
 import 'profile_screens/main_profile_screen.dart';
 import 'profile_screens/orders_screen.dart';
@@ -10,6 +11,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Globals.controller.resetCustomer();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +40,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               tabs: [
                 Tab(
                   child: Text('Profile', style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                    ),
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
                   ),
                 ),
                 Tab(
