@@ -9,11 +9,13 @@ class Address{
   String _address2;
   String _phone;
   String _city;
+  String _email;
   State _state;
   Country _country;
 
   Address(this._id, this._firstName, this._lastName, this._address1,
-      this._address2, this._phone, this._city, this._state, this._country);
+      this._address2, this._email, this._phone, this._city, this._state,
+      this._country);
 
 
   Address.fromJson(Map json){
@@ -24,6 +26,7 @@ class Address{
     _address2 = json['Address2'];
     _phone = json['PhoneNumber'];
     _city = json['City'];
+    _email = json['Email'];
     _state = State.fromJson(json['StateModel']);
     _country = Country.fromJson(json['CountryModel']);
   }
@@ -80,6 +83,12 @@ class Address{
 
   set firstName(String value) {
     _firstName = value;
+  }
+
+  String get email => _email;
+
+  set email(String value) {
+    _email = value;
   }
 
 

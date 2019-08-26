@@ -5,8 +5,12 @@ class State {
   State(this._id, this._name);
 
   State.fromJson(Map json) {
-    _id = json['Id'];
-    _name = json['Name'];
+    if (json != null) {
+      _id = json['Id'];
+      _name = json['Name'];
+    }
+
+
   }
 
   String get name => _name;

@@ -47,6 +47,7 @@ class Controller {
   ///using the data retrieved from
   ///the API.
   initCustomerFromJson(Map json) {
+    print('json == null : ${json == null}');
     _customer = Customer.fromJson(json);
     _testData();
   }
@@ -97,7 +98,7 @@ class Controller {
   ///Adds an address to the customer's
   ///addresses list.
   addAddress(Map address) {
-    if (_customer != null) _customer.addresses.add(Address.fromJson(address));
+    _customer.addresses.add(Address.fromJson(address));
   }
 
   ///Removes an address from the customer's

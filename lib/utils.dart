@@ -471,7 +471,7 @@ Future<Map> addAddress({
   @required String address1, @required String address2,
   @required String firstName, @required String lastName,
   @required String city, @required int countryId, @required int stateId,
-  @required String email,
+  @required String email, @required String phone
 }) async {
   Map result;
   String apiUrl = '$_baseUrl/api/address/add';
@@ -485,8 +485,9 @@ Future<Map> addAddress({
       'city': city,
       'address1': address1,
       'address2': address2,
-      'countryId': countryId,
-      'stateProvinceId': stateId
+      'countryId': '$countryId',
+      'stateProvinceId': '$stateId',
+      'phoneNumber': phone,
     },
   );
   if (response.statusCode == 200 ||

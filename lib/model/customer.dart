@@ -48,12 +48,12 @@ class Customer {
       _addresses.add(Address.fromJson(addresses[i]));
     }
 
-    List wishlists = json['wishlists'];
+    List wishlists = json['WishList']['Items'];
     for (int i = 0; i < wishlists.length; i ++) {
       _wishList.add(Product.fromJson(wishlists[i]['Product']));
     }
 
-    List cartItems = json['shoppingcarts'];
+    List cartItems = json['ShoppingCart']['Items'];
     for (int i = 0; i < cartItems.length; i++) {
       _cart.add(CartItem.fromJson(cartItems[i]));
     }

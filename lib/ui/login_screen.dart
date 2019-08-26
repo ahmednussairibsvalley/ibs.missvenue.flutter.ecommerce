@@ -192,35 +192,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 if(accepted != null && accepted['Login_Result']['login_result'] == true){
 
+                  ///Preparing the customer data.
+                  ///--------------------------------------------------------
+                  print('${Globals.customerId}');
+                  Map customerMap = await getCustomerDetails(
+                      Globals.customerId);
+
+                  Globals.controller.initCustomerFromJson(customerMap);
+
                   ///Preparing the products.
                   //---------------------------------------------------------
                   var list = await getSectorsList();
                   Globals.controller.populateSectors(list);
 
 
-                  if (list != null) {
-                    for (int i = 0; i <
-                        Globals.controller.sectors.length; i ++) {
-                      var list = await getCategoriesList(
-                          Globals.controller.sectors[i].id);
-                      Globals.controller.populateCategories(i, list);
-                      for (int j = 0; j < list.length; j ++) {
-                        var productsList = await getProductsList(
-                            Globals.controller.sectors[i].categories[j].id);
-                        Globals.controller.populateProducts(i, j, productsList);
+                  for (int i = 0; i <
+                      Globals.controller.sectors.length; i ++) {
+                    var list = await getCategoriesList(
+                        Globals.controller.sectors[i].id);
+                    Globals.controller.populateCategories(i, list);
+                    for (int j = 0; j < list.length; j ++) {
+                      var productsList = await getProductsList(
+                          Globals.controller.sectors[i].categories[j].id);
+                      Globals.controller.populateProducts(i, j, productsList);
 
-                        var brandsList = await getBrandsList(
-                            Globals.controller.sectors[i].categories[j].id);
-                        Globals.controller.populateBrands(i, j, brandsList);
-                      }
+                      var brandsList = await getBrandsList(
+                          Globals.controller.sectors[i].categories[j].id);
+                      Globals.controller.populateBrands(i, j, brandsList);
                     }
-                  } else {
-                    _showConnectionProblemDialog(() {
-                      setState(() {
-                        _waiting = false;
-                      });
-                    });
-                    return;
                   }
 
                   //---------------------------------------------------------
@@ -229,44 +228,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   /////---------------------------------------------------------
                   List countriesList = await getCountriesFromApi();
 
-                  if (countriesList != null) {
-                    Globals.controller.populateCountries(countriesList);
+                  Globals.controller.populateCountries(countriesList);
 
-                    for (int i = 0; i <
-                        Globals.controller.countries.length; i++) {
-                      List statesList = await getStatesFromApi(
-                          Globals.controller.countries[i].id);
-                      Globals.controller.populateStates(i, statesList);
-                    }
-                  } else {
-                    _showConnectionProblemDialog(() {
-                      setState(() {
-                        _waiting = false;
-                      });
-                    });
-                    return;
+                  for (int i = 0; i <
+                      Globals.controller.countries.length; i++) {
+                    List statesList = await getStatesFromApi(
+                        Globals.controller.countries[i].id);
+                    Globals.controller.populateStates(i, statesList);
                   }
+
+                  Navigator.of(context).pushReplacementNamed('/home');
 
 
                   //---------------------------------------------------------
 
-                  ///Preparing the customer data.
-                  ///--------------------------------------------------------
+
 //                  Globals.customerId = accepted['Customer']['Customer_Id'];
 
-                  Map customerMap = await getCustomerDetails(
-                      accepted['Customer']['Customer_Id']);
-
-                  if (customerMap != null) {
-                    Globals.controller.initCustomerFromJson(customerMap);
-                    Navigator.of(context).pushReplacementNamed('/home');
-                  } else {
-                    _showConnectionProblemDialog(() {
-                      setState(() {
-                        _waiting = false;
-                      });
-                    });
-                  }
                 } else {
                   setState(() {
                     _waiting = false;
