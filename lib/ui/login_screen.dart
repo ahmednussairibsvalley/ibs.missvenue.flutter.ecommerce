@@ -191,42 +191,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
                 if(accepted != null && accepted['Login_Result']['login_result'] == true){
+                  try {
+                    ///Preparing the customer data.
+                    ///--------------------------------------------------------
 
-                  ///Preparing the customer data.
-                  ///--------------------------------------------------------
+                    Map customerMap = await getCustomerDetails(
+                        Globals.customerId);
 
-                  Map customerMap = await getCustomerDetails(
-                      Globals.customerId);
+                    Globals.controller.initCustomerFromJson(customerMap);
 
-                  Globals.controller.initCustomerFromJson(customerMap);
-
-                  ///Preparing the products.
-                  //---------------------------------------------------------
-                  var list = await getSectorsList();
-                  Globals.controller.populateSectors(list);
-
-//                  var categoriesList = await getCategoriesList(Globals.controller.sectors[0].id);
-//
-//                  Globals.controller.populateCategories(0, categoriesList);
-
-
-//                  for (int i = 0; i <
-//                      Globals.controller.sectors.length; i ++) {
-//                    var list = await getCategoriesList(
-//                        Globals.controller.sectors[i].id);
-//                    Globals.controller.populateCategories(i, list);
-//                    for (int j = 0; j < list.length; j ++) {
-//                      var productsList = await getProductsList(
-//                          Globals.controller.sectors[i].categories[j].id);
-//                      Globals.controller.populateProducts(i, j, productsList);
-//
-//                      var brandsList = await getBrandsList(
-//                          Globals.controller.sectors[i].categories[j].id);
-//                      Globals.controller.populateBrands(i, j, brandsList);
-//                    }
-//                  }
-
-                  //---------------------------------------------------------
+                    ///Preparing the products.
+                    //---------------------------------------------------------
+                    var list = await getSectorsList();
+                    Globals.controller.populateSectors(list);
 
 //                  ///Preparing the countries.
 //                  /////---------------------------------------------------------
@@ -241,7 +218,14 @@ class _LoginScreenState extends State<LoginScreen> {
 //                    Globals.controller.populateStates(i, statesList);
 //                  }
 
-                  Navigator.of(context).pushReplacementNamed('/home');
+                    Navigator.of(context).pushReplacementNamed('/home');
+                  } catch (e) {
+                    _showConnectionProblemDialog(() {
+                      setState(() {
+                        _waiting = false;
+                      });
+                    });
+                  }
 
 
                   //---------------------------------------------------------

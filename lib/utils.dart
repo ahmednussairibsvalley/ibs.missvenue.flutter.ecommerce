@@ -58,6 +58,19 @@ Future<Map> authenticate(String email, String password) async {
   return result;
 }
 
+///Gets the total price of the customer's cart's items
+Future<double> getTotalPrice(int customerId) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$customerId';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result['ShoppingCart']['Total_Amount'];
+}
+
 ///Gets the customer details
 Future<Map> getCustomerDetails(int id) async {
   Map result;

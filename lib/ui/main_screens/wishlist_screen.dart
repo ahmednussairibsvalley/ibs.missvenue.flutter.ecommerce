@@ -141,7 +141,10 @@ class WishListItem extends StatelessWidget {
   final double _sellingPrice;
   final VoidCallback onDelete;
 
-  WishListItem(this._id, this._title, this._price, this._imageUrl, this._sellingPrice,{this.onDelete});
+  bool _addedToCart = false;
+
+  WishListItem(this._id, this._title, this._price, this._imageUrl,
+      this._sellingPrice, {@required this.onDelete});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -178,57 +181,78 @@ class WishListItem extends StatelessWidget {
                   );
                 },
               ),
-              GestureDetector(
-                onTap: () async {
-
-                  if (!Globals.controller.containsCartItem(_id)) {
-                    Map addedToCart = await addToCart(_id, 1);
-                    if (addedToCart != null && addedToCart['result']) {
-                      Globals.controller.addToCart(
-                          Globals.controller.getProductById(_id), 1);
-                      Scaffold.of(context).showSnackBar(
-                        SnackBar(
-                          duration: Duration(seconds: 4),
-                          backgroundColor: Colors.black87,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                              side: BorderSide(
-                                style: BorderStyle.none,
-                                width: 1,
-                              )
-                          ),
-                          content: Text('The item is added to the cart',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      );
+              FutureBuilder(
+                future: getCustomerCart(Globals.customerId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List list = snapshot.data['Items'];
+                    for (int i = 0; i < list.length; i ++) {
+                      if (list[i]['ProductId'] == _id) {
+                        _addedToCart = true;
+                        break;
+                      }
                     }
+                    return GestureDetector(
+                      onTap: () async {
+                        if (!_addedToCart) {
+                          Map addedToCart = await addToCart(_id, 1);
+                          if (addedToCart != null && addedToCart['result']) {
+                            Scaffold.of(context).showSnackBar(
+                              SnackBar(
+                                duration: Duration(seconds: 4),
+                                backgroundColor: Colors.black87,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                    side: BorderSide(
+                                      style: BorderStyle.none,
+                                      width: 1,
+                                    )
+                                ),
+                                content: Text('The item is added to the cart',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            );
+                          }
 
-                  } else {
-                    //debugPrint('Added Already');
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        duration: Duration(seconds: 4),
-                        backgroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            side: BorderSide(
-                              style: BorderStyle.none,
-                              width: 1,
-                            )
-                        ),
-                        content: Text('The item has been already added',
-                          textAlign: TextAlign.center,
-                        ),
+                          Map result = await getCustomerCart(
+                              Globals.customerId);
+
+                          List list = result ['Items'];
+                          for (int i = 0; i < list.length; i ++) {
+                            if (list[i]['ProductId'] == _id) {
+                              _addedToCart = true;
+                              break;
+                            }
+                          }
+                        } else {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              duration: Duration(seconds: 4),
+                              backgroundColor: Colors.black87,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                  side: BorderSide(
+                                    style: BorderStyle.none,
+                                    width: 1,
+                                  )
+                              ),
+                              content: Text('The item has been already added',
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        alignment: Alignment.topRight,
+                        child: Image.asset(
+                          'assets/add_to_cart.png', width: 35, height: 35,),
                       ),
                     );
                   }
+                  return Container();
                 },
-                child: Container(
-                  alignment: Alignment.topRight,
-                  child: Image.asset(
-                    'assets/add_to_cart.png', width: 35, height: 35,),
-                ),
               ),
             ],
           ),

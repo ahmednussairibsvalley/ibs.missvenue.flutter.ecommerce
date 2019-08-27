@@ -18,12 +18,16 @@ class ProductDetails extends StatefulWidget {
   final int sectorIndex;
   final int categoryIndex;
   final bool addedToWishList;
+  final bool addedToCart;
   final Function onUpdateWishList;
+  final Function onUpdateCart;
 
   ProductDetails({@required this.id, @required this.title, @required this.price,
     @required this.imagesUrls, @required this.sellingPrice,
     @required this.sectorIndex, @required this.categoryIndex,
-    @required this.addedToWishList, @required this.onUpdateWishList});
+    @required this.addedToWishList, @required this.onUpdateWishList,
+    @required this.addedToCart, @required this.onUpdateCart,
+  });
   @override
   _ProductDetailsState createState() => _ProductDetailsState(
     id: id,
@@ -35,6 +39,8 @@ class ProductDetails extends StatefulWidget {
     categoryIndex: categoryIndex,
     addedToWishList: addedToWishList,
     onUpdateWishList: onUpdateWishList,
+    onUpdateCart: onUpdateCart,
+    addedToCart: addedToCart,
   );
 }
 
@@ -47,7 +53,9 @@ class _ProductDetailsState extends State<ProductDetails> {
   final int sectorIndex;
   final int categoryIndex;
   final bool addedToWishList;
+  final bool addedToCart;
   final Function onUpdateWishList;
+  final Function onUpdateCart;
 
   bool _addedToWishlist = false;
 
@@ -56,7 +64,9 @@ class _ProductDetailsState extends State<ProductDetails> {
       {@required this.id, @required this.title, @required this.price,
         @required this.imagesUrls, @required this.sellingPrice,
         @required this.sectorIndex, @required this.categoryIndex,
-        @required this.addedToWishList, @required this.onUpdateWishList});
+        @required this.addedToWishList, @required this.onUpdateWishList,
+        @required this.addedToCart, @required this.onUpdateCart,
+      });
 
   @override
   void initState() {
@@ -219,12 +229,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                       right: 8.0, top: 8.0, bottom: 8.0),
                   child: GestureDetector(
                     onTap: () async {
-                      if (!Globals.controller.containsCartItem(id)) {
+                      if (!addedToCart) {
                         Map addedToCartApi = await addToCart(id, 1);
                         if (addedToCartApi != null &&
                             addedToCartApi['result']) {
-                          Globals.controller.addToCart(
-                              Globals.controller.getProductById(id), 1);
+                          onUpdateCart();
                           Scaffold.of(context).showSnackBar(
                             SnackBar(
                               duration: Duration(seconds: 4),
@@ -244,7 +253,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                         }
 
                       } else {
-                        //debugPrint('Added Already');
                         Scaffold.of(context).showSnackBar(
                           SnackBar(
                             duration: Duration(seconds: 4),
@@ -713,7 +721,6 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                 onTap: () async {
                   if (!Globals.controller.containsCartItem(_id)) {
                     Map addedToCartApi = await addToCart(_id, 1);
-//                    print('$addedToCartApi');
                     if (addedToCartApi != null && addedToCartApi['result']) {
                       Globals.controller.addToCart(
                           Globals.controller.getProductById(_id), 1);
@@ -736,7 +743,6 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                     }
 
                   } else {
-                    //debugPrint('Added Already');
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
                         duration: Duration(seconds: 4),

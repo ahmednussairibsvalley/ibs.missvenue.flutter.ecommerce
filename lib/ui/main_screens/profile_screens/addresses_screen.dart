@@ -27,13 +27,13 @@ class _AddressesState extends State<Addresses> {
     return Scaffold(
       bottomNavigationBar: GestureDetector(
         onTap: (){
-//          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-//              AddAddress(
-//                onAddAddress: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+              AddAddress(
+                onAddAddress: () {
 //              _list = Globals.controller.customer.addresses;
-//                },
-//              ))
-//          );
+                },
+              ))
+          );
 
 //          _showAddAddressDialog(context,() async {
 //            Map customerMap = await getCustomerDetails(Globals.customerId);
