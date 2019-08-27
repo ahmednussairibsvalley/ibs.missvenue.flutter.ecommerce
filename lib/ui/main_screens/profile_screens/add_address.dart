@@ -10,8 +10,8 @@ class AddAddress extends StatefulWidget {
 
   @override
   _AddAddressState createState() => _AddAddressState(
-        onAddAddress: onAddAddress,
-      );
+    onAddAddress: onAddAddress,
+  );
 }
 
 class _AddAddressState extends State<AddAddress> {
@@ -75,7 +75,7 @@ class _AddAddressState extends State<AddAddress> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              BorderRadius.all(Radius.circular(10)),
                             ),
                             labelText: 'First Name',
                           ),
@@ -97,7 +97,7 @@ class _AddAddressState extends State<AddAddress> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              BorderRadius.all(Radius.circular(10)),
                             ),
                             labelText: 'Last Name',
                           ),
@@ -120,7 +120,7 @@ class _AddAddressState extends State<AddAddress> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              BorderRadius.all(Radius.circular(10)),
                             ),
                             labelText: 'Phone',
                           ),
@@ -143,7 +143,7 @@ class _AddAddressState extends State<AddAddress> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              BorderRadius.all(Radius.circular(10)),
                             ),
                             labelText: 'Email',
                           ),
@@ -381,7 +381,7 @@ class _AddAddressState extends State<AddAddress> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              BorderRadius.all(Radius.circular(10)),
                             ),
                             labelText: 'The city',
                           ),
@@ -402,20 +402,20 @@ class _AddAddressState extends State<AddAddress> {
             ),
             _waiting
                 ? Positioned(
-                    left: 0.0,
-                    right: 0.0,
-                    top: 0.0,
-                    bottom: 0.0,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      child: Column(
-                        children: <Widget>[
-                          CircularProgressIndicator(),
-                        ],
-                      ),
-                    ),
-                  )
+              left: 0.0,
+              right: 0.0,
+              top: 0.0,
+              bottom: 0.0,
+              child: Container(
+                width: 100,
+                height: 100,
+                child: Column(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                  ],
+                ),
+              ),
+            )
                 : Container(),
           ],
         ),
@@ -439,7 +439,7 @@ class _AddAddressState extends State<AddAddress> {
 
               if (addressAdded != null && addressAdded['result']) {
                 Map customerDetails =
-                    await getCustomerDetails(Globals.customerId);
+                await getCustomerDetails(Globals.customerId);
 
                 List addresses = customerDetails['Addresses'];
 
