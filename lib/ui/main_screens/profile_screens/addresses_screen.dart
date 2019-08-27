@@ -13,6 +13,7 @@ class Addresses extends StatefulWidget {
 
 class _AddressesState extends State<Addresses> {
   List _list;
+  Future _addressesFuture;
 
   bool _waiting = false;
 
@@ -20,6 +21,7 @@ class _AddressesState extends State<Addresses> {
   void initState() {
     super.initState();
     _list = Globals.controller.customer.addresses;
+    _addressesFuture = utils.getCustomerAddresses(Globals.customerId);
   }
 
   @override
@@ -30,7 +32,8 @@ class _AddressesState extends State<Addresses> {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
               AddAddress(
                 onAddAddress: () {
-//              _list = Globals.controller.customer.addresses;
+                  _addressesFuture =
+                      utils.getCustomerAddresses(Globals.customerId);
                 },
               ))
           );
@@ -68,9 +71,10 @@ class _AddressesState extends State<Addresses> {
         ),
       ),
       body: FutureBuilder(
-        future: utils.getCustomerAddresses(Globals.customerId),
+        future: _addressesFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            Globals.controller.resetCustomer();
             Globals.controller.populateAddresses(snapshot.data);
             _list = Globals.controller.customer.addresses;
             return Stack(
