@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:miss_venue/globals.dart' as prefix0;
 
 import '../../globals.dart';
 import '../../utils.dart';
@@ -96,7 +95,6 @@ class _WishlistScreenState extends State<WishlistScreen>{
                               onDelete: () async {
                                 setState(() {
                                   _future = _getFuture();
-                                  ;
                                 });
                               });
                         })),
