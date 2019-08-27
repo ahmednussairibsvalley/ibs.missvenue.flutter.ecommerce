@@ -17,10 +17,13 @@ class ProductDetails extends StatefulWidget {
   final double sellingPrice;
   final int sectorIndex;
   final int categoryIndex;
+  final bool addedToWishList;
+  final Function onUpdateWishList;
 
   ProductDetails({@required this.id, @required this.title, @required this.price,
     @required this.imagesUrls, @required this.sellingPrice,
-    @required this.sectorIndex, @required this.categoryIndex});
+    @required this.sectorIndex, @required this.categoryIndex,
+    @required this.addedToWishList, @required this.onUpdateWishList});
   @override
   _ProductDetailsState createState() => _ProductDetailsState(
     id: id,
@@ -30,6 +33,8 @@ class ProductDetails extends StatefulWidget {
     sellingPrice: sellingPrice,
     sectorIndex: sectorIndex,
     categoryIndex: categoryIndex,
+    addedToWishList: addedToWishList,
+    onUpdateWishList: onUpdateWishList,
   );
 }
 
@@ -41,6 +46,8 @@ class _ProductDetailsState extends State<ProductDetails> {
   final double sellingPrice;
   final int sectorIndex;
   final int categoryIndex;
+  final bool addedToWishList;
+  final Function onUpdateWishList;
 
   bool _addedToWishlist = false;
 
@@ -48,13 +55,14 @@ class _ProductDetailsState extends State<ProductDetails> {
   _ProductDetailsState(
       {@required this.id, @required this.title, @required this.price,
         @required this.imagesUrls, @required this.sellingPrice,
-        @required this.sectorIndex, @required this.categoryIndex});
+        @required this.sectorIndex, @required this.categoryIndex,
+        @required this.addedToWishList, @required this.onUpdateWishList});
 
   @override
   void initState() {
     super.initState();
     super.initState();
-    _addedToWishlist = Globals.controller.containsWishListItem(id);
+    _addedToWishlist = addedToWishList;
   }
   @override
   Widget build(BuildContext context) {
@@ -164,6 +172,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 padding: const EdgeInsets.all(8.0),
                 child: GestureDetector(
                   onTap: () async {
+                    onUpdateWishList();
                     if (!_addedToWishlist) {
                       Map addedToWishList = await addToWishList(id);
                       if (addedToWishList != null &&
@@ -368,46 +377,81 @@ class _ProductDetailsState extends State<ProductDetails> {
           ),
         ),
         Center(
-          child: GridView(
-            padding: EdgeInsets.all(10),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 5
-            ),
-            shrinkWrap: true,
-            scrollDirection: Axis.vertical,
+          child: FutureBuilder(
+            future: getCustomerWishList(Globals.customerId),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List list = snapshot.data['Items'];
 
-            children: List.generate(
-                Globals.controller.sectors[sectorIndex]
-                    .categories[categoryIndex]
-                    .products[productIndex].relatedProducts.length, (index) {
-              final int _id = Globals.controller.sectors[sectorIndex]
-                  .categories[categoryIndex].products[productIndex]
-                  .relatedProducts[index].id;
-              final String _title = Globals.controller.sectors[sectorIndex]
-                  .categories[categoryIndex].products[productIndex]
-                  .relatedProducts[index].title;
-              final double _price = Globals.controller.sectors[sectorIndex]
-                  .categories[categoryIndex].products[productIndex]
-                  .relatedProducts[index].price;
-              final List _imagesUrls = Globals.controller.sectors[sectorIndex]
-                  .categories[categoryIndex].products[productIndex]
-                  .relatedProducts[index].imagesUrls;
-              final double _sellingPrice = Globals.controller
-                  .sectors[sectorIndex]
-                  .categories[categoryIndex].products[productIndex]
-                  .relatedProducts[index].sellingPrice;
+                return GridView(
+                  padding: EdgeInsets.all(10),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1,
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5
+                  ),
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
 
-              final int _sectorIndex = Globals.controller.getProductSectorIndex(
-                  _id);
-              final int _categoryIndex = Globals.controller
-                  .getProductCategoryIndex(_id);
-              return RelatedProductItem(
-                _id, _title, _price, _imagesUrls, _sellingPrice,
-                sectorIndex: _sectorIndex, categoryIndex: _categoryIndex,);
-            }),
+                  children: List.generate(
+                      Globals.controller.sectors[sectorIndex]
+                          .categories[categoryIndex]
+                          .products[productIndex].relatedProducts.length, (
+                      index) {
+                    final int _id = Globals.controller.sectors[sectorIndex]
+                        .categories[categoryIndex].products[productIndex]
+                        .relatedProducts[index].id;
+                    final String _title = Globals.controller
+                        .sectors[sectorIndex]
+                        .categories[categoryIndex].products[productIndex]
+                        .relatedProducts[index].title;
+                    final double _price = Globals.controller
+                        .sectors[sectorIndex]
+                        .categories[categoryIndex].products[productIndex]
+                        .relatedProducts[index].price;
+                    final List _imagesUrls = Globals.controller
+                        .sectors[sectorIndex]
+                        .categories[categoryIndex].products[productIndex]
+                        .relatedProducts[index].imagesUrls;
+                    final double _sellingPrice = Globals.controller
+                        .sectors[sectorIndex]
+                        .categories[categoryIndex].products[productIndex]
+                        .relatedProducts[index].sellingPrice;
+
+                    final int _sectorIndex = Globals.controller
+                        .getProductSectorIndex(
+                        _id);
+                    final int _categoryIndex = Globals.controller
+                        .getProductCategoryIndex(_id);
+
+                    bool wishListed = false;
+                    for (int i = 0; i < list.length; i++) {
+                      if (list[i]['ProductId'] == _id) {
+                        wishListed = true;
+                        break;
+                      }
+                    }
+                    return RelatedProductItem(
+                      _id, _title, _price, _imagesUrls, _sellingPrice,
+                      sectorIndex: _sectorIndex,
+                      categoryIndex: _categoryIndex,
+                      onUpdateWishList: onUpdateWishList,
+                      addedToWishList: wishListed,
+                    );
+                  }),
+                );
+              }
+              return Column(
+                children: <Widget>[
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(),
+                  )
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -561,17 +605,22 @@ class RelatedProductItem extends StatefulWidget {
   final double _sellingPrice;
   final int sectorIndex;
   final int categoryIndex;
+  final bool addedToWishList;
+
+  final Function onUpdateWishList;
 
   RelatedProductItem(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
-      {@required this.sectorIndex, @required this.categoryIndex});
+      {@required this.sectorIndex, @required this.categoryIndex,
+        @required this.onUpdateWishList, @required this.addedToWishList});
 
   @override
   _RelatedProductItemState createState() =>
       _RelatedProductItemState(
           this._id, this._title, this._price, this._imagesUrls,
           this._sellingPrice, sectorIndex: sectorIndex,
-          categoryIndex: categoryIndex);
+          categoryIndex: categoryIndex, onUpdateWishList: onUpdateWishList,
+          addedToWishList: addedToWishList);
 }
 
 class _RelatedProductItemState extends State<RelatedProductItem> {
@@ -583,18 +632,21 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
   final double _sellingPrice;
   final int sectorIndex;
   final int categoryIndex;
+  final bool addedToWishList;
+
+  final Function onUpdateWishList;
 
   bool _addedToWishlist = false;
 
   _RelatedProductItemState(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
-      {@required this.sectorIndex, @required this.categoryIndex});
+      {@required this.sectorIndex, @required this.categoryIndex, @required this.onUpdateWishList, @required this.addedToWishList});
 
   @override
   void initState() {
     super.initState();
 
-    _addedToWishlist = Globals.controller.containsWishListItem(_id);
+    _addedToWishlist = addedToWishList;
   }
 
   @override
@@ -621,6 +673,8 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                             sellingPrice: _sellingPrice,
                             sectorIndex: sectorIndex,
                             categoryIndex: categoryIndex,
+                            addedToWishList: _addedToWishlist,
+                            onUpdateWishList: onUpdateWishList,
                           ),
                     ),
                     );
@@ -737,9 +791,9 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                         addedToWishlistMap['result']) {
                       setState(() {
                         _addedToWishlist = true;
-                        Globals.controller.customer.wishList.add(
-                            Globals.controller.getProductById(_id)
-                        );
+//                        Globals.controller.customer.wishList.add(
+//                            Globals.controller.getProductById(_id)
+//                        );
                       });
                     }
                   } else {
@@ -749,12 +803,12 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                       setState(() {
                         _addedToWishlist = false;
                       });
-                      setState(() {
-                        _addedToWishlist = true;
-                        Globals.controller.customer.wishList.remove(
-                            Globals.controller.getProductById(_id)
-                        );
-                      });
+//                      setState(() {
+//                        _addedToWishlist = true;
+////                        Globals.controller.customer.wishList.remove(
+////                            Globals.controller.getProductById(_id)
+////                        );
+//                      });
                     }
                   }
                 },

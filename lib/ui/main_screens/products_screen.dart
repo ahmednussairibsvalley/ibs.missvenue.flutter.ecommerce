@@ -18,36 +18,52 @@ class ProductsScreen extends StatelessWidget {
         if (snapshot.hasData) {
           Globals.controller.populateProducts(
               sectorIndex, categoryIndex, snapshot.data);
-          return Center(
-            child: GridView(
-              padding: EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 5
-              ),
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
+          return FutureBuilder(
+            future: getCustomerWishList(Globals.customerId),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List list = snapshot.data['Items'];
+                return Center(
+                  child: GridView(
+                    padding: EdgeInsets.all(10),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 5
+                    ),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
 
-              children: List.generate(Globals.controller.sectors[sectorIndex]
-                  .categories[categoryIndex].products.length, (index) {
-                final int _id = Globals.controller.sectors[sectorIndex]
-                    .categories[categoryIndex].products[index].id;
-                final String _title = Globals.controller.sectors[sectorIndex]
-                    .categories[categoryIndex].products[index].title;
-                final double _price = Globals.controller.sectors[sectorIndex]
-                    .categories[categoryIndex].products[index].price;
-                final List _imagesUrls = Globals.controller.sectors[sectorIndex]
-                    .categories[categoryIndex].products[index].imagesUrls;
-                final double _sellingPrice = Globals.controller
-                    .sectors[sectorIndex].categories[categoryIndex]
-                    .products[index].sellingPrice;
-                return ProductItem(
-                  _id, _title, _price, _imagesUrls, _sellingPrice,
-                  sectorIndex: sectorIndex, categoryIndex: categoryIndex,);
-              }),
-            ),
+                    children: List.generate(
+                        Globals.controller.sectors[sectorIndex]
+                            .categories[categoryIndex].products.length, (
+                        index) {
+                      final int _id = Globals.controller.sectors[sectorIndex]
+                          .categories[categoryIndex].products[index].id;
+                      final String _title = Globals.controller
+                          .sectors[sectorIndex]
+                          .categories[categoryIndex].products[index].title;
+                      final double _price = Globals.controller
+                          .sectors[sectorIndex]
+                          .categories[categoryIndex].products[index].price;
+                      final List _imagesUrls = Globals.controller
+                          .sectors[sectorIndex]
+                          .categories[categoryIndex].products[index].imagesUrls;
+                      final double _sellingPrice = Globals.controller
+                          .sectors[sectorIndex].categories[categoryIndex]
+                          .products[index].sellingPrice;
+                      return ProductItem(
+                        _id, _title, _price, _imagesUrls, _sellingPrice,
+                        sectorIndex: sectorIndex,
+                        categoryIndex: categoryIndex,
+                        wishList: list,);
+                    }),
+                  ),
+                );
+              }
+              return Container();
+            },
           );
         } else {
           return Container(
@@ -76,15 +92,15 @@ class ProductItem extends StatefulWidget {
   final double _sellingPrice;
   final int sectorIndex;
   final int categoryIndex;
-
+  final List wishList;
   ProductItem(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
-      {@required this.sectorIndex, @required this.categoryIndex});
+      {@required this.sectorIndex, @required this.categoryIndex, @required this.wishList});
   @override
   _ProductItemState createState() =>
       _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
           this._sellingPrice, sectorIndex: sectorIndex,
-          categoryIndex: categoryIndex);
+          categoryIndex: categoryIndex, wishList: wishList);
 }
 
 class _ProductItemState extends State<ProductItem> {
@@ -96,17 +112,24 @@ class _ProductItemState extends State<ProductItem> {
   final double _sellingPrice;
   final int sectorIndex;
   final int categoryIndex;
+  final List wishList;
 
   bool _addedToWishlist = false;
 
   _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
-      {@required this.sectorIndex, @required this.categoryIndex});
+      {@required this.sectorIndex, @required this.categoryIndex, @required this.wishList});
 
   @override
   void initState() {
     super.initState();
-    _addedToWishlist = Globals.controller.containsWishListItem(_id);
+    for (int i = 0; i < wishList.length; i++) {
+      if (wishList[i]['ProductId'] == _id) {
+        _addedToWishlist = true;
+        break;
+      }
+    }
+//    _addedToWishlist = Globals.controller.containsWishListItem(_id);
     //getCustomerDetails(Globals.customerId)
   }
   @override
@@ -132,6 +155,23 @@ class _ProductItemState extends State<ProductItem> {
                             sellingPrice: _sellingPrice,
                             sectorIndex: sectorIndex,
                             categoryIndex: categoryIndex,
+                            addedToWishList: _addedToWishlist,
+                            onUpdateWishList: () async {
+                              Map result = await getCustomerWishList(
+                                  Globals.customerId);
+                              List list = result['Items'];
+
+                              bool added = false;
+                              for (int i = 0; i < list.length; i++) {
+                                if (list[0]['ProductId'] == _id) {
+                                  added = true;
+                                  break;
+                                }
+                              }
+                              setState(() {
+                                _addedToWishlist = added;
+                              });
+                            },
                           ),
                     ),
                     );

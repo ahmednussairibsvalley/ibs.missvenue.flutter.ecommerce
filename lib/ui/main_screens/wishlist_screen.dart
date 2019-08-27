@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miss_venue/globals.dart' as prefix0;
 
 import '../../globals.dart';
 import '../../utils.dart';
@@ -10,17 +11,22 @@ class WishlistScreen extends StatefulWidget {
 
 class _WishlistScreenState extends State<WishlistScreen>{
 
+  Future _future;
+  List _list;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Globals.controller.resetCustomer();
+    _future = _getFuture();
+  }
+
+  Future _getFuture() {
+    return getCustomerWishList(Globals.customerId);
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -33,94 +39,97 @@ class _WishlistScreenState extends State<WishlistScreen>{
           ),
         ),
         body: FutureBuilder(
-          future: getCustomerWishList(Globals.customerId),
+          future: _future,
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List list = snapshot.data['Items'];
-              Globals.controller.populateWishList(list);
-              return Container(
-                child: CustomScrollView(
-                  slivers: <Widget>[
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                          [
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Text(
-                                Globals.controller.customer.wishList.length > 0
-                                    ?
-                                '${Globals.controller.customer.wishList
-                                    .length} Products'
-                                    : 'You don\'t have any products in wishlist',
-                                style: TextStyle(
-                                  fontSize: 15,
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                List list = snapshot.data['Items'];
+                Globals.controller.resetCustomer();
+                Globals.controller.populateWishList(list);
+                _list = Globals.controller.customer.wishList;
+                return Container(
+                  child: CustomScrollView(
+                    slivers: <Widget>[
+                      SliverList(
+                        delegate: SliverChildListDelegate(
+                            [
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text(
+                                  Globals.controller.customer.wishList.length >
+                                      0
+                                      ?
+                                  '${Globals.controller.customer.wishList
+                                      .length} Products'
+                                      : 'You don\'t have any products in wishlist',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
-                            ),
-                          ]
+                            ]
+                        ),
                       ),
-                    ),
-                    SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1,
-                          crossAxisSpacing: 5,
-                          mainAxisSpacing: 5
+                      SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1,
+                            crossAxisSpacing: 5,
+                            mainAxisSpacing: 5
+                        ),
+                        delegate: SliverChildListDelegate(List.generate(_list
+                            .length, (index) {
+                          final int _id = _list[index].id;
+                          final String _title = _list[index].title;
+                          final double _price = _list[index].price;
+                          final String _imageUrl = _list[index].imagesUrls !=
+                              null &&
+                              _list[index]
+                                  .imagesUrls.length > 0 ?
+                          _list[index]
+                              .imagesUrls[0] : '';
+                          final double _sellingPrice = _list[index]
+                              .sellingPrice;
+                          return WishListItem(
+                              _id, _title, _price, _imageUrl, _sellingPrice,
+                              onDelete: () async {
+                                setState(() {
+                                  _future = _getFuture();
+                                  ;
+                                });
+                              });
+                        })),
                       ),
-                      delegate: SliverChildListDelegate(List.generate(Globals
-                          .controller.customer.wishList.length, (index) {
-                        final int _id = Globals.controller.customer
-                            .wishList[index].id;
-                        final String _title = Globals.controller.customer
-                            .wishList[index].title;
-                        final double _price = Globals.controller.customer
-                            .wishList[index].price;
-                        final String _imageUrl = Globals.controller.customer
-                            .wishList[index].imagesUrls != null &&
-                            Globals.controller.customer.wishList[index]
-                                .imagesUrls.length > 0 ?
-                        Globals.controller.customer.wishList[index]
-                            .imagesUrls[0] : '';
-                        final double _sellingPrice = Globals.controller.customer
-                            .wishList[index].sellingPrice;
-                        return WishListItem(
-                            _id, _title, _price, _imageUrl, _sellingPrice,
-                            onDelete: () async {
-//                    print('${Globals.customerId}');
-//                    print('$_id');
-                              Map removedFromWishList = await removeFromWishList(
-                                  _id);
-                              if (removedFromWishList != null &&
-                                  removedFromWishList['result']) {
-//                                setState(() {
-//                                  Globals.controller.customer.wishList.removeAt(
-//                                      index);
-//                                  _list = Globals.controller.customer.wishList;
-//                                });
-                              }
-                            });
-                      })),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return Container(
-                height: 100,
-                width: 100,
-                child: Column(
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                  ],
-                ),
-              );
+                    ],
+                  ),
+                );
+              }
+              else {
+                return Container(
+                  height: 100,
+                  width: 100,
+                  child: Column(
+                    children: <Widget>[
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                );
+              }
             }
+            return Container(
+              height: 100,
+              width: 100,
+              child: Column(
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
           },
         ),
       ),
     );
-
   }
 
 
@@ -218,8 +227,9 @@ class WishListItem extends StatelessWidget {
                   }
                 },
                 child: Container(
-                    alignment: Alignment.topRight,
-                    child: Image.asset('assets/add_to_cart.png', width: 35, height: 35,),
+                  alignment: Alignment.topRight,
+                  child: Image.asset(
+                    'assets/add_to_cart.png', width: 35, height: 35,),
                 ),
               ),
             ],
@@ -246,7 +256,14 @@ class WishListItem extends StatelessWidget {
               )
                   : Text('$_price SR'),
               GestureDetector(
-                onTap: this.onDelete,
+                onTap: () async {
+                  Map removedFromWishList = await removeFromWishList(
+                      _id);
+                  if (removedFromWishList != null &&
+                      removedFromWishList['result']) {
+                    this.onDelete();
+                  }
+                },
                 child: Icon(Icons.delete_outline),
               ),
             ],
@@ -256,5 +273,3 @@ class WishListItem extends StatelessWidget {
     );
   }
 }
-
-

@@ -223,54 +223,64 @@ class _AddAddressState extends State<AddAddress> {
                         ),
                       ),
 
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          // Countries drop down.
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                              padding: EdgeInsets.only(left: 10),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Colors.black,
-                                  )),
-                              child: DropdownButton(
-                                onChanged: (index) {
-                                  setState(() {
-                                    _countryIndex = index;
-                                    _statesList = Globals
-                                        .controller.countries[index].states;
-                                    _countryId =
-                                        Globals.controller.countries[index].id;
+                      FutureBuilder(
+                        future: getCountriesFromApi(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                // Countries drop down.
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Container(
+                                    padding: EdgeInsets.only(left: 10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: Colors.black,
+                                        )),
+                                    child: DropdownButton(
+                                      onChanged: (index) {
+                                        setState(() {
+                                          _countryIndex = index;
+                                          _statesList = Globals
+                                              .controller.countries[index]
+                                              .states;
+                                          _countryId =
+                                              Globals.controller
+                                                  .countries[index].id;
 
-                                    if (Globals.controller.countries[index]
-                                            .states.length <=
-                                        0) {
-                                      _stateId = 0;
-                                    } else {
-                                      _stateId =
-                                          Globals.controller.countries[index]
-                                              .states[_stateIndex].id;
-                                    }
-                                  });
-                                },
-                                value: _countryIndex,
-                                items: List.generate(_countriesList.length,
-                                    (index) {
-                                  return DropdownMenuItem(
-                                    child: Text(_countriesList[index].name),
-                                    value: index,
-                                  );
-                                }),
-                              ),
-                            ),
-                          ),
+                                          if (Globals.controller
+                                              .countries[index]
+                                              .states.length <=
+                                              0) {
+                                            _stateId = 0;
+                                          } else {
+                                            _stateId =
+                                                Globals.controller
+                                                    .countries[index]
+                                                    .states[_stateIndex].id;
+                                          }
+                                        });
+                                      },
+                                      value: _countryIndex,
+                                      items: List.generate(
+                                          _countriesList.length,
+                                              (index) {
+                                            return DropdownMenuItem(
+                                              child: Text(
+                                                  _countriesList[index].name),
+                                              value: index,
+                                            );
+                                          }),
+                                    ),
+                                  ),
+                                ),
 
-                          // States dropdown.
-                          _statesList.length >= 1
-                              ? Padding(
+                                // States dropdown.
+                                _statesList.length >= 1
+                                    ? Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: Container(
                                     padding: EdgeInsets.only(left: 10),
@@ -292,17 +302,30 @@ class _AddAddressState extends State<AddAddress> {
                                       },
                                       value: _stateIndex,
                                       items: List.generate(_statesList.length,
-                                          (index) {
-                                        return DropdownMenuItem(
-                                          child: Text(_statesList[index].name),
-                                          value: index,
-                                        );
-                                      }),
+                                              (index) {
+                                            return DropdownMenuItem(
+                                              child: Text(
+                                                  _statesList[index].name),
+                                              value: index,
+                                            );
+                                          }),
                                     ),
                                   ),
                                 )
-                              : Container(),
-                        ],
+                                    : Container(),
+                              ],
+                            );
+                          }
+                          return Column(
+                            children: <Widget>[
+                              Container(
+                                height: 100,
+                                width: 100,
+                                child: CircularProgressIndicator(),
+                              )
+                            ],
+                          );
+                        },
                       ),
 
                       // The city.
