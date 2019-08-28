@@ -71,10 +71,10 @@ Future<double> getTotalPrice(int customerId) async {
   return result['ShoppingCart']['Total_Amount'];
 }
 
-///Gets the customer details
-Future<Map> getCustomerDetails(int id) async {
-  Map result;
-  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+///Gets the list of offers from the API.
+Future<List> getOffers() async {
+  List result;
+  String apiUrl = '$_baseUrl/api/product/select?categoryId=null&manufacturerId=null&productId=null&hasOffer=true';
   var response = await http.get(apiUrl);
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||
@@ -84,9 +84,23 @@ Future<Map> getCustomerDetails(int id) async {
   return result;
 }
 
-Future<Map> getCustomerWishList(int id) async {
+///Gets the customer details
+Future<Map> getCustomerDetails(int customerId) async {
   Map result;
-  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$customerId';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
+///Gets the customer wish list data from the API.
+Future<Map> getCustomerWishList(int customerId) async {
+  Map result;
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$customerId';
   var response = await http.get(apiUrl);
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||
@@ -96,9 +110,10 @@ Future<Map> getCustomerWishList(int id) async {
   return result['WishList'];
 }
 
-Future<Map> getCustomerCart(int id) async {
+///Gets the customer cart data from the API.
+Future<Map> getCustomerCart(int customerId) async {
   Map result;
-  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$customerId';
   var response = await http.get(apiUrl);
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||
@@ -108,9 +123,10 @@ Future<Map> getCustomerCart(int id) async {
   return result['ShoppingCart'];
 }
 
-Future<List> getCustomerAddresses(int id) async {
+///Gets the customer's addresses from the API.
+Future<List> getCustomerAddresses(int customerId) async {
   Map result;
-  String apiUrl = '$_baseUrl/api/customer/details?Id=$id';
+  String apiUrl = '$_baseUrl/api/customer/details?Id=$customerId';
   var response = await http.get(apiUrl);
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||

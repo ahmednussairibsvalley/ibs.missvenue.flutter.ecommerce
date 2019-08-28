@@ -78,8 +78,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
     final int _productIndex = _getProductIndex(sectorIndex, categoryIndex, id);
-    return sectorIndex > -1 && categoryIndex > -1 ?
-    SafeArea(
+    return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -292,22 +291,6 @@ class _ProductDetailsState extends State<ProductDetails> {
             ],
           );
         }),
-      ),
-    )
-        : SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: Icon(Icons.arrow_back_ios,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        body: Container(),
       ),
     );
   }

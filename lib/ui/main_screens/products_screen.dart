@@ -168,7 +168,7 @@ class _ProductItemState extends State<ProductItem> {
 
                               bool added = false;
                               for (int i = 0; i < list.length; i++) {
-                                if (list[0]['ProductId'] == _id) {
+                                if (list[i]['ProductId'] == _id) {
                                   added = true;
                                   break;
                                 }
@@ -183,7 +183,7 @@ class _ProductItemState extends State<ProductItem> {
                               List list = result['Items'];
                               bool added = false;
                               for (int i = 0; i < list.length; i++) {
-                                if (list[0]['ProductId'] == _id) {
+                                if (list[i]['ProductId'] == _id) {
                                   added = true;
                                   break;
                                 }
@@ -226,6 +226,8 @@ class _ProductItemState extends State<ProductItem> {
                   ),
                 ),
               ),
+
+              // Add to cart
               FutureBuilder(
                 future: _addedToCartFuture,
                 builder: (context, snapshot) {
@@ -301,6 +303,8 @@ class _ProductItemState extends State<ProductItem> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
+
+              // Prices.
               _sellingPrice < _price?
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,6 +319,8 @@ class _ProductItemState extends State<ProductItem> {
                 ],
               )
                   : Text('$_price SR'),
+
+              // Add to wishlist.
               GestureDetector(
                 onTap: () async {
                   if (!_addedToWishlist) {
@@ -324,9 +330,6 @@ class _ProductItemState extends State<ProductItem> {
                       setState(() {
                         _addedToWishlist = true;
                       });
-//                      Globals.controller.customer.wishList.add(
-//                          Globals.controller.getProductById(_id)
-//                      );
                     }
                   } else {
                     Map removedFromWishListApi = await removeFromWishList(_id);
@@ -335,9 +338,6 @@ class _ProductItemState extends State<ProductItem> {
                       setState(() {
                         _addedToWishlist = false;
                       });
-//                      Globals.controller.customer.wishList.remove(
-//                          Globals.controller.getProductById(_id)
-//                      );
                     }
                   }
 

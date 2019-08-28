@@ -134,6 +134,7 @@ class _WishlistScreenState extends State<WishlistScreen>{
 }
 
 class WishListItem extends StatelessWidget {
+
   final int _id;
   final String _title;
   final double _price;
@@ -150,11 +151,14 @@ class WishListItem extends StatelessWidget {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(5),
-      child: Column(
+      child: ListView(
         children: <Widget>[
 
+          // The product image and the add to cart button
           Stack(
             children: <Widget>[
+
+              // The product image.
               FutureBuilder(
                 future: isImageAvailable(_imageUrl),
                 builder: (context, snapshot) {
@@ -181,6 +185,8 @@ class WishListItem extends StatelessWidget {
                   );
                 },
               ),
+
+              // The add to cart button
               FutureBuilder(
                 future: getCustomerCart(Globals.customerId),
                 builder: (context, snapshot) {
@@ -256,15 +262,21 @@ class WishListItem extends StatelessWidget {
               ),
             ],
           ),
+
+          // Product title
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(_title, maxLines: 2, overflow: TextOverflow.ellipsis,),
           ),
+
+          // prices and delete wishlist button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
+
+              // prices
               _sellingPrice < _price?
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   Text('$_sellingPrice SR'),
@@ -277,6 +289,8 @@ class WishListItem extends StatelessWidget {
                 ],
               )
                   : Text('$_price SR'),
+
+              // Delete wishlist.
               GestureDetector(
                 onTap: () async {
                   Map removedFromWishList = await removeFromWishList(
