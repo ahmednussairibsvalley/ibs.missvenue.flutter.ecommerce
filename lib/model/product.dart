@@ -8,6 +8,7 @@ class Product{
   int _color;
   String _size;
   double _sellingPrice;
+
   List _imagesUrls;
   List<ProductSpecification> _specifications;
   List<Attribute> _attributes;

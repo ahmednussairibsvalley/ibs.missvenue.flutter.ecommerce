@@ -18,7 +18,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _firstName = Globals.controller.customer.firstName;
     _lastName = Globals.controller.customer.lastName;
