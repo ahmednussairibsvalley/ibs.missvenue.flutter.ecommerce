@@ -8,13 +8,14 @@ class Product{
   int _color;
   String _size;
   double _sellingPrice;
-
+  String _imageUrl;
   List _imagesUrls;
   List<ProductSpecification> _specifications;
   List<Attribute> _attributes;
   List<Product> _relatedProducts;
 
-  Product(this._id, this._title, this._price, this._sellingPrice,) {
+  Product(this._id, this._title, this._imageUrl, this._price,
+      this._sellingPrice,) {
     _color = 0;
     _size = '';
     _imagesUrls = List();
@@ -27,6 +28,7 @@ class Product{
     _id = json['id'];
     _title = json['Name'];
     _price = json['Price'];
+    _imageUrl = json['image_url'];
     _imagesUrls = json['Images'];
     _sellingPrice = json['SellingPrice'];
     _color = 0;
@@ -59,6 +61,7 @@ class Product{
     _title = json['Name'];
     _price = json['Price'];
     _imagesUrls = json['Images'];
+    _imageUrl = json['image_url'];
     _sellingPrice = json['SellingPrice'];
     _color = 0;
     _size = '';
@@ -139,6 +142,12 @@ class Product{
 
   set relatedProducts(List<Product> value) {
     _relatedProducts = value;
+  }
+
+  String get imageUrl => _imageUrl;
+
+  set imageUrl(String value) {
+    _imageUrl = value;
   }
 
 
