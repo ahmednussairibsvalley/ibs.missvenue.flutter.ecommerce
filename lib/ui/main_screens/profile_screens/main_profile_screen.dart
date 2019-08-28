@@ -41,7 +41,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
           },
           child: ListTile(
             title: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
@@ -52,7 +52,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                   children: <Widget>[
                     Icon(Icons.edit, color: Colors.white,),
                     Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Text('Edit Profile',
                         textAlign: TextAlign.center,
                         style: TextStyle(

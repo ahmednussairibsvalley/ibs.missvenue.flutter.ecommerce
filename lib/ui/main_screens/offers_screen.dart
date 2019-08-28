@@ -269,7 +269,7 @@ class _OfferItemState extends State<OfferItem> {
           // The product title.
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(_title),
+            child: Text(_title, overflow: TextOverflow.ellipsis, maxLines: 1,),
           ),
 
 

@@ -133,7 +133,25 @@ class _WishlistScreenState extends State<WishlistScreen>{
 
 }
 
-class WishListItem extends StatelessWidget {
+class WishListItem extends StatefulWidget {
+
+  final int _id;
+  final String _title;
+  final double _price;
+  final String _imageUrl;
+  final double _sellingPrice;
+  final VoidCallback onDelete;
+
+  WishListItem(this._id, this._title, this._price, this._imageUrl,
+      this._sellingPrice, {@required this.onDelete});
+
+  @override
+  _WishListItemState createState() =>
+      _WishListItemState(this._id, this._title, this._price, this._imageUrl,
+          this._sellingPrice, onDelete: onDelete);
+}
+
+class _WishListItemState extends State<WishListItem> {
 
   final int _id;
   final String _title;
@@ -144,65 +162,96 @@ class WishListItem extends StatelessWidget {
 
   bool _addedToCart = false;
 
-  WishListItem(this._id, this._title, this._price, this._imageUrl,
+  _WishListItemState(this._id, this._title, this._price, this._imageUrl,
       this._sellingPrice, {@required this.onDelete});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.all(5),
-      child: ListView(
-        children: <Widget>[
+    return Scaffold(
+      body: Container(
+        color: Colors.white,
+        padding: EdgeInsets.all(5),
+        child: ListView(
+          children: <Widget>[
 
-          // The product image and the add to cart button
-          Stack(
-            children: <Widget>[
+            // The product image and the add to cart button
+            Stack(
+              children: <Widget>[
 
-              // The product image.
-              FutureBuilder(
-                future: isImageAvailable(_imageUrl),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data) {
-                      return Center(
-                        child: Image.network(_imageUrl,
-                          width: 90,
-                          height: 80,
-                        ),
-                      );
-                    } else {
-                      return Text('No image available');
-                    }
-                  }
-                  return Container(
-                    height: 90,
-                    width: 90,
-                    child: Column(
-                      children: <Widget>[
-                        CircularProgressIndicator(),
-                      ],
-                    ),
-                  );
-                },
-              ),
-
-              // The add to cart button
-              FutureBuilder(
-                future: getCustomerCart(Globals.customerId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    List list = snapshot.data['Items'];
-                    for (int i = 0; i < list.length; i ++) {
-                      if (list[i]['ProductId'] == _id) {
-                        _addedToCart = true;
-                        break;
+                // The product image.
+                FutureBuilder(
+                  future: isImageAvailable(_imageUrl),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data) {
+                        return Center(
+                          child: Image.network(_imageUrl,
+                            width: 90,
+                            height: 80,
+                          ),
+                        );
+                      } else {
+                        return Text('No image available');
                       }
                     }
-                    return GestureDetector(
-                      onTap: () async {
-                        if (!_addedToCart) {
-                          Map addedToCart = await addToCart(_id, 1);
-                          if (addedToCart != null && addedToCart['result']) {
+                    return Container(
+                      height: 90,
+                      width: 90,
+                      child: Column(
+                        children: <Widget>[
+                          CircularProgressIndicator(),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                // The add to cart button
+                FutureBuilder(
+                  future: getCustomerCart(Globals.customerId),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List list = snapshot.data['Items'];
+                      for (int i = 0; i < list.length; i ++) {
+                        if (list[i]['ProductId'] == _id) {
+                          _addedToCart = true;
+                          break;
+                        }
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          if (!_addedToCart) {
+                            Map addedToCart = await addToCart(_id, 1);
+                            if (addedToCart != null && addedToCart['result']) {
+                              Scaffold.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: Duration(seconds: 4),
+                                  backgroundColor: Colors.black87,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                      side: BorderSide(
+                                        style: BorderStyle.none,
+                                        width: 1,
+                                      )
+                                  ),
+                                  content: Text('The item is added to the cart',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }
+
+                            Map result = await getCustomerCart(
+                                Globals.customerId);
+
+                            List list = result ['Items'];
+                            for (int i = 0; i < list.length; i ++) {
+                              if (list[i]['ProductId'] == _id) {
+                                _addedToCart = true;
+                                break;
+                              }
+                            }
+                          } else {
                             Scaffold.of(context).showSnackBar(
                               SnackBar(
                                 duration: Duration(seconds: 4),
@@ -214,98 +263,248 @@ class WishListItem extends StatelessWidget {
                                       width: 1,
                                     )
                                 ),
-                                content: Text('The item is added to the cart',
+                                content: Text('The item has been already added',
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                             );
                           }
+                        },
+                        child: Container(
+                          alignment: Alignment.topRight,
+                          child: Image.asset(
+                            'assets/add_to_cart.png', width: 35, height: 35,),
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
+                ),
+              ],
+            ),
 
-                          Map result = await getCustomerCart(
-                              Globals.customerId);
+            // Product title
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                _title, maxLines: 1, overflow: TextOverflow.ellipsis,),
+            ),
 
-                          List list = result ['Items'];
-                          for (int i = 0; i < list.length; i ++) {
-                            if (list[i]['ProductId'] == _id) {
-                              _addedToCart = true;
-                              break;
-                            }
-                          }
-                        } else {
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              duration: Duration(seconds: 4),
-                              backgroundColor: Colors.black87,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  side: BorderSide(
-                                    style: BorderStyle.none,
-                                    width: 1,
-                                  )
-                              ),
-                              content: Text('The item has been already added',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                        alignment: Alignment.topRight,
-                        child: Image.asset(
-                          'assets/add_to_cart.png', width: 35, height: 35,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+
+                // prices
+                _sellingPrice < _price ?
+                Column(
+//            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Text('$_sellingPrice SR'),
+                    Text('$_price SR',
+                      style: TextStyle(
+                          color: Colors.grey,
+                          decoration: TextDecoration.lineThrough
                       ),
-                    );
-                  }
-                  return Container();
-                },
-              ),
-            ],
-          ),
-
-          // Product title
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(_title, maxLines: 2, overflow: TextOverflow.ellipsis,),
-          ),
-
-          // prices and delete wishlist button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-
-              // prices
-              _sellingPrice < _price?
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Text('$_sellingPrice SR'),
-                  Text('$_price SR',
-                    style: TextStyle(
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough
                     ),
-                  ),
-                ],
-              )
-                  : Text('$_price SR'),
+                  ],
+                )
+                    : Text('$_price SR'),
 
-              // Delete wishlist.
-              GestureDetector(
-                onTap: () async {
-                  Map removedFromWishList = await removeFromWishList(
-                      _id);
-                  if (removedFromWishList != null &&
-                      removedFromWishList['result']) {
-                    this.onDelete();
-                  }
-                },
-                child: Icon(Icons.delete_outline),
-              ),
-            ],
-          ),
-        ],
+                // Delete wishlist.
+                GestureDetector(
+                  onTap: () async {
+                    Map removedFromWishList = await removeFromWishList(
+                        _id);
+                    if (removedFromWishList != null &&
+                        removedFromWishList['result']) {
+                      this.onDelete();
+                    }
+                  },
+                  child: Icon(Icons.delete_outline),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 }
+
+
+//class WishListItem extends StatelessWidget {
+//
+//  final int _id;
+//  final String _title;
+//  final double _price;
+//  final String _imageUrl;
+//  final double _sellingPrice;
+//  final VoidCallback onDelete;
+//
+//  bool _addedToCart = false;
+//
+//  WishListItem(this._id, this._title, this._price, this._imageUrl,
+//      this._sellingPrice, {@required this.onDelete});
+//  @override
+//  Widget build(BuildContext context) {
+//    return Container(
+//      color: Colors.white,
+//      padding: EdgeInsets.all(5),
+//      child: ListView(
+//        children: <Widget>[
+//
+//          // The product image and the add to cart button
+//          Stack(
+//            children: <Widget>[
+//
+//              // The product image.
+//              FutureBuilder(
+//                future: isImageAvailable(_imageUrl),
+//                builder: (context, snapshot) {
+//                  if (snapshot.hasData) {
+//                    if (snapshot.data) {
+//                      return Center(
+//                        child: Image.network(_imageUrl,
+//                          width: 90,
+//                          height: 80,
+//                        ),
+//                      );
+//                    } else {
+//                      return Text('No image available');
+//                    }
+//                  }
+//                  return Container(
+//                    height: 90,
+//                    width: 90,
+//                    child: Column(
+//                      children: <Widget>[
+//                        CircularProgressIndicator(),
+//                      ],
+//                    ),
+//                  );
+//                },
+//              ),
+//
+//              // The add to cart button
+//              FutureBuilder(
+//                future: getCustomerCart(Globals.customerId),
+//                builder: (context, snapshot) {
+//                  if (snapshot.hasData) {
+//                    List list = snapshot.data['Items'];
+//                    for (int i = 0; i < list.length; i ++) {
+//                      if (list[i]['ProductId'] == _id) {
+//                        _addedToCart = true;
+//                        break;
+//                      }
+//                    }
+//                    return GestureDetector(
+//                      onTap: () async {
+//                        if (!_addedToCart) {
+//                          Map addedToCart = await addToCart(_id, 1);
+//                          if (addedToCart != null && addedToCart['result']) {
+//                            Scaffold.of(context).showSnackBar(
+//                              SnackBar(
+//                                duration: Duration(seconds: 4),
+//                                backgroundColor: Colors.black87,
+//                                shape: RoundedRectangleBorder(
+//                                    borderRadius: BorderRadius.circular(50),
+//                                    side: BorderSide(
+//                                      style: BorderStyle.none,
+//                                      width: 1,
+//                                    )
+//                                ),
+//                                content: Text('The item is added to the cart',
+//                                  textAlign: TextAlign.center,
+//                                ),
+//                              ),
+//                            );
+//                          }
+//
+//                          Map result = await getCustomerCart(
+//                              Globals.customerId);
+//
+//                          List list = result ['Items'];
+//                          for (int i = 0; i < list.length; i ++) {
+//                            if (list[i]['ProductId'] == _id) {
+//                              _addedToCart = true;
+//                              break;
+//                            }
+//                          }
+//                        } else {
+//                          Scaffold.of(context).showSnackBar(
+//                            SnackBar(
+//                              duration: Duration(seconds: 4),
+//                              backgroundColor: Colors.black87,
+//                              shape: RoundedRectangleBorder(
+//                                  borderRadius: BorderRadius.circular(50),
+//                                  side: BorderSide(
+//                                    style: BorderStyle.none,
+//                                    width: 1,
+//                                  )
+//                              ),
+//                              content: Text('The item has been already added',
+//                                textAlign: TextAlign.center,
+//                              ),
+//                            ),
+//                          );
+//                        }
+//                      },
+//                      child: Container(
+//                        alignment: Alignment.topRight,
+//                        child: Image.asset(
+//                          'assets/add_to_cart.png', width: 35, height: 35,),
+//                      ),
+//                    );
+//                  }
+//                  return Container();
+//                },
+//              ),
+//            ],
+//          ),
+//
+//          // Product title
+//          Padding(
+//            padding: const EdgeInsets.all(8.0),
+//            child: Text(_title, maxLines: 2, overflow: TextOverflow.ellipsis,),
+//          ),
+//
+//          // prices and delete wishlist button
+//          Row(
+//            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//            children: <Widget>[
+//
+//              // prices
+//              _sellingPrice < _price?
+//              Column(
+//                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                children: <Widget>[
+//                  Text('$_sellingPrice SR'),
+//                  Text('$_price SR',
+//                    style: TextStyle(
+//                        color: Colors.grey,
+//                        decoration: TextDecoration.lineThrough
+//                    ),
+//                  ),
+//                ],
+//              )
+//                  : Text('$_price SR'),
+//
+//              // Delete wishlist.
+//              GestureDetector(
+//                onTap: () async {
+//                  Map removedFromWishList = await removeFromWishList(
+//                      _id);
+//                  if (removedFromWishList != null &&
+//                      removedFromWishList['result']) {
+//                    this.onDelete();
+//                  }
+//                },
+//                child: Icon(Icons.delete_outline),
+//              ),
+//            ],
+//          ),
+//        ],
+//      ),
+//    );
+//  }
+//}
