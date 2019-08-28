@@ -29,6 +29,7 @@ class _AddressesState extends State<Addresses> {
     return Scaffold(
       bottomNavigationBar: GestureDetector(
         onTap: (){
+          print('${Globals.controller.countries[0].id}');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
               AddAddress(
                 onAddAddress: () {

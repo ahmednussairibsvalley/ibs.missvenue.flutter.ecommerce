@@ -171,7 +171,7 @@ class _WishListItemState extends State<WishListItem> {
       body: Container(
         color: Colors.white,
         padding: EdgeInsets.all(5),
-        child: ListView(
+        child: Column(
           children: <Widget>[
 
             // The product image and the add to cart button

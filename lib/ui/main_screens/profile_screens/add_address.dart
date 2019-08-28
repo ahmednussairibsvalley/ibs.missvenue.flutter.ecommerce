@@ -38,6 +38,12 @@ class _AddAddressState extends State<AddAddress> {
   _AddAddressState({@required this.onAddAddress});
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -64,6 +70,15 @@ class _AddAddressState extends State<AddAddress> {
           children: <Widget>[
             ListView(
               children: <Widget>[
+                CountryAndCity(
+                  onUpdateCountry: (countryId) {
+                    _countryId = countryId;
+                  },
+                  onUpdateState: (stateId) {
+                    _stateId = stateId;
+                    print('State ID $_stateId');
+                  },
+                ),
                 Form(
                   key: _key,
                   child: Column(
@@ -164,169 +179,6 @@ class _AddAddressState extends State<AddAddress> {
                         ),
                       ),
 
-                      // country and city
-                      FutureBuilder(
-                        future: getCountriesFromApi(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            if (snapshot.hasData) {
-                              List list = snapshot.data;
-                              Globals.controller.populateCountries(list);
-                              _statesFuture = getStatesFromApi(
-                                  Globals.controller.countries[_countryIndex]
-                                      .id);
-
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10.0),
-                                    child: Text('Country:'),
-                                  ),
-                                  // Countries drop down.
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Container(
-                                      padding: EdgeInsets.only(left: 10),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                              10),
-                                          border: Border.all(
-                                            color: Colors.black,
-                                          )),
-                                      child: DropdownButton(
-                                        onChanged: (index) {
-                                          setState(() {
-                                            _countryIndex = index;
-                                            _statesFuture = getStatesFromApi(
-                                                Globals.controller
-                                                    .countries[index].id);
-                                          });
-                                        },
-                                        value: _countryIndex,
-                                        items: List.generate(
-                                            Globals.controller.countries.length,
-                                                (index) {
-                                              return DropdownMenuItem(
-                                                child: Text(
-                                                    Globals.controller
-                                                        .countries[index].name),
-                                                value: index,
-                                              );
-                                            }),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // States dropdown.
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 8.0),
-                                        child: Text('State:'),
-                                      ),
-                                      FutureBuilder(
-                                        future: _statesFuture,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.done) {
-                                            if (snapshot.hasData) {
-                                              List list = snapshot.data;
-                                              Globals.controller.populateStates(
-                                                  _countryIndex, list);
-                                              return Globals.controller
-                                                  .countries[_countryIndex]
-                                                  .states.length >= 1 ?
-                                              Padding(
-                                                padding: const EdgeInsets.all(
-                                                    10.0),
-                                                child: Container(
-                                                  padding: EdgeInsets.only(
-                                                      left: 10),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius
-                                                          .circular(10),
-                                                      border: Border.all(
-                                                        color: Colors.black,
-                                                      )),
-                                                  child: DropdownButton(
-                                                    onChanged: (index) {
-                                                      setState(() {
-                                                        _stateIndex = index;
-                                                      });
-                                                    },
-                                                    value: _stateIndex,
-                                                    items: List.generate(
-                                                        Globals.controller
-                                                            .countries[_countryIndex]
-                                                            .states.length,
-                                                            (index) {
-                                                          return DropdownMenuItem(
-                                                            child: Text(
-                                                                Globals
-                                                                    .controller
-                                                                    .countries[_countryIndex]
-                                                                    .states[index]
-                                                                    .name),
-                                                            value: index,
-                                                          );
-                                                        }),
-                                                  ),
-                                                ),
-                                              ) : Container();
-                                            }
-                                            return Column(
-                                              children: <Widget>[
-                                                Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: CircularProgressIndicator(),
-                                                )
-                                              ],
-                                            );
-                                          }
-                                          return Column(
-                                            children: <Widget>[
-                                              Container(
-                                                height: 50,
-                                                width: 50,
-                                                child: CircularProgressIndicator(),
-                                              )
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }
-                            return Column(
-                              children: <Widget>[
-                                Container(
-                                  height: 50,
-                                  width: 50,
-                                  child: CircularProgressIndicator(),
-                                )
-                              ],
-                            );
-                          }
-                          return Column(
-                            children: <Widget>[
-                              Container(
-                                height: 50,
-                                width: 50,
-                                child: CircularProgressIndicator(),
-                              )
-                            ],
-                          );
-                        },
-                      ),
-
                       //address line 1
                       Padding(
                         padding: const EdgeInsets.all(10),
@@ -397,7 +249,7 @@ class _AddAddressState extends State<AddAddress> {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
             _waiting
@@ -472,6 +324,183 @@ class _AddAddressState extends State<AddAddress> {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class CountryAndCity extends StatefulWidget {
+
+  final Function(int) onUpdateCountry;
+  final Function(int) onUpdateState;
+
+  CountryAndCity(
+      {@required this.onUpdateCountry, @required this.onUpdateState});
+
+  @override
+  _CountryAndCityState createState() =>
+      _CountryAndCityState(
+        onUpdateCountry: onUpdateCountry,
+        onUpdateState: onUpdateState,
+      );
+}
+
+class _CountryAndCityState extends State<CountryAndCity> {
+
+  int _countryIndex = 0;
+  int _stateIndex = 0;
+  Future _statesFuture;
+
+  final Function(int) onUpdateCountry;
+  final Function(int) onUpdateState;
+
+  _CountryAndCityState(
+      {@required this.onUpdateCountry, @required this.onUpdateState});
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _statesFuture =
+        getStatesFromApi(Globals.controller.countries[_countryIndex].id);
+    onUpdateState(Globals.controller.countries[_countryIndex].id);
+    if (Globals.controller.countries[_countryIndex].states.length >= 1) {
+      onUpdateState(
+          Globals.controller.countries[_countryIndex].states[_stateIndex].id);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: Text('Country:'),
+        ),
+        // Countries drop down.
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Container(
+            padding: EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                    10),
+                border: Border.all(
+                  color: Colors.black,
+                )),
+            child: DropdownButton(
+              onChanged: (index) {
+                onUpdateCountry(Globals.controller.countries[_countryIndex].id);
+                setState(() {
+                  _countryIndex = index;
+                  _stateIndex = 0;
+                  _statesFuture = getStatesFromApi(
+                      Globals.controller.countries[_countryIndex].id);
+                });
+              },
+              value: _countryIndex,
+              items: List.generate(
+                  Globals.controller.countries.length,
+                      (index) {
+                    return DropdownMenuItem(
+                      child: Text(
+                          Globals.controller
+                              .countries[index].name),
+                      value: index,
+                    );
+                  }),
+            ),
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+
+            FutureBuilder(
+              future: _statesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    List list = snapshot.data;
+                    Globals.controller.populateStates(
+                        _countryIndex, list);
+                    if (Globals.controller.countries[_countryIndex].states
+                        .length >= 1) {
+                      onUpdateState(
+                          Globals.controller.countries[_countryIndex].states[0]
+                              .id);
+                    }
+                    return Globals.controller
+                        .countries[_countryIndex]
+                        .states.length >= 1 ?
+                    Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('State:'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(
+                              10.0),
+                          child: Container(
+                            padding: EdgeInsets.only(
+                                left: 10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius
+                                    .circular(10),
+                                border: Border.all(
+                                  color: Colors.black,
+                                )),
+                            child: DropdownButton(
+                              onChanged: (index) {
+                                setState(() {
+                                  _stateIndex = index;
+                                });
+                                onUpdateState(
+                                    Globals.controller.countries[_countryIndex]
+                                        .states[_stateIndex].id);
+                              },
+                              value: _stateIndex,
+                              items: List.generate(
+                                  Globals.controller
+                                      .countries[_countryIndex]
+                                      .states.length,
+                                      (index) {
+                                    return DropdownMenuItem(
+                                      child: Text(
+                                          Globals
+                                              .controller
+                                              .countries[_countryIndex]
+                                              .states[index]
+                                              .name),
+                                      value: index,
+                                    );
+                                  }),
+                            ),
+                          ),
+                        )
+                      ],
+                    ) :
+                    Container();
+                  }
+                  return Container();
+                }
+                return Column(
+                  children: <Widget>[
+                    Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(),
+                    )
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

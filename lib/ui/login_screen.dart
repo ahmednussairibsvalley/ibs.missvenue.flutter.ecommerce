@@ -207,10 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //                  ///Preparing the countries.
 //                  /////---------------------------------------------------------
-//                  List countriesList = await getCountriesFromApi();
-//
-//                  Globals.controller.populateCountries(countriesList);
-//
+                    List countriesList = await getCountriesFromApi();
+
+                    Globals.controller.populateCountries(countriesList);
+
 //                  for (int i = 0; i <
 //                      Globals.controller.countries.length; i++) {
 //                    List statesList = await getStatesFromApi(
