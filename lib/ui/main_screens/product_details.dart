@@ -696,7 +696,6 @@ class _FooterState extends State<Footer> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _addedToWishListFuture = widget.addedToWishListFuture;
     _addedToCartFuture = widget.addedToCartFuture;
