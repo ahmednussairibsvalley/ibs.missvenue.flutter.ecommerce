@@ -148,6 +148,8 @@ class _ProductItemState extends State<ProductItem> {
 
           Stack(
             children: <Widget>[
+
+              // Product Image.
               Center(
                 child: GestureDetector(
                   onTap: (){
@@ -159,16 +161,19 @@ class _ProductItemState extends State<ProductItem> {
                             price: _price,
                             imagesUrls: _imagesUrls,
                             sellingPrice: _sellingPrice,
-//                            sectorIndex: sectorIndex,
-//                            categoryIndex: categoryIndex,
                             addedToWishList: _addedToWishlist,
                             addedToCart: _addedToCart,
+                            onUpdateCart: () {
+                              _addedToCart = _addedToCart ? false : true;
+                              _addedToCartFuture =
+                                  getCustomerCart(Globals.customerId);
+                            },
                             onUpdateWishList: () {
                               setState(() {
                                 _addedToWishlist =
                                 _addedToWishlist ? false : true;
-                                _addedToCartFuture =
-                                    getCustomerCart(Globals.customerId);
+                                _addedToWishListFuture =
+                                    getCustomerWishList(Globals.customerId);
                               });
                             },
                           ),

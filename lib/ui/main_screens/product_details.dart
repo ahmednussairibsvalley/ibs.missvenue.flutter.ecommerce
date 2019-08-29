@@ -16,6 +16,7 @@ class ProductDetails extends StatefulWidget {
   final List imagesUrls;
   final double sellingPrice;
   final Function onUpdateWishList;
+  final Function onUpdateCart;
 
 //  final int sectorIndex;
 //  final int categoryIndex;
@@ -25,7 +26,7 @@ class ProductDetails extends StatefulWidget {
   ProductDetails({@required this.id, @required this.title, @required this.price,
     @required this.imagesUrls, @required this.sellingPrice,
     @required this.addedToWishList, @required this.addedToCart,
-    @required this.onUpdateWishList,
+    @required this.onUpdateWishList, @required this.onUpdateCart,
   });
   @override
   _ProductDetailsState createState() => _ProductDetailsState(
@@ -34,9 +35,8 @@ class ProductDetails extends StatefulWidget {
     price: price,
     imagesUrls: imagesUrls,
     sellingPrice: sellingPrice,
-    addedToWishList: addedToWishList,
-    addedToCart: addedToCart,
     onUpdateWishList: onUpdateWishList,
+    onUpdateCart: onUpdateCart,
   );
 }
 
@@ -46,28 +46,28 @@ class _ProductDetailsState extends State<ProductDetails> {
   final double price;
   final List imagesUrls;
   final double sellingPrice;
-  final bool addedToWishList;
-  final bool addedToCart;
   final Function onUpdateWishList;
+  final Function onUpdateCart;
 
   bool _addedToWishlist = false;
+  bool _addedToCart = false;
 
   Future _addedToWishListFuture;
+  Future _addedToCartFuture;
 
 
   _ProductDetailsState(
       {@required this.id, @required this.title, @required this.price,
         @required this.imagesUrls, @required this.sellingPrice,
-        @required this.addedToWishList, @required this.addedToCart,
-        @required this.onUpdateWishList,
+        @required this.onUpdateWishList, @required this.onUpdateCart,
       });
 
   @override
   void initState() {
     super.initState();
     super.initState();
-    _addedToWishlist = addedToWishList;
     _addedToWishListFuture = getCustomerWishList(Globals.customerId);
+    _addedToCartFuture = getCustomerCart(Globals.customerId);
   }
   @override
   Widget build(BuildContext context) {
@@ -340,64 +340,86 @@ class _ProductDetailsState extends State<ProductDetails> {
                 child: Padding(
                   padding: const EdgeInsets.only(
                       right: 8.0, top: 8.0, bottom: 8.0),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (!addedToCart) {
-                        Map addedToCartApi = await addToCart(id, 1);
-                        if (addedToCartApi != null &&
-                            addedToCartApi['result']) {
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              duration: Duration(seconds: 4),
-                              backgroundColor: Colors.black87,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  side: BorderSide(
-                                    style: BorderStyle.none,
-                                    width: 1,
-                                  )
-                              ),
-                              content: Text('The item is added to the cart',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          );
+                  child: FutureBuilder(
+                    future: _addedToCartFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        List list = snapshot.data['Items'];
+                        for (int i = 0; i < list.length; i++) {
+                          if (list[i]['ProductId'] == id) {
+                            _addedToCart = true;
+                            break;
+                          }
                         }
-
-                      } else {
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            duration: Duration(seconds: 4),
-                            backgroundColor: Colors.black87,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                                side: BorderSide(
-                                  style: BorderStyle.none,
-                                  width: 1,
-                                )
+                        return GestureDetector(
+                          onTap: () async {
+                            if (!_addedToCart) {
+                              Map addedToCartApi = await addToCart(id, 1);
+                              if (addedToCartApi != null &&
+                                  addedToCartApi['result']) {
+                                onUpdateCart();
+                                _addedToCart = true;
+                                setState(() {
+                                  _addedToCartFuture =
+                                      getCustomerCart(Globals.customerId);
+                                });
+                                Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    duration: Duration(seconds: 4),
+                                    backgroundColor: Colors.black87,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(50),
+                                        side: BorderSide(
+                                          style: BorderStyle.none,
+                                          width: 1,
+                                        )
+                                    ),
+                                    content: Text(
+                                      'The item is added to the cart',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              Scaffold.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: Duration(seconds: 4),
+                                  backgroundColor: Colors.black87,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                      side: BorderSide(
+                                        style: BorderStyle.none,
+                                        width: 1,
+                                      )
+                                  ),
+                                  content: Text(
+                                    'The item has been already added',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            height: _width / 10,
+                            decoration: BoxDecoration(
+                              color: Colors.black87,
                             ),
-                            content: Text('The item has been already added',
-                              textAlign: TextAlign.center,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Add to Cart',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         );
                       }
+                      return Container();
                     },
-                    child: Container(
-                      height: _width / 10,
-                      decoration: BoxDecoration(
-                        color: Colors.black87,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Add to Cart',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
                   ),
                 ),
               )
