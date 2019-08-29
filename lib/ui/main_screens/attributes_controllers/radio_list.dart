@@ -1,50 +1,30 @@
 import 'package:flutter/material.dart';
 
-import '../../../globals.dart';
-
 class RadioList extends StatefulWidget {
-  final int sectorIndex;
-  final int categoryIndex;
-  final int productIndex;
-  final int attributeIndex;
+  final List list;
 
-  RadioList(
-      {@required this.sectorIndex,
-      @required this.categoryIndex,
-      @required this.productIndex,
-      @required this.attributeIndex});
+  RadioList({@required this.list});
 
   @override
   _RadioListState createState() => _RadioListState(
-        sectorIndex: sectorIndex,
-        categoryIndex: categoryIndex,
-        productIndex: productIndex,
-        attributeIndex: attributeIndex,
-      );
+    list: list,
+  );
 }
 
 class _RadioListState extends State<RadioList> {
-  final int sectorIndex;
-  final int categoryIndex;
-  final int productIndex;
-  final int attributeIndex;
+  final List list;
 
   int _length;
 
   int _index;
 
-  _RadioListState(
-      {@required this.sectorIndex,
-      @required this.categoryIndex,
-      @required this.productIndex,
-      @required this.attributeIndex});
+  _RadioListState({@required this.list});
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _length = Globals.controller.sectors[sectorIndex].categories[categoryIndex]
-        .products[productIndex].attributes[attributeIndex].values.length;
+    _length = list.length;
     _index = 0;
   }
 
@@ -52,14 +32,7 @@ class _RadioListState extends State<RadioList> {
   Widget build(BuildContext context) {
     return Column(
       children: List.generate(_length, (index) {
-        String _title = Globals
-            .controller
-            .sectors[sectorIndex]
-            .categories[categoryIndex]
-            .products[productIndex]
-            .attributes[attributeIndex]
-            .values[index]
-            .name;
+        String _title = list[index]['Name'];
         return RadioListTile(
           value: index,
           groupValue: _index,

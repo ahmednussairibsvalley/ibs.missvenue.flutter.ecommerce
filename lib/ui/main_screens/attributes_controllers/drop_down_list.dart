@@ -1,82 +1,40 @@
 import 'package:flutter/material.dart';
 
-import '../../../globals.dart';
-
 class DropDownList extends StatefulWidget {
-  final int sectorIndex;
-  final int categoryIndex;
-  final int productIndex;
-  final int attributeIndex;
+  final List list;
 
-  DropDownList(
-      {@required this.sectorIndex,
-      @required this.categoryIndex,
-      @required this.productIndex,
-      @required this.attributeIndex});
+  DropDownList({@required this.list});
 
   @override
   _DropDownListState createState() => _DropDownListState(
-        sectorIndex: sectorIndex,
-        categoryIndex: categoryIndex,
-        productIndex: productIndex,
-        attributeIndex: attributeIndex,
-      );
+      list: list
+  );
 }
 
 class _DropDownListState extends State<DropDownList> {
   int _value = 0;
 
-  final int sectorIndex;
-  final int categoryIndex;
-  final int productIndex;
-  final int attributeIndex;
+  final List list;
 
-  _DropDownListState(
-      {@required this.sectorIndex,
-      @required this.categoryIndex,
-      @required this.productIndex,
-      @required this.attributeIndex});
+  _DropDownListState({@required this.list});
 
   @override
   void initState() {
     super.initState();
 
-    _value = Globals.controller.sectors[sectorIndex].categories[categoryIndex]
-        .products[productIndex].attributes[attributeIndex].values[0].id;
+    _value = list[0]['Id'];
   }
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton(
         value: _value,
-        items: List.generate(
-            Globals
-                .controller
-                .sectors[sectorIndex]
-                .categories[categoryIndex]
-                .products[productIndex]
-                .attributes[attributeIndex]
-                .values
-                .length, (index) {
+        items: List.generate(list.length, (index) {
           return DropdownMenuItem(
-            value: Globals
-                .controller
-                .sectors[sectorIndex]
-                .categories[categoryIndex]
-                .products[productIndex]
-                .attributes[attributeIndex]
-                .values[index]
-                .id,
+            value: list[index]['Id'],
             child: Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text(Globals
-                  .controller
-                  .sectors[sectorIndex]
-                  .categories[categoryIndex]
-                  .products[productIndex]
-                  .attributes[attributeIndex]
-                  .values[index]
-                  .name),
+              child: Text(list[index]['Name']),
             ),
           );
         }),

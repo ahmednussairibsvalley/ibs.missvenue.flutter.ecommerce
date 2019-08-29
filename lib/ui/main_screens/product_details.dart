@@ -145,7 +145,21 @@ class _ProductDetailsState extends State<ProductDetails> {
 
                       return Column(
                         children: List.generate(attributesList.length, (index) {
-                          return Text('${attributesList[index]['Name']}');
+                          int controlType = attributesList[index]['ControlType'];
+                          List valuesList = attributesList[index]['Values'];
+                          return Column(
+                            children: <Widget>[
+                              Text('${attributesList[index]['Name']}'),
+                              controlType ==
+                                  AttributesController.radioListControlType ?
+                              RadioList(list: valuesList,) :
+                              controlType ==
+                                  AttributesController.checkboxesControlType ?
+                              CheckBoxes(list: valuesList,) :
+                              DropDownList(list: valuesList,),
+                              Divider(),
+                            ],
+                          );
                         }),
                       );
                     }

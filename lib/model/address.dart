@@ -27,8 +27,10 @@ class Address{
     _phone = json['PhoneNumber'];
     _city = json['City'];
     _email = json['Email'];
-    _state = State.fromJson(json['StateModel']);
-    _country = Country.fromJson(json['CountryModel']);
+    if (json['StateModel'] != null)
+      _state = State.fromJson(json['StateModel']);
+    if (json['CountryModel'] != null)
+      _country = Country.fromJson(json['CountryModel']);
   }
 
   int get id => _id;

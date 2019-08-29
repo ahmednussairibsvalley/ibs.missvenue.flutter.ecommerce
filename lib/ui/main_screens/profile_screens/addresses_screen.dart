@@ -29,7 +29,6 @@ class _AddressesState extends State<Addresses> {
     return Scaffold(
       bottomNavigationBar: GestureDetector(
         onTap: (){
-          print('${Globals.controller.countries[0].id}');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
               AddAddress(
                 onAddAddress: () {
@@ -91,9 +90,18 @@ class _AddressesState extends State<Addresses> {
                         final _address2 = _list[index].address2;
                         final _email = _list[index].email;
                         final _phone = _list[index].phone;
-                        final _state = _list[index].state.name;
+                        String _state;
+                        if (_list[index].state != null)
+                          _state = _list[index].state.name;
+                        else
+                          _state = '';
                         final _city = _list[index].city;
-                        final _country = _list[index].country.name;
+
+                        String _country;
+                        if (_list[index].country != null)
+                          _country = _list[index].country.name;
+                        else
+                          _country = '';
                         return Column(
                           children: <Widget>[
                             AddressItem(

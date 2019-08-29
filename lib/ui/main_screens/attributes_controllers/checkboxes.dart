@@ -1,48 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../../../globals.dart';
-
 class CheckBoxes extends StatelessWidget {
-  final int sectorIndex;
-  final int categoryIndex;
-  final int productIndex;
-  final int attributeIndex;
+  final List list;
 
-  CheckBoxes(
-      {@required this.sectorIndex,
-      @required this.categoryIndex,
-      @required this.productIndex,
-      @required this.attributeIndex});
+  CheckBoxes({@required this.list});
 
   @override
   Widget build(BuildContext context) {
-    final int _length = Globals
-        .controller
-        .sectors[sectorIndex]
-        .categories[categoryIndex]
-        .products[productIndex]
-        .attributes[attributeIndex]
-        .values
-        .length;
+    final int _length = list.length;
     return Column(
       children: List.generate(_length, (index) {
-        String _title = Globals
-            .controller
-            .sectors[sectorIndex]
-            .categories[categoryIndex]
-            .products[productIndex]
-            .attributes[attributeIndex]
-            .values[index]
-            .name;
-        bool _checked = Globals
-            .controller
-            .sectors[sectorIndex]
-            .categories[categoryIndex]
-            .products[productIndex]
-            .attributes[attributeIndex]
-            .values[index]
-            .preSelected;
-        return CheckBoxItem(
+        String _title = list[index]['Name'];
+        bool _checked = list[index]['IsPreSelected'];
+        return _CheckBoxItem(
           title: _title,
           checked: _checked,
         );
@@ -51,26 +21,26 @@ class CheckBoxes extends StatelessWidget {
   }
 }
 
-class CheckBoxItem extends StatefulWidget {
-  final bool checked;
+class _CheckBoxItem extends StatefulWidget {
   final String title;
+  final bool checked;
 
-  CheckBoxItem({@required this.checked, @required this.title});
+  _CheckBoxItem({@required this.title, @required this.checked});
 
   @override
   _CheckBoxItemState createState() => _CheckBoxItemState(
-        title: title,
-        checked: checked,
-      );
+    title: title, checked: checked,
+  );
 }
 
-class _CheckBoxItemState extends State<CheckBoxItem> {
-  final bool checked;
+class _CheckBoxItemState extends State<_CheckBoxItem> {
+
   final String title;
+  final bool checked;
 
   bool _checked;
 
-  _CheckBoxItemState({@required this.checked, @required this.title});
+  _CheckBoxItemState({@required this.title, @required this.checked});
 
   @override
   void initState() {

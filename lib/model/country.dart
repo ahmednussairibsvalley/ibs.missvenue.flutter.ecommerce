@@ -10,6 +10,7 @@ class Country {
   }
 
   Country.fromJson(Map json) {
+    print('Json equals null: ${json == null}');
     _id = json['Id'];
     _name = json['Name'];
     _states = List();

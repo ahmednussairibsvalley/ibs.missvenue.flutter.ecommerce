@@ -57,7 +57,6 @@ class Controller {
   ///using the data retrieved from
   ///the API.
   initCustomerFromJson(Map json) {
-    print('json == null : ${json == null}');
     _customer = Customer.fromJson(json);
     _testData();
   }
@@ -291,7 +290,6 @@ class Controller {
     double sum = 0;
 
     for (int i = 0; i < _customer.cart.length; i++) {
-      //print('Item price: ${_customer.cart[i].product.price}');
       if (_customer.cart[i].product.sellingPrice <
           _customer.cart[i].product.price) {
         sum = sum +
