@@ -116,35 +116,19 @@ class _OfferItemState extends State<OfferItem> {
                             sellingPrice: _sellingPrice,
                             addedToCart: _addedToCart,
                             addedToWishList: _addedToWishlist,
-                            onUpdateCart: () async {
-                              Map result = await getCustomerCart(
-                                  Globals.customerId);
-                              List list = result['Items'];
-                              bool added = false;
-                              for (int i = 0; i < list.length; i++) {
-                                if (list[i]['ProductId'] == _id) {
-                                  added = true;
-                                  break;
-                                }
-                              }
+                            onUpdateCart: () {
+                              _addedToCart = _addedToCart ? false : true;
                               setState(() {
-                                _addedToCart = added;
+                                _addedToCartFuture =
+                                    getCustomerCart(Globals.customerId);
                               });
                             },
-                            onUpdateWishList: () async {
-                              Map result = await getCustomerWishList(
-                                  Globals.customerId);
-                              List list = result['Items'];
-
-                              bool added = false;
-                              for (int i = 0; i < list.length; i++) {
-                                if (list[i]['ProductId'] == _id) {
-                                  added = true;
-                                  break;
-                                }
-                              }
+                            onUpdateWishList: () {
+                              _addedToWishlist =
+                              _addedToWishlist ? false : true;
                               setState(() {
-                                _addedToWishlist = added;
+                                _addedToWishListFuture =
+                                    getCustomerWishList(Globals.customerId);
                               });
                             },
 
@@ -315,8 +299,8 @@ class _OfferItemState extends State<OfferItem> {
                               Map addedToWishlistMap = await addToWishList(_id);
                               if (addedToWishlistMap != null &&
                                   addedToWishlistMap['result']) {
+                                _addedToWishlist = true;
                                 setState(() {
-                                  _addedToWishlist = true;
                                   _addedToWishListFuture =
                                       getCustomerWishList(Globals.customerId);
                                 });
@@ -326,8 +310,8 @@ class _OfferItemState extends State<OfferItem> {
                                   _id);
                               if (removeFromWishListApi != null &&
                                   removeFromWishListApi['result']) {
+                                _addedToWishlist = false;
                                 setState(() {
-                                  _addedToWishlist = false;
                                   _addedToWishListFuture =
                                       getCustomerWishList(Globals.customerId);
                                 });

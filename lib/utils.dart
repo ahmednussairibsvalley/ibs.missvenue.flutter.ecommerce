@@ -87,7 +87,7 @@ Future<List> getOffers() async {
 ///Gets all products from the API.
 Future<List> getAllProducts() async {
   List result;
-  String apiUrl = '$_baseUrl/api/product/select?categoryId=null&manufacturerId=null&productId=null&hasOffer=false';
+  String apiUrl = '$_baseUrl/api/product/select?categoryId=null&manufacturerId=null&productId=null&hasOffer=null';
   var response = await http.get(apiUrl);
   if (response.statusCode == 200 ||
       response.statusCode == 201 ||

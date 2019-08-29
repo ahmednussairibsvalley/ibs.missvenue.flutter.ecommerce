@@ -17,9 +17,6 @@ class ProductDetails extends StatefulWidget {
   final double sellingPrice;
   final Function onUpdateWishList;
   final Function onUpdateCart;
-
-//  final int sectorIndex;
-//  final int categoryIndex;
   final bool addedToWishList;
   final bool addedToCart;
 
@@ -129,47 +126,43 @@ class _ProductDetailsState extends State<ProductDetails> {
             // Divider
             Divider(),
 
-//            Column(
-//              children: List.generate(Globals.controller
-//                  .getProductById(id)
-//                  .attributes
-//                  .length, (index) {
-//                int controlType = Globals.controller
-//                    .getProductById(id)
-//                    .attributes[index]
-//                    .controlType;
-//                return Column(
-//                  children: <Widget>[
-//                    Text('${Globals.controller
-//                        .getProductById(id)
-//                        .attributes[index].name}'),
-////                    controlType == AttributesController.dropDownListControlType
-////                        ?
-////                    DropDownList(
-////                      sectorIndex: sectorIndex,
-////                      categoryIndex: categoryIndex,
-////                      productIndex: Globals.controller.getProductIndex(id),
-////                      attributeIndex: index,
-////                    )
-////                        :
-////                    controlType == AttributesController.radioListControlType ?
-////                    RadioList(
-////                      sectorIndex: sectorIndex,
-////                      categoryIndex: categoryIndex,
-////                      productIndex: Globals.controller.getProductIndex(id),
-////                      attributeIndex: index,
-////                    ) :
-////                    CheckBoxes(
-////                      sectorIndex: sectorIndex,
-////                      categoryIndex: categoryIndex,
-////                      productIndex: Globals.controller.getProductIndex(id),
-////                      attributeIndex: index,
-////                    ),
-////                    Divider(),
-//                  ],
-//                );
-//              }),
-//            ),
+            // Product Attributes.
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: FutureBuilder(
+                future: getAllProducts(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      List list = snapshot.data;
+                      List attributesList = List();
+                      for (int i = 0; i < list.length; i++) {
+                        if (list[i]['id'] == id) {
+                          attributesList = list[i]['Attributes'];
+                          break;
+                        }
+                      }
+
+                      return Column(
+                        children: List.generate(attributesList.length, (index) {
+                          return Text('${attributesList[index]['Name']}');
+                        }),
+                      );
+                    }
+                    return Container();
+                  }
+                  return Column(
+                    children: <Widget>[
+                      Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
 
             // Product Specifications.
             Padding(
@@ -271,14 +264,14 @@ class _ProductDetailsState extends State<ProductDetails> {
             ),
           ],
         ),
-        bottomNavigationBar: Builder(builder: (context) {
-          return Row(
-            children: <Widget>[
+        bottomNavigationBar: Row(
+          children: <Widget>[
 
-              // wishtlist
-              FutureBuilder(
-                future: _addedToWishListFuture,
-                builder: (context, snapshot) {
+            // wishtlist
+            FutureBuilder(
+              future: _addedToWishListFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
                     List list = snapshot.data['Items'];
                     for (int i = 0; i < list.length; i++) {
@@ -294,7 +287,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                           Map addedToWishlistMap = await addToWishList(id);
                           if (addedToWishlistMap != null &&
                               addedToWishlistMap['result']) {
-                            setState(() {
+                            this.setState(() {
                               _addedToWishlist = true;
                               _addedToWishListFuture =
                                   getCustomerWishList(Globals.customerId);
@@ -305,8 +298,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                               id);
                           if (removeFromWishListApi != null &&
                               removeFromWishListApi['result']) {
-                            setState(() {
-                              _addedToWishlist = false;
+                            _addedToWishlist = false;
+                            this.setState(() {
                               _addedToWishListFuture =
                                   getCustomerWishList(Globals.customerId);
                             });
@@ -334,54 +327,41 @@ class _ProductDetailsState extends State<ProductDetails> {
                     );
                   }
                   return Container();
-                },
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      right: 8.0, top: 8.0, bottom: 8.0),
-                  child: FutureBuilder(
-                    future: _addedToCartFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        List list = snapshot.data['Items'];
-                        for (int i = 0; i < list.length; i++) {
-                          if (list[i]['ProductId'] == id) {
-                            _addedToCart = true;
-                            break;
-                          }
+                }
+                return Container(
+                  height: 40,
+                  width: 40,
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    right: 8.0, top: 8.0, bottom: 8.0),
+                child: FutureBuilder(
+                  future: _addedToCartFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List list = snapshot.data['Items'];
+                      for (int i = 0; i < list.length; i++) {
+                        if (list[i]['ProductId'] == id) {
+                          _addedToCart = true;
+                          break;
                         }
-                        return GestureDetector(
-                          onTap: () async {
-                            if (!_addedToCart) {
-                              Map addedToCartApi = await addToCart(id, 1);
-                              if (addedToCartApi != null &&
-                                  addedToCartApi['result']) {
-                                onUpdateCart();
-                                _addedToCart = true;
-                                setState(() {
-                                  _addedToCartFuture =
-                                      getCustomerCart(Globals.customerId);
-                                });
-                                Scaffold.of(context).showSnackBar(
-                                  SnackBar(
-                                    duration: Duration(seconds: 4),
-                                    backgroundColor: Colors.black87,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(50),
-                                        side: BorderSide(
-                                          style: BorderStyle.none,
-                                          width: 1,
-                                        )
-                                    ),
-                                    content: Text(
-                                      'The item is added to the cart',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                );
-                              }
-                            } else {
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          if (!_addedToCart) {
+                            Map addedToCartApi = await addToCart(id, 1);
+                            if (addedToCartApi != null &&
+                                addedToCartApi['result']) {
+                              onUpdateCart();
+                              _addedToCart = true;
+                              setState(() {
+                                _addedToCartFuture =
+                                    getCustomerCart(Globals.customerId);
+                              });
                               Scaffold.of(context).showSnackBar(
                                 SnackBar(
                                   duration: Duration(seconds: 4),
@@ -394,38 +374,56 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       )
                                   ),
                                   content: Text(
-                                    'The item has been already added',
+                                    'The item is added to the cart',
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
                               );
                             }
-                          },
-                          child: Container(
-                            height: _width / 10,
-                            decoration: BoxDecoration(
-                              color: Colors.black87,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Add to Cart',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
+                          } else {
+                            Scaffold.of(context).showSnackBar(
+                              SnackBar(
+                                duration: Duration(seconds: 4),
+                                backgroundColor: Colors.black87,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                    side: BorderSide(
+                                      style: BorderStyle.none,
+                                      width: 1,
+                                    )
                                 ),
+                                content: Text(
+                                  'The item has been already added',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          height: _width / 10,
+                          decoration: BoxDecoration(
+                            color: Colors.black87,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Add to Cart',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
                               ),
                             ),
                           ),
-                        );
-                      }
-                      return Container();
-                    },
-                  ),
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
                 ),
-              )
-            ],
-          );
-        }),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
