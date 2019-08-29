@@ -106,55 +106,51 @@ class _OfferItemState extends State<OfferItem> {
               Center(
                 child: GestureDetector(
                   onTap: (){
-//                    Navigator.of(context).push(MaterialPageRoute(
-//                      builder: (context) =>
-//                          ProductDetails(
-//                            id: _id,
-//                            title: _title,
-//                            price: _price,
-//                            imagesUrls: _imagesUrls,
-//                            sellingPrice: _sellingPrice,
-//                            sectorIndex: Globals.controller
-//                                .getProductSectorIndex(_id),
-//                            categoryIndex: Globals.controller
-//                                .getProductCategoryIndex(_id),
-//                            addedToCart: _addedToCart,
-//                            addedToWishList: _addedToWishlist,
-//                            onUpdateCart: () async{
-//                              Map result = await getCustomerCart(
-//                                  Globals.customerId);
-//                              List list = result['Items'];
-//                              bool added = false;
-//                              for (int i = 0; i < list.length; i++) {
-//                                if (list[i]['ProductId'] == _id) {
-//                                  added = true;
-//                                  break;
-//                                }
-//                              }
-//                              setState(() {
-//                                _addedToCart = added;
-//                              });
-//                            },
-//                            onUpdateWishList: () async{
-//                              Map result = await getCustomerWishList(
-//                                  Globals.customerId);
-//                              List list = result['Items'];
-//
-//                              bool added = false;
-//                              for (int i = 0; i < list.length; i++) {
-//                                if (list[i]['ProductId'] == _id) {
-//                                  added = true;
-//                                  break;
-//                                }
-//                              }
-//                              setState(() {
-//                                _addedToWishlist = added;
-//                              });
-//                            },
-//
-//                          ),
-//                    ),
-//                    );
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetails(
+                            id: _id,
+                            title: _title,
+                            price: _price,
+                            imagesUrls: _imagesUrls,
+                            sellingPrice: _sellingPrice,
+                            addedToCart: _addedToCart,
+                            addedToWishList: _addedToWishlist,
+                            onUpdateCart: () async {
+                              Map result = await getCustomerCart(
+                                  Globals.customerId);
+                              List list = result['Items'];
+                              bool added = false;
+                              for (int i = 0; i < list.length; i++) {
+                                if (list[i]['ProductId'] == _id) {
+                                  added = true;
+                                  break;
+                                }
+                              }
+                              setState(() {
+                                _addedToCart = added;
+                              });
+                            },
+                            onUpdateWishList: () async {
+                              Map result = await getCustomerWishList(
+                                  Globals.customerId);
+                              List list = result['Items'];
+
+                              bool added = false;
+                              for (int i = 0; i < list.length; i++) {
+                                if (list[i]['ProductId'] == _id) {
+                                  added = true;
+                                  break;
+                                }
+                              }
+                              setState(() {
+                                _addedToWishlist = added;
+                              });
+                            },
+
+                          ),
+                    ),
+                    );
                   },
                   child: FutureBuilder(
                       future: isImageAvailable(_imagesUrls[0]),
@@ -194,8 +190,10 @@ class _OfferItemState extends State<OfferItem> {
                         if (!_addedToCart) {
                           Map addedToCart = await addToCart(_id, 1);
                           if (addedToCart != null && addedToCart['result']) {
+                            _addedToCart = true;
                             setState(() {
-                              _addedToCart = true;
+                              _addedToCartFuture =
+                                  getCustomerCart(Globals.customerId);
                             });
                             Scaffold.of(context).showSnackBar(
                               SnackBar(
@@ -314,19 +312,22 @@ class _OfferItemState extends State<OfferItem> {
                         return GestureDetector(
                           onTap: () async {
                             if (!_addedToWishlist) {
-                              Map addedToWishList = await addToWishList(_id);
-                              if (addedToWishList != null &&
-                                  addedToWishList['result'] == true) {
+                              Map addedToWishlistMap = await addToWishList(_id);
+                              if (addedToWishlistMap != null &&
+                                  addedToWishlistMap['result']) {
                                 setState(() {
                                   _addedToWishlist = true;
+                                  _addedToWishListFuture =
+                                      getCustomerWishList(Globals.customerId);
                                 });
                               }
                             } else {
-                              Map removedFromWishListApi = await removeFromWishList(
+                              Map removeFromWishListApi = await removeFromWishList(
                                   _id);
-                              if (removedFromWishListApi != null &&
-                                  removedFromWishListApi['result']) {
+                              if (removeFromWishListApi != null &&
+                                  removeFromWishListApi['result']) {
                                 setState(() {
+                                  _addedToWishlist = false;
                                   _addedToWishListFuture =
                                       getCustomerWishList(Globals.customerId);
                                 });
@@ -335,7 +336,8 @@ class _OfferItemState extends State<OfferItem> {
                           },
                           child: _addedToWishlist ?
                           Icon(Icons.favorite, color: Colors.red, size: 30,)
-                              : Icon(Icons.favorite_border, color: Colors.red,
+                              : Icon(
+                            Icons.favorite_border, color: Colors.red,
                             size: 30,),
                         );
                       }
@@ -344,10 +346,10 @@ class _OfferItemState extends State<OfferItem> {
                     return Column(
                       children: <Widget>[
                         Container(
-                          height: 50,
-                          width: 50,
+                          height: 30,
+                          width: 30,
                           child: CircularProgressIndicator(),
-                        )
+                        ),
                       ],
                     );
                   },

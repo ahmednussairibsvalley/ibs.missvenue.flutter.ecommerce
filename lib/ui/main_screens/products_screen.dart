@@ -127,16 +127,8 @@ class _ProductItemState extends State<ProductItem> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < wishList.length; i++) {
-      if (wishList[i]['ProductId'] == _id) {
-        _addedToWishlist = true;
-        break;
-      }
-    }
     _addedToCartFuture = getCustomerCart(Globals.customerId);
     _addedToWishListFuture = getCustomerWishList(Globals.customerId);
-//    _addedToWishlist = Globals.controller.containsWishListItem(_id);
-    //getCustomerDetails(Globals.customerId)
   }
   @override
   Widget build(BuildContext context) {
@@ -164,9 +156,11 @@ class _ProductItemState extends State<ProductItem> {
                             addedToWishList: _addedToWishlist,
                             addedToCart: _addedToCart,
                             onUpdateCart: () {
-                              _addedToCart = _addedToCart ? false : true;
-                              _addedToCartFuture =
-                                  getCustomerCart(Globals.customerId);
+                              setState(() {
+                                _addedToCart = _addedToCart ? false : true;
+                                _addedToCartFuture =
+                                    getCustomerCart(Globals.customerId);
+                              });
                             },
                             onUpdateWishList: () {
                               setState(() {
