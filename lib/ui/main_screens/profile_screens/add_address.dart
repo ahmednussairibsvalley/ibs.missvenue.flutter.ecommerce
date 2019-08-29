@@ -36,12 +36,6 @@ class _AddAddressState extends State<AddAddress> {
   _AddAddressState({@required this.onAddAddress});
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -73,52 +67,62 @@ class _AddAddressState extends State<AddAddress> {
                   key: _key,
                   child: Column(
                     children: <Widget>[
-                      // The First name.
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: TextFormField(onEditingComplete: () {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          ;
-                        },
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(10)),
-                            ),
-                            labelText: 'First Name',
-                          ),
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Please enter the first name.';
-                            } else {
-                              _firstName = value;
-                              return null;
-                            }
-                          },
-                        ),
-                      ),
 
-                      //The last name.
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(10)),
+                      Row(
+                        children: <Widget>[
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: TextFormField(onEditingComplete: () {
+                                FocusScope.of(context).requestFocus(
+                                    FocusNode());
+                              },
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  labelText: 'First Name',
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter the first name.';
+                                  } else {
+                                    _firstName = value;
+                                    return null;
+                                  }
+                                },
+                              ),
                             ),
-                            labelText: 'Last Name',
                           ),
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Please enter the last name.';
-                            } else {
-                              _lastName = value;
-                              return null;
-                            }
-                          },
-                        ),
+
+                          //The last name.
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  labelText: 'Last Name',
+                                ),
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter the last name.';
+                                  } else {
+                                    _lastName = value;
+                                    return null;
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      // The First name.
+
 
                       //The phone.
                       Padding(
@@ -249,7 +253,6 @@ class _AddAddressState extends State<AddAddress> {
                   },
                   onUpdateState: (stateId) {
                     _stateId = stateId;
-                    print('State ID $_stateId');
                   },
                 ),
               ],
@@ -363,7 +366,6 @@ class _CountryAndCityState extends State<CountryAndCity> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     statesList = List();
     onUpdateState(Globals.controller.countries[_countryIndex].id);
@@ -373,7 +375,6 @@ class _CountryAndCityState extends State<CountryAndCity> {
     }
 
     initStatesList();
-    print('${statesList.length}');
   }
 
 

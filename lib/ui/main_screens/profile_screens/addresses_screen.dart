@@ -32,8 +32,10 @@ class _AddressesState extends State<Addresses> {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
               AddAddress(
                 onAddAddress: () {
-                  _addressesFuture =
-                      utils.getCustomerAddresses(Globals.customerId);
+                  setState(() {
+                    _addressesFuture =
+                        utils.getCustomerAddresses(Globals.customerId);
+                  });
                 },
               ))
           );

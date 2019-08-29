@@ -262,12 +262,8 @@ Future<Map> loginWithFacebook() async {
     final token = result.accessToken.token;
     final graphResponse = await http.get(
         'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,cover,picture.type(large),email&access_token=$token');
-//    print('${graphResponse.statusCode}');
     if (graphResponse.statusCode == 200) {
       final profile = json.decode(graphResponse.body);
-//      print('${profile.toString()}, token: $token');
-//      print('${profile['first_name']}');
-      //return true;
 
       map = profile;
       map['id'] = profile['id'];
@@ -280,13 +276,10 @@ Future<Map> loginWithFacebook() async {
           profile['lastName'], profile['email'], '', '123', '123');
       Globals.customerId = customerMap['customer_id'];
       map['id'] = customerMap['customer_id'];
-//      print('${map['id']}');
     }
   } catch (error) {
     map = null;
   }
-
-//  print('${map.toString()}');
   return map;
 }
 
@@ -300,14 +293,9 @@ Future<Map> loginWithGoogle() async {
     ],
   );
 
-//  String value = DateFormat.yMMMMd().format(DateTime.now());
-//  print(value);
   try {
     final result = await _googleSignIn.signIn();
-    //print('${result.email}');
-    //print('${result.displayName}');
-    //print('${result.id}');
-    //print('${result.photoUrl}');
+
     Map tmpMap = Map();
     tmpMap['id'] = result.id;
     List names = result.displayName.split(' ');
@@ -319,9 +307,6 @@ Future<Map> loginWithGoogle() async {
     map = await register(tmpMap['firstName'], tmpMap['lastName'],
         tmpMap['email'], '', '123', '123');
     Globals.customerId = map['customer_id'];
-//    map['id'] = customerMap['customer_id'];
-//    print('$map');
-    //return true;
   } on SocketException catch (_) {
     map = null;
     print('not connected');
@@ -494,7 +479,6 @@ Future<Map> updateCartItem(int productId, int quantity) async {
 Future<Map> addToWishList(int productId) async {
   Map result;
   String apiUrl = '$_baseUrl/api/Cart/add';
-  print('${Globals.customerId}');
   try {
     var response = await http.post(
       apiUrl,
@@ -523,8 +507,6 @@ Future<Map> addToWishList(int productId) async {
 ///Removes a product specified by its productId
 ///from the customer's wishlist
 Future<Map> removeFromWishList(int productId) async {
-//  print('Customer ID: ${Globals.customerId}');
-//  print('Product ID: $productId');
   Map result;
   String apiUrl = '$_baseUrl/api/Cart/update';
   var response = await http.post(
