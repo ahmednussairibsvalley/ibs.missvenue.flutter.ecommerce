@@ -156,16 +156,16 @@ class _ProductItemState extends State<ProductItem> {
                             addedToWishList: _addedToWishlist,
                             addedToCart: _addedToCart,
                             onUpdateCart: () {
+                              _addedToCart = _addedToCart ? false : true;
                               setState(() {
-                                _addedToCart = _addedToCart ? false : true;
                                 _addedToCartFuture =
                                     getCustomerCart(Globals.customerId);
                               });
                             },
                             onUpdateWishList: () {
+                              _addedToWishlist =
+                              _addedToWishlist ? false : true;
                               setState(() {
-                                _addedToWishlist =
-                                _addedToWishlist ? false : true;
                                 _addedToWishListFuture =
                                     getCustomerWishList(Globals.customerId);
                               });
