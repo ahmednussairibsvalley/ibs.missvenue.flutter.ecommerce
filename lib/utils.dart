@@ -84,6 +84,19 @@ Future<List> getOffers() async {
   return result;
 }
 
+///Gets all products from the API.
+Future<List> getAllProducts() async {
+  List result;
+  String apiUrl = '$_baseUrl/api/product/select?categoryId=null&manufacturerId=null&productId=null&hasOffer=false';
+  var response = await http.get(apiUrl);
+  if (response.statusCode == 200 ||
+      response.statusCode == 201 ||
+      response.statusCode == 202) {
+    result = json.decode(response.body);
+  }
+  return result;
+}
+
 ///Gets the customer details
 Future<Map> getCustomerDetails(int customerId) async {
   Map result;

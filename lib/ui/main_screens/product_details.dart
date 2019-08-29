@@ -15,18 +15,17 @@ class ProductDetails extends StatefulWidget {
   final double price;
   final List imagesUrls;
   final double sellingPrice;
-  final int sectorIndex;
-  final int categoryIndex;
+  final Function onUpdateWishList;
+
+//  final int sectorIndex;
+//  final int categoryIndex;
   final bool addedToWishList;
   final bool addedToCart;
-  final Function onUpdateWishList;
-  final Function onUpdateCart;
 
   ProductDetails({@required this.id, @required this.title, @required this.price,
     @required this.imagesUrls, @required this.sellingPrice,
-    @required this.sectorIndex, @required this.categoryIndex,
-    @required this.addedToWishList, @required this.onUpdateWishList,
-    @required this.addedToCart, @required this.onUpdateCart,
+    @required this.addedToWishList, @required this.addedToCart,
+    @required this.onUpdateWishList,
   });
   @override
   _ProductDetailsState createState() => _ProductDetailsState(
@@ -35,12 +34,9 @@ class ProductDetails extends StatefulWidget {
     price: price,
     imagesUrls: imagesUrls,
     sellingPrice: sellingPrice,
-    sectorIndex: sectorIndex,
-    categoryIndex: categoryIndex,
     addedToWishList: addedToWishList,
-    onUpdateWishList: onUpdateWishList,
-    onUpdateCart: onUpdateCart,
     addedToCart: addedToCart,
+    onUpdateWishList: onUpdateWishList,
   );
 }
 
@@ -50,22 +46,20 @@ class _ProductDetailsState extends State<ProductDetails> {
   final double price;
   final List imagesUrls;
   final double sellingPrice;
-  final int sectorIndex;
-  final int categoryIndex;
   final bool addedToWishList;
   final bool addedToCart;
   final Function onUpdateWishList;
-  final Function onUpdateCart;
 
   bool _addedToWishlist = false;
+
+  Future _addedToWishListFuture;
 
 
   _ProductDetailsState(
       {@required this.id, @required this.title, @required this.price,
         @required this.imagesUrls, @required this.sellingPrice,
-        @required this.sectorIndex, @required this.categoryIndex,
-        @required this.addedToWishList, @required this.onUpdateWishList,
-        @required this.addedToCart, @required this.onUpdateCart,
+        @required this.addedToWishList, @required this.addedToCart,
+        @required this.onUpdateWishList,
       });
 
   @override
@@ -73,11 +67,11 @@ class _ProductDetailsState extends State<ProductDetails> {
     super.initState();
     super.initState();
     _addedToWishlist = addedToWishList;
+    _addedToWishListFuture = getCustomerWishList(Globals.customerId);
   }
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
-    final int _productIndex = _getProductIndex(sectorIndex, categoryIndex, id);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -93,9 +87,13 @@ class _ProductDetailsState extends State<ProductDetails> {
         ),
         body: ListView(
           children: <Widget>[
+
+            // Product gallery
             ProductGallery(
               list: imagesUrls,
             ),
+
+            // Product name title
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
@@ -107,6 +105,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ),
               ),
             ),
+
+            // Product price
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: sellingPrice < price ?
@@ -125,102 +125,216 @@ class _ProductDetailsState extends State<ProductDetails> {
               )
                   : Text('$price SR', textAlign: TextAlign.center,),
             ),
+
+            // Divider
             Divider(),
-            Column(
-              children: List.generate(Globals.controller
-                  .getProductById(id)
-                  .attributes
-                  .length, (index) {
-                int controlType = Globals.controller
-                    .getProductById(id)
-                    .attributes[index]
-                    .controlType;
+
+//            Column(
+//              children: List.generate(Globals.controller
+//                  .getProductById(id)
+//                  .attributes
+//                  .length, (index) {
+//                int controlType = Globals.controller
+//                    .getProductById(id)
+//                    .attributes[index]
+//                    .controlType;
+//                return Column(
+//                  children: <Widget>[
+//                    Text('${Globals.controller
+//                        .getProductById(id)
+//                        .attributes[index].name}'),
+////                    controlType == AttributesController.dropDownListControlType
+////                        ?
+////                    DropDownList(
+////                      sectorIndex: sectorIndex,
+////                      categoryIndex: categoryIndex,
+////                      productIndex: Globals.controller.getProductIndex(id),
+////                      attributeIndex: index,
+////                    )
+////                        :
+////                    controlType == AttributesController.radioListControlType ?
+////                    RadioList(
+////                      sectorIndex: sectorIndex,
+////                      categoryIndex: categoryIndex,
+////                      productIndex: Globals.controller.getProductIndex(id),
+////                      attributeIndex: index,
+////                    ) :
+////                    CheckBoxes(
+////                      sectorIndex: sectorIndex,
+////                      categoryIndex: categoryIndex,
+////                      productIndex: Globals.controller.getProductIndex(id),
+////                      attributeIndex: index,
+////                    ),
+////                    Divider(),
+//                  ],
+//                );
+//              }),
+//            ),
+
+            // Product Specifications.
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FutureBuilder(
+                future: getAllProducts(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      List list = snapshot.data;
+                      List specsList = List();
+                      for (int i = 0; i < list.length; i++) {
+                        if (list[i]['id'] == id) {
+                          specsList = list[i]['SpecificationAttribute'];
+                          break;
+                        }
+                      }
+                      return Column(
+                        children: List.generate(specsList.length, (index) {
+                          return Row(
+                            children: <Widget>[
+                              Text('${specsList[index]['Name']}: ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('${specsList[index]['Value']}',)
+                            ],
+                          );
+                        }),
+                      );
+                    }
+                    return Container();
+                  }
+                  return Column(
+                    children: <Widget>[
+                      Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // Divider
+            Divider(),
+
+            // Related Products
+            FutureBuilder(
+              future: getAllProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    List list = snapshot.data;
+                    List relatedProductsList = List();
+                    for (int i = 0; i < list.length; i++) {
+                      if (list[i]['id'] == id) {
+                        relatedProductsList = list[i]['RelatedProducts'];
+                        break;
+                      }
+                    }
+
+                    return GridView(
+                      padding: EdgeInsets.all(10),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5
+                      ),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: List.generate(
+                          relatedProductsList.length, (index) {
+                        final int _id = relatedProductsList[index]['id'];
+                        final String _title = relatedProductsList[index]['Name'];
+                        final double _price = relatedProductsList[index]['Price'];
+                        final List _imagesUrls = relatedProductsList[index]['Images'];
+                        final double _sellingPrice = relatedProductsList[index]['SellingPrice'];
+
+                        return RelatedProductItem(
+                          _id, _title, _price, _imagesUrls, _sellingPrice,);
+                      }),
+                    );
+                  }
+                  return Container();
+                }
                 return Column(
                   children: <Widget>[
-                    Text('${Globals.controller
-                        .getProductById(id)
-                        .attributes[index].name}'),
-                    controlType == AttributesController.dropDownListControlType
-                        ?
-                    DropDownList(
-                      sectorIndex: sectorIndex,
-                      categoryIndex: categoryIndex,
-                      productIndex: Globals.controller.getProductIndex(id),
-                      attributeIndex: index,
-                    )
-                        :
-                    controlType == AttributesController.radioListControlType ?
-                    RadioList(
-                      sectorIndex: sectorIndex,
-                      categoryIndex: categoryIndex,
-                      productIndex: Globals.controller.getProductIndex(id),
-                      attributeIndex: index,
-                    ) :
-                    CheckBoxes(
-                      sectorIndex: sectorIndex,
-                      categoryIndex: categoryIndex,
-                      productIndex: Globals.controller.getProductIndex(id),
-                      attributeIndex: index,
+                    Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(),
                     ),
-                    Divider(),
                   ],
                 );
-              }),
+              },
             ),
-            _productSpecs(),
-            Divider(),
-            _productIndex >= 0 && sectorIndex >= 0 && categoryIndex >= 0 ?
-            _relatedProducts(sectorIndex, categoryIndex, _productIndex) :
-            Container(),
           ],
         ),
         bottomNavigationBar: Builder(builder: (context) {
           return Row(
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    onUpdateWishList();
-                    if (!_addedToWishlist) {
-                      Map addedToWishList = await addToWishList(id);
-                      if (addedToWishList != null &&
-                          addedToWishList['result'] == true) {
-                        setState(() {
-                          _addedToWishlist = true;
-                        });
-                        Globals.controller.customer.wishList.add(
-                            Globals.controller.getProductById(id)
-                        );
-                      }
-                    } else {
-                      Map removedFromWishListApi = await removeFromWishList(id);
-                      if (removedFromWishListApi != null &&
-                          removedFromWishListApi['result']) {
-                        setState(() {
-                          _addedToWishlist = false;
-                        });
-                        Globals.controller.customer.wishList.remove(
-                            Globals.controller.getProductById(id)
-                        );
+
+              // wishtlist
+              FutureBuilder(
+                future: _addedToWishListFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List list = snapshot.data['Items'];
+                    for (int i = 0; i < list.length; i++) {
+                      if (list[i]['ProductId'] == id) {
+                        _addedToWishlist = true;
+                        break;
                       }
                     }
-                  },
-                  child: Container(
-                    width: _width / 10,
-                    height: _width / 10,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 2,
-                          color: Colors.black,
-                        )
-                    ),
-                    child: _addedToWishlist ?
-                    Icon(Icons.favorite, color: Colors.red, size: 30,)
-                        : Icon(
-                      Icons.favorite_border, color: Colors.red, size: 30,),
-                  ),
-                ),
+                    return GestureDetector(
+                      onTap: () async {
+                        onUpdateWishList();
+                        if (!_addedToWishlist) {
+                          Map addedToWishlistMap = await addToWishList(id);
+                          if (addedToWishlistMap != null &&
+                              addedToWishlistMap['result']) {
+                            setState(() {
+                              _addedToWishlist = true;
+                              _addedToWishListFuture =
+                                  getCustomerWishList(Globals.customerId);
+                            });
+                          }
+                        } else {
+                          Map removeFromWishListApi = await removeFromWishList(
+                              id);
+                          if (removeFromWishListApi != null &&
+                              removeFromWishListApi['result']) {
+                            setState(() {
+                              _addedToWishlist = false;
+                              _addedToWishListFuture =
+                                  getCustomerWishList(Globals.customerId);
+                            });
+                          }
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          width: _width / 10,
+                          height: _width / 10,
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 2,
+                                color: Colors.black,
+                              )
+                          ),
+                          child: _addedToWishlist ?
+                          Icon(Icons.favorite, color: Colors.red, size: 30,)
+                              : Icon(
+                            Icons.favorite_border, color: Colors.red,
+                            size: 30,),
+                        ),
+                      ),
+                    );
+                  }
+                  return Container();
+                },
               ),
               Expanded(
                 child: Padding(
@@ -232,7 +346,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                         Map addedToCartApi = await addToCart(id, 1);
                         if (addedToCartApi != null &&
                             addedToCartApi['result']) {
-                          onUpdateCart();
                           Scaffold.of(context).showSnackBar(
                             SnackBar(
                               duration: Duration(seconds: 4),
@@ -295,159 +408,6 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 
-  int _getProductIndex(int sectorIndex, int categoryIndex, int productId) {
-    int result = -1;
-    try {
-      List list = Globals.controller.sectors[sectorIndex]
-          .categories[categoryIndex].products;
-      for (int i = 0; i < list.length; i++) {
-        if (list[i].id == productId) {
-          result = i;
-          break;
-        }
-      }
-    } catch (e) {
-
-    }
-
-    return result;
-  }
-
-  Widget _productSpecs() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('Description:',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Globals.controller.getProductById(id) != null ?
-          Column(
-            children: List.generate(Globals.controller
-                .getProductById(id)
-                .specifications
-                .length, (index) {
-              return Row(
-                children: <Widget>[
-                  Text('${Globals.controller
-                      .getProductById(id)
-                      .specifications[index].name}:\t',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(Globals.controller
-                      .getProductById(id)
-                      .specifications[index].value),
-                ],
-              );
-            }),
-          ) : Container(),
-        ),
-      ],
-    );
-  }
-
-  Widget _relatedProducts(int sectorIndex, int categoryIndex,
-      int productIndex) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('You May Also Like',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Center(
-          child: FutureBuilder(
-            future: getCustomerWishList(Globals.customerId),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List list = snapshot.data['Items'];
-
-                return GridView(
-                  padding: EdgeInsets.all(10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 5
-                  ),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-
-                  children: List.generate(
-                      Globals.controller.sectors[sectorIndex]
-                          .categories[categoryIndex]
-                          .products[productIndex].relatedProducts.length, (
-                      index) {
-                    final int _id = Globals.controller.sectors[sectorIndex]
-                        .categories[categoryIndex].products[productIndex]
-                        .relatedProducts[index].id;
-                    final String _title = Globals.controller
-                        .sectors[sectorIndex]
-                        .categories[categoryIndex].products[productIndex]
-                        .relatedProducts[index].title;
-                    final double _price = Globals.controller
-                        .sectors[sectorIndex]
-                        .categories[categoryIndex].products[productIndex]
-                        .relatedProducts[index].price;
-                    final List _imagesUrls = Globals.controller
-                        .sectors[sectorIndex]
-                        .categories[categoryIndex].products[productIndex]
-                        .relatedProducts[index].imagesUrls;
-                    final double _sellingPrice = Globals.controller
-                        .sectors[sectorIndex]
-                        .categories[categoryIndex].products[productIndex]
-                        .relatedProducts[index].sellingPrice;
-
-                    final int _sectorIndex = Globals.controller
-                        .getProductSectorIndex(
-                        _id);
-                    final int _categoryIndex = Globals.controller
-                        .getProductCategoryIndex(_id);
-
-                    bool wishListed = false;
-                    for (int i = 0; i < list.length; i++) {
-                      if (list[i]['ProductId'] == _id) {
-                        wishListed = true;
-                        break;
-                      }
-                    }
-                    return RelatedProductItem(
-                      _id, _title, _price, _imagesUrls, _sellingPrice,
-                      sectorIndex: _sectorIndex,
-                      categoryIndex: _categoryIndex,
-                      onUpdateWishList: onUpdateWishList,
-                      addedToWishList: wishListed,
-                    );
-                  }),
-                );
-              }
-              return Column(
-                children: <Widget>[
-                  Container(
-                    height: 100,
-                    width: 100,
-                    child: CircularProgressIndicator(),
-                  )
-                ],
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class ProductGallery extends StatefulWidget {
@@ -594,24 +554,15 @@ class RelatedProductItem extends StatefulWidget {
   final double _price;
   final List _imagesUrls;
   final double _sellingPrice;
-  final int sectorIndex;
-  final int categoryIndex;
-  final bool addedToWishList;
-
-  final Function onUpdateWishList;
 
   RelatedProductItem(this._id, this._title, this._price, this._imagesUrls,
-      this._sellingPrice,
-      {@required this.sectorIndex, @required this.categoryIndex,
-        @required this.onUpdateWishList, @required this.addedToWishList});
+      this._sellingPrice,);
 
   @override
   _RelatedProductItemState createState() =>
       _RelatedProductItemState(
           this._id, this._title, this._price, this._imagesUrls,
-          this._sellingPrice, sectorIndex: sectorIndex,
-          categoryIndex: categoryIndex, onUpdateWishList: onUpdateWishList,
-          addedToWishList: addedToWishList);
+        this._sellingPrice,);
 }
 
 class _RelatedProductItemState extends State<RelatedProductItem> {
@@ -621,23 +572,17 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
   final double _price;
   final List _imagesUrls;
   final double _sellingPrice;
-  final int sectorIndex;
-  final int categoryIndex;
-  final bool addedToWishList;
-
-  final Function onUpdateWishList;
 
   bool _addedToWishlist = false;
+  Future _addedToWishListFuture;
 
   _RelatedProductItemState(this._id, this._title, this._price, this._imagesUrls,
-      this._sellingPrice,
-      {@required this.sectorIndex, @required this.categoryIndex, @required this.onUpdateWishList, @required this.addedToWishList});
+      this._sellingPrice,);
 
   @override
   void initState() {
     super.initState();
-
-    _addedToWishlist = addedToWishList;
+    _addedToWishListFuture = getCustomerWishList(Globals.customerId);
   }
 
   @override
@@ -653,22 +598,20 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetails(
-                            id: _id,
-                            title: _title,
-                            price: _price,
-                            imagesUrls: _imagesUrls,
-                            sellingPrice: _sellingPrice,
-                            sectorIndex: sectorIndex,
-                            categoryIndex: categoryIndex,
-                            addedToWishList: _addedToWishlist,
-                            onUpdateWishList: onUpdateWishList,
-                          ),
-                    ),
-                    );
+//                    Navigator.of(context).pop();
+//                    Navigator.of(context).push(MaterialPageRoute(
+//                      builder: (context) =>
+//                          ProductDetails(
+//                            id: _id,
+//                            title: _title,
+//                            price: _price,
+//                            imagesUrls: _imagesUrls,
+//                            sellingPrice: _sellingPrice,
+//                            addedToWishList: _addedToWishlist,
+//                            onUpdateWishList: onUpdateWishList,
+//                          ),
+//                    ),
+//                    );
                   },
                   child: FutureBuilder(
                     builder: (context, snapshot) {
@@ -700,13 +643,14 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                   ),
                 ),
               ),
+
+              // Add to cart button.
               GestureDetector(
                 onTap: () async {
                   if (!Globals.controller.containsCartItem(_id)) {
                     Map addedToCartApi = await addToCart(_id, 1);
                     if (addedToCartApi != null && addedToCartApi['result']) {
-                      Globals.controller.addToCart(
-                          Globals.controller.getProductById(_id), 1);
+
                       Scaffold.of(context).showSnackBar(
                         SnackBar(
                           duration: Duration(seconds: 4),
@@ -751,13 +695,18 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
               ),
             ],
           ),
+
+          // Product name title.
           Padding(
             padding: const EdgeInsets.all(4.0),
             child: Text(_title, maxLines: 1, overflow: TextOverflow.ellipsis,),
           ),
+
+          // Prices and wishlist
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              // Prices
               _sellingPrice < _price ?
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -772,38 +721,63 @@ class _RelatedProductItemState extends State<RelatedProductItem> {
                 ],
               )
                   : Text('$_price SR'),
-              GestureDetector(
-                onTap: () async {
-                  if (!_addedToWishlist) {
-                    Map addedToWishlistMap = await addToWishList(_id);
-                    if (addedToWishlistMap != null &&
-                        addedToWishlistMap['result']) {
-                      setState(() {
-                        _addedToWishlist = true;
-//                        Globals.controller.customer.wishList.add(
-//                            Globals.controller.getProductById(_id)
-//                        );
-                      });
+
+              // WishList
+              FutureBuilder(
+                future: _addedToWishListFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      List list = snapshot.data['Items'];
+                      for (int i = 0; i < list.length; i++) {
+                        if (list[i]['ProductId'] == _id) {
+                          _addedToWishlist = true;
+                          break;
+                        }
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          if (!_addedToWishlist) {
+                            Map addedToWishlistMap = await addToWishList(_id);
+                            if (addedToWishlistMap != null &&
+                                addedToWishlistMap['result']) {
+                              setState(() {
+                                _addedToWishlist = true;
+                                _addedToWishListFuture =
+                                    getCustomerWishList(Globals.customerId);
+                              });
+                            }
+                          } else {
+                            Map removeFromWishListApi = await removeFromWishList(
+                                _id);
+                            if (removeFromWishListApi != null &&
+                                removeFromWishListApi['result']) {
+                              setState(() {
+                                _addedToWishlist = false;
+                                _addedToWishListFuture =
+                                    getCustomerWishList(Globals.customerId);
+                              });
+                            }
+                          }
+                        },
+                        child: _addedToWishlist ?
+                        Icon(Icons.favorite, color: Colors.red, size: 30,)
+                            : Icon(
+                          Icons.favorite_border, color: Colors.red, size: 30,),
+                      );
                     }
-                  } else {
-                    Map removeFromWishListApi = await removeFromWishList(_id);
-                    if (removeFromWishListApi != null &&
-                        removeFromWishListApi['result']) {
-                      setState(() {
-                        _addedToWishlist = false;
-                      });
-//                      setState(() {
-//                        _addedToWishlist = true;
-////                        Globals.controller.customer.wishList.remove(
-////                            Globals.controller.getProductById(_id)
-////                        );
-//                      });
-                    }
+                    return Container();
                   }
+                  return Column(
+                    children: <Widget>[
+                      Container(
+                        height: 30,
+                        width: 30,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
+                  );
                 },
-                child: _addedToWishlist ?
-                Icon(Icons.favorite, color: Colors.red, size: 30,)
-                    : Icon(Icons.favorite_border, color: Colors.red, size: 30,),
               ),
             ],
           ),

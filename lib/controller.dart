@@ -24,12 +24,21 @@ class Controller {
   ///List of countries returned from the API
   List<Country> _countries;
 
+  /// List of products whether it has offers or not.
+  List<Product> _products;
+
   Controller() {
     _offers = List();
     _sectors = List();
     _countries = List();
   }
 
+
+  List<Product> get products => _products;
+
+  set products(List<Product> value) {
+    _products = value;
+  }
 
   List<Country> get countries => _countries;
 
@@ -151,69 +160,65 @@ class Controller {
     return order;
   }
 
-  ///Gets a product by its ID.
-  Product getProductById(int id) {
+  ///Gets a product by its ID from the product list productList.
+  Product getProductById(int productId, List productsList) {
     Product _product;
-    for (int i = 0; i < sectors.length; i++) {
-      for (int j = 0; j < sectors[i].categories.length; j++) {
-        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
-          if (sectors[i].categories[j].products[a].id == id) {
-            _product = sectors[i].categories[j].products[a];
-            break;
-          }
-        }
+    for (int i = 0; i < productsList.length; i++) {
+      if (productsList[i]['id'] == productId) {
+        _product = Product.fromJson(productsList[i]);
+        break;
       }
     }
     return _product;
   }
 
-  ///Returns the product's sector index.
-  int getProductSectorIndex(int productId) {
-    int index = -1;
-    for (int i = 0; i < sectors.length; i++) {
-      for (int j = 0; j < sectors[i].categories.length; j++) {
-        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
-          if (sectors[i].categories[j].products[a].id == productId) {
-            index = i;
-            break;
-          }
-        }
-      }
-    }
-    return index;
-  }
-
-  ///Returns the product's category index.
-  int getProductCategoryIndex(int productId) {
-    int index = -1;
-    for (int i = 0; i < sectors.length; i++) {
-      for (int j = 0; j < sectors[i].categories.length; j++) {
-        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
-          if (sectors[i].categories[j].products[a].id == productId) {
-            index = j;
-            break;
-          }
-        }
-      }
-    }
-    return index;
-  }
-
-  ///Returns the product index.
-  int getProductIndex(int productId) {
-    int index = -1;
-    for (int i = 0; i < sectors.length; i++) {
-      for (int j = 0; j < sectors[i].categories.length; j++) {
-        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
-          if (sectors[i].categories[j].products[a].id == productId) {
-            index = a;
-            break;
-          }
-        }
-      }
-    }
-    return index;
-  }
+//  ///Returns the product's sector index.
+//  int getProductSectorIndex(int productId) {
+//    int index = -1;
+//    for (int i = 0; i < sectors.length; i++) {
+//      for (int j = 0; j < sectors[i].categories.length; j++) {
+//        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
+//          if (sectors[i].categories[j].products[a].id == productId) {
+//            index = i;
+//            break;
+//          }
+//        }
+//      }
+//    }
+//    return index;
+//  }
+//
+//  ///Returns the product's category index.
+//  int getProductCategoryIndex(int productId) {
+//    int index = -1;
+//    for (int i = 0; i < sectors.length; i++) {
+//      for (int j = 0; j < sectors[i].categories.length; j++) {
+//        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
+//          if (sectors[i].categories[j].products[a].id == productId) {
+//            index = j;
+//            break;
+//          }
+//        }
+//      }
+//    }
+//    return index;
+//  }
+//
+//  ///Returns the product index.
+//  int getProductIndex(int productId) {
+//    int index = -1;
+//    for (int i = 0; i < sectors.length; i++) {
+//      for (int j = 0; j < sectors[i].categories.length; j++) {
+//        for (int a = 0; a < sectors[i].categories[j].products.length; a++) {
+//          if (sectors[i].categories[j].products[a].id == productId) {
+//            index = a;
+//            break;
+//          }
+//        }
+//      }
+//    }
+//    return index;
+//  }
 
   ///Gets an item from the customer's
   ///cart using the cart item's ID.
@@ -460,67 +465,7 @@ class Controller {
     }
   }
 
-  ///Gets the attributes for the product specified with its
-  ///productIndex, and its category specified by its categoryIndex,
-  ///with its sector specified by its sectorIndex.
-  Map<String, Map<int, String>> getAttributes(int sectorIndex,
-      int categoryIndex,
-      int productIndex,) {
-    Map<String, Map<int, String>> result;
 
-    for (int i = 0;
-    i <
-        sectors[sectorIndex]
-            .categories[categoryIndex]
-            .products[productIndex]
-            .attributes
-            .length;
-    i++) {
-      result[sectors[sectorIndex]
-          .categories[categoryIndex]
-          .products[productIndex]
-          .attributes[i]
-          .name] =
-          getAttributesValues(sectorIndex, categoryIndex, productIndex, i);
-    }
-
-    return result;
-  }
-
-  ///Gets values of an attribute specified by its attributeIndex
-  ///for the product specified with its productIndex,
-  ///and its category specified by its categoryIndex,
-  ///with its sector specified by its sectorIndex.
-  Map<int, String> getAttributesValues(int sectorIndex,
-      int categoryIndex,
-      int productIndex,
-      int attributeIndex,) {
-    Map<int, String> result;
-
-    for (int i = 0;
-    i <
-        sectors[sectorIndex]
-            .categories[categoryIndex]
-            .products[productIndex]
-            .attributes[attributeIndex]
-            .values
-            .length;
-    i++) {
-      result[sectors[sectorIndex]
-          .categories[categoryIndex]
-          .products[productIndex]
-          .attributes[attributeIndex]
-          .values[i]
-          .id] =
-          sectors[sectorIndex]
-              .categories[categoryIndex]
-              .products[productIndex]
-              .attributes[attributeIndex]
-              .values[i]
-              .name;
-    }
-    return result;
-  }
 
   ///Populates the countries list.
   populateCountries(List json) {

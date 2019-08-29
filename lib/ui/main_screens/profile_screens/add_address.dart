@@ -33,8 +33,6 @@ class _AddAddressState extends State<AddAddress> {
 
   bool _waiting = false;
 
-  Future _statesFuture;
-
   _AddAddressState({@required this.onAddAddress});
 
   @override
@@ -70,15 +68,7 @@ class _AddAddressState extends State<AddAddress> {
           children: <Widget>[
             ListView(
               children: <Widget>[
-                CountryAndCity(
-                  onUpdateCountry: (countryId) {
-                    _countryId = countryId;
-                  },
-                  onUpdateState: (stateId) {
-                    _stateId = stateId;
-                    print('State ID $_stateId');
-                  },
-                ),
+
                 Form(
                   key: _key,
                   child: Column(
@@ -86,7 +76,10 @@ class _AddAddressState extends State<AddAddress> {
                       // The First name.
                       Padding(
                         padding: const EdgeInsets.all(10),
-                        child: TextFormField(
+                        child: TextFormField(onEditingComplete: () {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                          ;
+                        },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
@@ -250,6 +243,15 @@ class _AddAddressState extends State<AddAddress> {
                     ],
                   ),
                 ),
+                CountryAndCity(
+                  onUpdateCountry: (countryId) {
+                    _countryId = countryId;
+                  },
+                  onUpdateState: (stateId) {
+                    _stateId = stateId;
+                    print('State ID $_stateId');
+                  },
+                ),
               ],
             ),
             _waiting
@@ -349,10 +351,12 @@ class _CountryAndCityState extends State<CountryAndCity> {
 
   int _countryIndex = 0;
   int _stateIndex = 0;
-  Future _statesFuture;
 
   final Function(int) onUpdateCountry;
   final Function(int) onUpdateState;
+
+  List statesList;
+  bool _waiting = false;
 
   _CountryAndCityState(
       {@required this.onUpdateCountry, @required this.onUpdateState});
@@ -361,145 +365,143 @@ class _CountryAndCityState extends State<CountryAndCity> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _statesFuture =
-        getStatesFromApi(Globals.controller.countries[_countryIndex].id);
+    statesList = List();
     onUpdateState(Globals.controller.countries[_countryIndex].id);
     if (Globals.controller.countries[_countryIndex].states.length >= 1) {
       onUpdateState(
           Globals.controller.countries[_countryIndex].states[_stateIndex].id);
     }
+
+    initStatesList();
+    print('${statesList.length}');
+  }
+
+
+  initStatesList() async {
+    List list = await getStatesFromApi(
+        Globals.controller.countries[_countryIndex].id);
+    setState(() {
+      statesList = list;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: Text('Country:'),
-        ),
-        // Countries drop down.
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                    10),
-                border: Border.all(
-                  color: Colors.black,
-                )),
-            child: DropdownButton(
-              onChanged: (index) {
-                onUpdateCountry(Globals.controller.countries[_countryIndex].id);
-                setState(() {
-                  _countryIndex = index;
-                  _stateIndex = 0;
-                  _statesFuture = getStatesFromApi(
-                      Globals.controller.countries[_countryIndex].id);
-                });
-              },
-              value: _countryIndex,
-              items: List.generate(
-                  Globals.controller.countries.length,
-                      (index) {
-                    return DropdownMenuItem(
-                      child: Text(
-                          Globals.controller
-                              .countries[index].name),
-                      value: index,
-                    );
-                  }),
-            ),
-          ),
-        ),
+
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
 
-            FutureBuilder(
-              future: _statesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData) {
-                    List list = snapshot.data;
-                    Globals.controller.populateStates(
-                        _countryIndex, list);
-                    if (Globals.controller.countries[_countryIndex].states
-                        .length >= 1) {
-                      onUpdateState(
-                          Globals.controller.countries[_countryIndex].states[0]
-                              .id);
-                    }
-                    return Globals.controller
-                        .countries[_countryIndex]
-                        .states.length >= 1 ?
-                    Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('State:'),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(
-                              10.0),
-                          child: Container(
-                            padding: EdgeInsets.only(
-                                left: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius
-                                    .circular(10),
-                                border: Border.all(
-                                  color: Colors.black,
-                                )),
-                            child: DropdownButton(
-                              onChanged: (index) {
-                                setState(() {
-                                  _stateIndex = index;
-                                });
-                                onUpdateState(
-                                    Globals.controller.countries[_countryIndex]
-                                        .states[_stateIndex].id);
-                              },
-                              value: _stateIndex,
-                              items: List.generate(
-                                  Globals.controller
-                                      .countries[_countryIndex]
-                                      .states.length,
-                                      (index) {
-                                    return DropdownMenuItem(
-                                      child: Text(
-                                          Globals
-                                              .controller
-                                              .countries[_countryIndex]
-                                              .states[index]
-                                              .name),
-                                      value: index,
-                                    );
-                                  }),
-                            ),
-                          ),
-                        )
-                      ],
-                    ) :
-                    Container();
-                  }
-                  return Container();
-                }
-                return Column(
-                  children: <Widget>[
-                    Container(
-                      height: 50,
-                      width: 50,
-                      child: CircularProgressIndicator(),
-                    )
-                  ],
-                );
-              },
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Text('Country:'),
             ),
+
+            // Countries drop down.
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.only(left: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                        10),
+                    border: Border.all(
+                      color: Colors.black,
+                    )),
+                child: DropdownButton(
+                  onChanged: (index) async {
+                    List list = await getStatesFromApi(
+                        Globals.controller.countries[index].id);
+                    onUpdateCountry(
+                        Globals.controller.countries[_countryIndex].id);
+                    setState(() {
+                      _countryIndex = index;
+                      _stateIndex = 0;
+                      statesList = list;
+                    });
+                  },
+                  value: _countryIndex,
+                  items: List.generate(
+                      Globals.controller.countries.length,
+                          (index) {
+                        return DropdownMenuItem(
+                          child: Text(
+                              Globals.controller
+                                  .countries[index].name),
+                          value: index,
+                        );
+                      }),
+                ),
+              ),
+            ),
+            statesList.length >= 1 ?
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('State:'),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(
+                      10.0),
+                  child: Container(
+                    padding: EdgeInsets.only(
+                        left: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius
+                            .circular(10),
+                        border: Border.all(
+                          color: Colors.black,
+                        )),
+                    child: DropdownButton(
+                      onChanged: (index) {
+                        setState(() {
+                          _stateIndex = index;
+                        });
+                        onUpdateState(statesList[_stateIndex]['Id']);
+                      },
+                      value: _stateIndex,
+                      items: List.generate(statesList.length, (index) {
+                        return DropdownMenuItem(
+                          child: Text(statesList[index]['Name']),
+                          value: index,
+                        );
+                      }),
+                    ),
+                  ),
+                )
+              ],
+            ) :
+            Container(),
           ],
         ),
+
+        _waiting ?
+        Positioned(
+          bottom: 0.0,
+          top: 0.0,
+          right: 0.0,
+          left: 0.0,
+          child: Container(
+            color: Colors.black.withOpacity(0.5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: CircularProgressIndicator(),
+                  width: 100,
+                  height: 100,
+                )
+              ],
+            ),
+          ),
+        )
+            : Container(),
       ],
     );
   }

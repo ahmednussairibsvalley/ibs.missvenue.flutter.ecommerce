@@ -118,6 +118,7 @@ class _ProductItemState extends State<ProductItem> {
   bool _addedToCart = false;
 
   Future _addedToCartFuture;
+  Future _addedToWishListFuture;
 
   _ProductItemState(this._id, this._title, this._price, this._imagesUrls,
       this._sellingPrice,
@@ -133,6 +134,7 @@ class _ProductItemState extends State<ProductItem> {
       }
     }
     _addedToCartFuture = getCustomerCart(Globals.customerId);
+    _addedToWishListFuture = getCustomerWishList(Globals.customerId);
 //    _addedToWishlist = Globals.controller.containsWishListItem(_id);
     //getCustomerDetails(Globals.customerId)
   }
@@ -157,39 +159,16 @@ class _ProductItemState extends State<ProductItem> {
                             price: _price,
                             imagesUrls: _imagesUrls,
                             sellingPrice: _sellingPrice,
-                            sectorIndex: sectorIndex,
-                            categoryIndex: categoryIndex,
+//                            sectorIndex: sectorIndex,
+//                            categoryIndex: categoryIndex,
                             addedToWishList: _addedToWishlist,
                             addedToCart: _addedToCart,
-                            onUpdateWishList: () async {
-                              Map result = await getCustomerWishList(
-                                  Globals.customerId);
-                              List list = result['Items'];
-
-                              bool added = false;
-                              for (int i = 0; i < list.length; i++) {
-                                if (list[i]['ProductId'] == _id) {
-                                  added = true;
-                                  break;
-                                }
-                              }
+                            onUpdateWishList: () {
                               setState(() {
-                                _addedToWishlist = added;
-                              });
-                            },
-                            onUpdateCart: () async {
-                              Map result = await getCustomerCart(
-                                  Globals.customerId);
-                              List list = result['Items'];
-                              bool added = false;
-                              for (int i = 0; i < list.length; i++) {
-                                if (list[i]['ProductId'] == _id) {
-                                  added = true;
-                                  break;
-                                }
-                              }
-                              setState(() {
-                                _addedToCart = added;
+                                _addedToWishlist =
+                                _addedToWishlist ? false : true;
+                                _addedToCartFuture =
+                                    getCustomerCart(Globals.customerId);
                               });
                             },
                           ),
@@ -296,10 +275,14 @@ class _ProductItemState extends State<ProductItem> {
               ),
             ],
           ),
+
+          // Product name title.
           Padding(
             padding: const EdgeInsets.all(4.0),
             child: Text(_title, maxLines: 1, overflow: TextOverflow.ellipsis,),
           ),
+
+          // Prices and wishlist
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -321,30 +304,61 @@ class _ProductItemState extends State<ProductItem> {
                   : Text('$_price SR'),
 
               // Add to wishlist.
-              GestureDetector(
-                onTap: () async {
-                  if (!_addedToWishlist) {
-                    Map addedToWishListMap = await addToWishList(_id);
-                    if (addedToWishListMap != null &&
-                        addedToWishListMap['result'] == true) {
-                      setState(() {
-                        _addedToWishlist = true;
-                      });
+              FutureBuilder(
+                future: _addedToWishListFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      List list = snapshot.data['Items'];
+                      for (int i = 0; i < list.length; i++) {
+                        if (list[i]['ProductId'] == _id) {
+                          _addedToWishlist = true;
+                          break;
+                        }
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          if (!_addedToWishlist) {
+                            Map addedToWishlistMap = await addToWishList(_id);
+                            if (addedToWishlistMap != null &&
+                                addedToWishlistMap['result']) {
+                              setState(() {
+                                _addedToWishlist = true;
+                                _addedToWishListFuture =
+                                    getCustomerWishList(Globals.customerId);
+                              });
+                            }
+                          } else {
+                            Map removeFromWishListApi = await removeFromWishList(
+                                _id);
+                            if (removeFromWishListApi != null &&
+                                removeFromWishListApi['result']) {
+                              setState(() {
+                                _addedToWishlist = false;
+                                _addedToWishListFuture =
+                                    getCustomerWishList(Globals.customerId);
+                              });
+                            }
+                          }
+                        },
+                        child: _addedToWishlist ?
+                        Icon(Icons.favorite, color: Colors.red, size: 30,)
+                            : Icon(
+                          Icons.favorite_border, color: Colors.red, size: 30,),
+                      );
                     }
-                  } else {
-                    Map removedFromWishListApi = await removeFromWishList(_id);
-                    if (removedFromWishListApi != null &&
-                        removedFromWishListApi['result']) {
-                      setState(() {
-                        _addedToWishlist = false;
-                      });
-                    }
+                    return Container();
                   }
-
+                  return Column(
+                    children: <Widget>[
+                      Container(
+                        height: 30,
+                        width: 30,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
+                  );
                 },
-                child: _addedToWishlist?
-                Icon(Icons.favorite, color: Colors.red, size: 30,)
-                    :Icon(Icons.favorite_border, color: Colors.red, size: 30,),
               ),
             ],
           ),
